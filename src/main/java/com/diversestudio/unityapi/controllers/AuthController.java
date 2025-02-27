@@ -1,7 +1,8 @@
-package com.diversestudio.unityapi;
+package com.diversestudio.unityapi.controllers;
 
 
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

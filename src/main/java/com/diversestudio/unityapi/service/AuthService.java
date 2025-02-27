@@ -1,4 +1,4 @@
-package com.diversestudio.unityapi;
+package com.diversestudio.unityapi.service;
 
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.repository.UserRepository;

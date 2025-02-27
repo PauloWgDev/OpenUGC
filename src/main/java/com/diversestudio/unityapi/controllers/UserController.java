@@ -1,6 +1,5 @@
 package com.diversestudio.unityapi.controllers;
 
-
 import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.entities.User;
 import org.springframework.http.ResponseEntity;
