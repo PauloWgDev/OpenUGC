@@ -1,6 +1,7 @@
 package com.diversestudio.unityapi.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +35,6 @@ public class Content {
     private int version;
 
     @OneToOne(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private ContentDates contentDates;
 }

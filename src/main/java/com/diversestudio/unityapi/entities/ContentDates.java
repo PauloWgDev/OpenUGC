@@ -1,6 +1,6 @@
 package com.diversestudio.unityapi.entities;
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +24,8 @@ public class ContentDates {
 
 
     @OneToOne
-    @MapsId
+    @MapsId // Ensures content_id is the same as in Content
     @JoinColumn(name = "content_id")
+    @JsonBackReference
     private Content content;
 }

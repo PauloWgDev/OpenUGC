@@ -1,11 +1,10 @@
 package com.diversestudio.unityapi.controllers;
 
 import com.diversestudio.unityapi.dto.ContentDTO;
+import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.service.ContentService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,4 +23,11 @@ public class ContentController {
         List<ContentDTO> contentList = contentService.getAllContent();
         return ResponseEntity.ok(contentList);
     }
+
+    // POST api/content- Create new content
+    @PostMapping ResponseEntity<Content> createContent(@RequestParam Long userId, @RequestBody Content content) {
+        Content savedContent = contentService.createContent(userId, content);
+        return ResponseEntity.ok(savedContent);
+    }
+
 }
