@@ -23,7 +23,7 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    // 🔹 Retrieve a single user by ID
+    // Retrieve a single user by ID
     @GetMapping("/{id}")
     public Optional<ResponseEntity<User>> getUserById(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
@@ -31,7 +31,7 @@ public class UserController {
     }
 
 
-    // 🔹 Create a new user
+    // Create a new user
     @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody User user) {
         // Check if username already exists
