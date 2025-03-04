@@ -26,4 +26,4 @@ Registering a user will create a new entry in the **users** table of the databas
     "username": "random_username",
     "credential": "password_here"
   }
-```
+
