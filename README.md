@@ -7,11 +7,10 @@ This REST API serves as an intermediary between a PostgreSQL database and Unity,
 Unity's official UGC has been on Beta for years already and it lacks some crucial functionalities that any UGC system should have. 
 As a response we decided to create our own UGC system.
 
-## How to set up?
+## Requirements
 
 - Set up a postgreSQL database with tables for `user`, `content`, `rating`, `download`, `content_dates`. 
 - Create an application.properties file where you define the domain of your postgre database.
-- Run the API.
 
 ---
 
