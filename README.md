@@ -1,6 +1,6 @@
 # API for Unofficial Unity's User Generated Content (U3GC)
 
-This REST API serves as a bridge between a PostgreSQL database and Unity, enabling seamless integration of user-generated content (UGC) into your Unity projects.
+This REST API serves as an intermediary between a PostgreSQL database and Unity, enabling an easy integration of user-generated content (UGC) into your Unity projects.
 
 ---
 
