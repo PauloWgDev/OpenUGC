@@ -85,6 +85,14 @@ Authenticates a user and returns a token.
   }
   ```
 
+#### Sucessfull Rensponse Examplejson
+
+```json
+{
+"token": "eyJhbGciOiJIUzM4NCJ9..."
+}
+```
+
 #### Response
 
 * `200 OK` – Returns JWT token
@@ -153,7 +161,7 @@ Uploads new user-generated content.
   }
   ```
 
-#### Response 
+#### Response
 
 ```json
 {
@@ -180,14 +188,9 @@ Uploads new user-generated content.
 * `201 Created` – Content successfully uploaded
 * `403 Forbidden` – Invalid or missing token / User does not exist
 
-
 ---
 
-
-
-
 ## Summary of API Endpoints
-
 
 
 | Method | Endpoint                   | Description                        |
