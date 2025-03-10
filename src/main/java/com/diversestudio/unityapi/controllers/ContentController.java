@@ -29,5 +29,4 @@ public class ContentController {
         Content savedContent = contentService.createContent(userId, content);
         return ResponseEntity.ok(savedContent);
     }
-
 }
