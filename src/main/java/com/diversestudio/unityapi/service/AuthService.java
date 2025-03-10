@@ -38,7 +38,7 @@ public class AuthService {
 
         // Check if the username already exists
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new UsernameAlreadyExistsException("403 Forbidden – Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
 
         user.setCredential(passwordEncoder.encode(user.getCredential())); // Encrypt password
