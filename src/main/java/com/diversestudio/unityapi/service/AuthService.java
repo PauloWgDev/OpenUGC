@@ -3,6 +3,7 @@ package com.diversestudio.unityapi.service;
 import com.diversestudio.unityapi.dto.AuthRequest;
 import com.diversestudio.unityapi.dto.AuthResponse;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.exeption.UsernameAlreadyExistsException;
 import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,12 @@ public class AuthService {
     }
 
     public String register(User user) {
+
+        // Check if the username already exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new UsernameAlreadyExistsException("403 Forbidden – Username already exists");
+        }
+
         user.setCredential(passwordEncoder.encode(user.getCredential())); // Encrypt password
         userRepository.save(user);
         return "User registered successfully!";
