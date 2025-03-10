@@ -66,17 +66,7 @@ Registers a new user in the users table.
 
 ### Login
 
-Login will search the username in the database and will make sure the credential is the correct one.
-
-- **Successful login:** Returns
-
-```json
-{
-    "token": "eyJhbGciOiJIUzM4NCJ..."
-}
-```
-
-- **Failure (e.g., username already exists):** Returns `"403 Forbidden"`
+Authenticates a user and returns a token.
 
 #### Endpoint for Login:
 
@@ -95,13 +85,27 @@ Login will search the username in the database and will make sure the credential
   }
   ```
 
+#### Response
+
+* `200 OK` – Returns JWT token
+* `403 Forbidden` – Invalid username or password
+
 ---
 
-## Contents
+## Contents Management
 
-### Retrieve Content
+### Retrieve All Content
 
-It will return a json with the following format
+Retrieves all user-generated content.
+
+#### Endpoint retrieve all contents
+
+- URL:
+  `GET http://<your-domain>/api/content`
+- **Headers:**
+  - `Authorization: Bearer <token>"`
+
+#### Response Example
 
 ```js
 [
@@ -115,34 +119,41 @@ It will return a json with the following format
         "version": 1,
         "createdAt": "2025-02-25T19:02:10.914+00:00",
         "updatedAt": "2025-02-25T19:02:10.914+00:00"
-    },
-    {
-        "contentId": 6,
-        "creatorId": 2,
-        "creatorName": "TomatoHead",
-        "data": "some data",
-        "name": "Very Epic Content",
-        "description": "This is a very Epic content",
-        "version": 1,
-        "createdAt": "2025-02-27T04:41:01.025+00:00",
-        "updatedAt": "2025-02-27T04:41:01.025+00:00"
-    },
+    },...
 ]
 ```
 
-#### Endpoint retrieve all contents:
+#### Responses
 
-- URL:
-  `GET http://<your-domain>/api/content`
-- **Headers:**
-  - **Key:** `Authorization`
-  - **Value:** `Bearer eyJhbGciOiJIUzM4NCJ..."`
+* `200 OK` – Returns content list
+* `403 Forbidden` – Invalid or missing token
+* `500 Internal Server Error` – Database issue
 
 ### Upload Content
 
-Creates a new Content entry in the database, the content has to be associated with an existing user.
+Uploads new user-generated content.
 
-A successfull Post will return something like:
+#### Endpoint
+
+- URL:
+  `POST http://<your-domain>/content?userId={id}`
+- **Headers:**
+
+  - **Key:** `Authorization`
+  - **Value:** `Bearer eyJhbGciOiJIUzM4NCJ..."`
+-
+- **Body:**
+
+  ```json
+  {
+             "data": "This is some data",
+             "name": "New Content",
+             "description": "This is just a test",
+             "version": 1
+  }
+  ```
+
+#### Response 
 
 ```json
 {
@@ -164,27 +175,24 @@ A successfull Post will return something like:
 }
 ```
 
-An unsuccessfull post will return `403 Forbidden`. It can be unsuccessfull for two reasons:
+##### Responses:
 
-- Incorrect Authorization
-- The user id used does not exist
+* `201 Created` – Content successfully uploaded
+* `403 Forbidden` – Invalid or missing token / User does not exist
 
-#### Endpoint uploading content:
 
-- URL:
-  `POST http://<your-domain>/content?userId={id}`
-- **Headers:**
+---
 
-  - **Key:** `Authorization`
-  - **Value:** `Bearer eyJhbGciOiJIUzM4NCJ..."`
--
-- **Body:**
 
-  ```json
-  {
-             "data": "This is some data",
-             "name": "New Content",
-             "description": "This is just a test",
-             "version": 1
-  }
-  ```
+
+
+## Summary of API Endpoints
+
+
+
+| Method | Endpoint                   | Description                        |
+| ------ | -------------------------- | ---------------------------------- |
+| `POST` | `/api/auth/register`       | Registers a new user               |
+| `POST` | `/api/auth/login`          | Logs in a user and returns a token |
+| `GET`  | `/api/content`             | Retrieves all content              |
+| `POST` | `/api/content?userId={id}` | Uploads new content                |
