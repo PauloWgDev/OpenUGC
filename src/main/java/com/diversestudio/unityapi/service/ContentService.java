@@ -28,6 +28,11 @@ public class ContentService {
         return contentRepository.findAllContentWithDates();
     }
 
+    public Optional<ContentDTO> getContentById(Long id) {
+        return contentRepository.findContentDTOById(id);
+    }
+
+
     @Transactional
     public Content createContent(Long userId, Content content) {
         // Fetch the user from the database
