@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/content")
@@ -18,10 +19,17 @@ public class ContentController {
     }
 
     // GET /api/content - Fetch all content with timestamps
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<ContentDTO>> getAllContent() {
         List<ContentDTO> contentList = contentService.getAllContent();
         return ResponseEntity.ok(contentList);
+    }
+
+    // GET /api/content/{id} - fetch a specific content based on its id
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<ContentDTO>> getContent(@PathVariable Long id) {
+        Optional<ContentDTO> content = contentService.getContentById(id);
+        return ResponseEntity.ok(content);
     }
 
     // POST api/content- Create new content

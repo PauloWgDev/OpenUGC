@@ -85,7 +85,7 @@ Authenticates a user and returns a token.
   }
   ```
 
-#### Sucessfull Rensponse Examplejson
+#### Sucessfull Rensponse Example:
 
 ```json
 {
