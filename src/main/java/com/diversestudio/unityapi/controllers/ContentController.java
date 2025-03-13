@@ -32,7 +32,7 @@ public class ContentController {
         return ResponseEntity.ok(content);
     }
 
-    // POST api/content- Create new content
+    // POST api/content?userId=1- Create new content
     @PostMapping ResponseEntity<Content> createContent(@RequestParam Long userId, @RequestBody Content content) {
         Content savedContent = contentService.createContent(userId, content);
         return ResponseEntity.ok(savedContent);
