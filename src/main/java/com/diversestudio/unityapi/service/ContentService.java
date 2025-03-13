@@ -48,8 +48,8 @@ public class ContentService {
         ContentDates contentDates = new ContentDates();
         Timestamp now = Timestamp.from(Instant.now());
 
-        contentDates.setCreated_at(now);
-        contentDates.setUpdated_at(now);
+        contentDates.setCreatedAt(now);
+        contentDates.setUpdatedAt(now);
         contentDates.setContent(content);
 
         content.setContentDates(contentDates);

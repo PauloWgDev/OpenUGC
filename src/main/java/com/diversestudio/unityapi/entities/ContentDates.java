@@ -14,13 +14,13 @@ import java.sql.Timestamp;
 public class ContentDates {
 
     @Id
-    private Long content_id;
+    private Long contentId;
 
     @Column(nullable = false, updatable = false)
-    private Timestamp created_at;
+    private Timestamp createdAt;
 
     @Column(nullable = false)
-    private Timestamp updated_at;
+    private Timestamp updatedAt;
 
 
     @OneToOne

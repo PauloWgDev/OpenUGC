@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
-
 @Entity
 @Table(name = "content")
 @Getter
@@ -16,7 +14,7 @@ public class Content {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
-    private Long content_id;
+    private Long contentId;
 
     @Column(nullable = false)
     private String data;

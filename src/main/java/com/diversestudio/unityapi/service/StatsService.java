@@ -1,6 +1,6 @@
 package com.diversestudio.unityapi.service;
 
-import com.diversestudio.unityapi.dto.StatsResponse;
+import com.diversestudio.unityapi.dto.StatsDTO;
 import com.diversestudio.unityapi.repository.StatsRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ public class StatsService {
         this.statsRepository = statsRepository;
     }
 
-    public StatsResponse getStats(Long contentId)
+    public StatsDTO getStats(Long contentId)
     {
         return statsRepository.findStatsByContentId(contentId);
     }

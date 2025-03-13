@@ -1,6 +1,6 @@
 package com.diversestudio.unityapi.repository;
 
-import com.diversestudio.unityapi.dto.StatsResponse;
+import com.diversestudio.unityapi.dto.StatsDTO;
 import com.diversestudio.unityapi.entities.Content;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -20,5 +20,5 @@ public interface StatsRepository extends CrudRepository<Content, Long> {
             "FROM content " +
             "WHERE content_id = :contentId",
             nativeQuery = true)
-    StatsResponse findStatsByContentId(@Param("contentId") Long contentId);
+    StatsDTO findStatsByContentId(@Param("contentId") Long contentId);
 }

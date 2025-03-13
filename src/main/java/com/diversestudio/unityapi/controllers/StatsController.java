@@ -1,6 +1,6 @@
 package com.diversestudio.unityapi.controllers;
 
-import com.diversestudio.unityapi.dto.StatsResponse;
+import com.diversestudio.unityapi.dto.StatsDTO;
 import com.diversestudio.unityapi.service.StatsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,9 @@ public class StatsController {
 
     // GET /api/stats/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<StatsResponse> getStats(@PathVariable("id") Long contentId)
+    public ResponseEntity<StatsDTO> getStats(@PathVariable("id") Long contentId)
     {
-        StatsResponse stats = statsService.getStats(contentId);
+        StatsDTO stats = statsService.getStats(contentId);
         return ResponseEntity.ok(stats);
     }
 }
