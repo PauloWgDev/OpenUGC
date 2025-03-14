@@ -1,5 +1,6 @@
 package com.diversestudio.unityapi.service;
 
+import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.entities.ContentDates;
@@ -34,24 +35,28 @@ public class ContentService {
 
 
     @Transactional
-    public Content createContent(Long userId, Content content) {
+    public Content createContent(ContentCreationDTO dto) {
+
         // Fetch the user from the database
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(dto.creatorId());
         if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User with ID " + userId + " not found.");
+            throw new IllegalArgumentException("User with ID " + dto.creatorId() + " not found.");
         }
 
-        content.setCreator(userOptional.get()); // Associate the user
+        // Map DTO fields to the Content entity
+        Content content = new Content();
+        content.setName(dto.name());
+        content.setDescription(dto.description());
+        content.setData(dto.data());
+        content.setVersion(dto.version());
+        content.setCreator(userOptional.get());
 
-        // Create a new ContentDates object
-
+        // Create and set ContentDates
         ContentDates contentDates = new ContentDates();
         Timestamp now = Timestamp.from(Instant.now());
-
         contentDates.setCreatedAt(now);
         contentDates.setUpdatedAt(now);
         contentDates.setContent(content);
-
         content.setContentDates(contentDates);
 
         return contentRepository.save(content);
