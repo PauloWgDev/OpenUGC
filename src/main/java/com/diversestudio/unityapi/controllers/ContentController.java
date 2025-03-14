@@ -1,5 +1,6 @@
 package com.diversestudio.unityapi.controllers;
 
+import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.service.ContentService;
@@ -32,9 +33,9 @@ public class ContentController {
         return ResponseEntity.ok(content);
     }
 
-    // POST api/content?userId=1- Create new content
-    @PostMapping ResponseEntity<Content> createContent(@RequestParam Long userId, @RequestBody Content content) {
-        Content savedContent = contentService.createContent(userId, content);
+    // POST api/content- Create new content
+    @PostMapping ResponseEntity<Content> createContent(@RequestBody ContentCreationDTO contentCreationDTO) {
+        Content savedContent = contentService.createContent(contentCreationDTO);
         return ResponseEntity.ok(savedContent);
     }
 }
