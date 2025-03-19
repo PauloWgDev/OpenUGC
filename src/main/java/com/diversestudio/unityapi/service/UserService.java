@@ -34,7 +34,12 @@ public class UserService {
              user.getUserId(),
              user.getUsername(),
              user.getJoinedAt(),
-             user.getRole() != null ? user.getRole().getRoleName() : null
+             user.getRole() != null ? user.getRole().getRoleName() : null,
+             user.getProfilePicture(),
+             user.getAboutMe(),
+             0, // i should get the statists values
+             0,
+             0f
      );
     }
 }

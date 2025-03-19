@@ -7,6 +7,8 @@ import com.diversestudio.unityapi.entities.ContentDates;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.repository.ContentRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -36,11 +38,16 @@ public class ContentService {
 
     @Transactional
     public Content createContent(ContentCreationDTO dto) {
+        // Retrieve the currently authenticated user's id from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userIdStr = authentication.getName();
+        Long creatorId = Long.parseLong(userIdStr);
+
 
         // Fetch the user from the database
-        Optional<User> userOptional = userRepository.findById(dto.creatorId());
+        Optional<User> userOptional = userRepository.findById(creatorId);
         if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User with ID " + dto.creatorId() + " not found.");
+            throw new IllegalArgumentException("User with ID " + creatorId + " not found.");
         }
 
         // Map DTO fields to the Content entity

@@ -2,16 +2,12 @@ package com.diversestudio.unityapi.controllers;
 
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
-import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,7 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-
     // Retrieve a single user by ID
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
@@ -32,7 +27,6 @@ public class UserController {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return ResponseEntity.ok(userDto);
     }
-
 
     // Create a new user (registration)
     @PostMapping
