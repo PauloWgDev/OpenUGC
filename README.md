@@ -144,22 +144,26 @@ Uploads new user-generated content.
 #### Endpoint
 
 - URL:
-  `POST http://<your-domain>/content?userId={id}`
+  `POST http://<your-domain>/content`
 - **Headers:**
 
   - **Key:** `Authorization`
   - **Value:** `Bearer eyJhbGciOiJIUzM4NCJ..."`
 -
 - **Body:**
-
   ```json
   {
-             "data": "This is some data",
-             "name": "New Content",
-             "description": "This is just a test",
-             "version": 1
+    "creatorId": 4,
+    "name": "New Content",
+    "description": "This is just a test",
+    "version": 1,
+    "data": "This is some data",
+    "thumbnail": "base64encodedImage",
+    "tags": ["tag1", "tag2"]
   }
   ```
+
+**thumbnail and tags are optional, you don't have to include them in the body if your not going to upload any.**
 
 #### Response
 
@@ -198,4 +202,4 @@ Uploads new user-generated content.
 | `POST` | `/api/auth/register`       | Registers a new user               |
 | `POST` | `/api/auth/login`          | Logs in a user and returns a token |
 | `GET`  | `/api/content`             | Retrieves all content              |
-| `POST` | `/api/content?userId={id}` | Uploads new content                |
+| `POST` | `/api/content`             | Uploads new content                |
