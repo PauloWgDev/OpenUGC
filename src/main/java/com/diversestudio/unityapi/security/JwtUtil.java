@@ -27,9 +27,10 @@ public class JwtUtil {
     }
 
     // Generates a JWT token for a given username and role
-    public String generateToken(String username, Collection<String> roles) {
+    public String generateToken(Long userId, String username, Collection<String> roles) {
         return Jwts.builder()
-                .subject(username)
+                .subject(userId.toString())
+                .claim("username", username)
                 .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -52,14 +53,20 @@ public class JwtUtil {
                 .collect(Collectors.toList());
     }
 
+    public Long extractUserId(String token)
+    {
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        return Long.parseLong(claims.getSubject());
+    }
+
+
     // Extract username from the token
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+                .getPayload().get("username", String.class);
     }
 
     public boolean validateToken(String token, String username) {

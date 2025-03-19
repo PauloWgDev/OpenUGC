@@ -36,7 +36,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid credentials");
         }
 
-        String token = jwtUtil.generateToken(userOptional.get().getUsername(), Collections.singletonList(userOptional.get().getRole().getRoleName()));
+        String token = jwtUtil.generateToken(userOptional.get().getUserId(), userOptional.get().getUsername(), Collections.singletonList(userOptional.get().getRole().getRoleName()));
         return new AuthResponse(token);
     }
 

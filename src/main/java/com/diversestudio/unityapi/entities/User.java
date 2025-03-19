@@ -28,4 +28,10 @@ public class User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @Column(name = "profile_picture")
+    private String profilePicture;
+
+    @Column(name = "about_me", columnDefinition = "TEXT")
+    private String aboutMe;
 }

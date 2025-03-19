@@ -34,15 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
             try {
-                String username = jwtUtil.extractUsername(token);
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                Long userId = jwtUtil.extractUserId(token);
+                if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                     // Extract the authorities from the token
                     Collection<? extends GrantedAuthority> authorities = jwtUtil.extractAuthorities(token);
 
                     // Create an authentication token with empty authorities for now.
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
+                            new UsernamePasswordAuthenticationToken(userId.toString(), null, authorities);
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
