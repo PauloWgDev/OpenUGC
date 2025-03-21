@@ -20,7 +20,6 @@ public class UserController {
     }
 
     // Retrieve a single user by ID
-    //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         UserDTO userDto = userService.getUserById(id)
