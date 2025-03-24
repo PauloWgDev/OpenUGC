@@ -4,10 +4,12 @@ import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.service.ContentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,8 +23,12 @@ public class ContentController {
 
     // GET /api/content - Fetch all content with timestamps
     @GetMapping()
-    public ResponseEntity<List<ContentDTO>> getAllContent() {
-        List<ContentDTO> contentList = contentService.getAllContent();
+    public ResponseEntity<Page<ContentDTO>> getAllContent(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size)
+    {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ContentDTO> contentList = contentService.getAllContent(pageable);
         return ResponseEntity.ok(contentList);
     }
 
