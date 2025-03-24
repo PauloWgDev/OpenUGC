@@ -7,9 +7,11 @@ import com.diversestudio.unityapi.entities.ContentDates;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.repository.ContentRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -27,8 +29,8 @@ public class ContentService {
         this.userRepository = userRepository;
     }
 
-    public List<ContentDTO> getAllContent() {
-        return contentRepository.findAllContentWithDates();
+    public Page<ContentDTO> getAllContent(Pageable pageable) {
+        return contentRepository.findAllContentWithDates(pageable);
     }
 
     public Optional<ContentDTO> getContentById(Long id) {
