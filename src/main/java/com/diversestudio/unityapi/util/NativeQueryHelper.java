@@ -23,4 +23,12 @@ public class NativeQueryHelper {
     public String getFindSingleContent() {
         return queryProvider.getFindSingleContent();
     }
+    public String getWhereFilter() {
+        return queryProvider.getWhereFilter();
+    }
+
+    public String getOrderBySimilarity() {
+        return queryProvider.getOrderBySimilarity();
+    }
+
 }

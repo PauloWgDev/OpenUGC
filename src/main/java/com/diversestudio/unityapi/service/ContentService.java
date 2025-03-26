@@ -37,11 +37,7 @@ public class ContentService {
     public Sort StringToSort(String s) {
         String[] sortParams = s.split(",");
         String property = sortParams[0];
-        // If the client asks for sorting by createdAt or updatedAt,
-        // map it to the associated property path in the entity.
-        /*if ("created_at".equals(property) || "updated_at".equals(property)) {
-            property = "cd." + property;
-        }*/
+
         if (sortParams.length == 2 && "desc".equalsIgnoreCase(sortParams[1])) {
             return Sort.by(property).descending();
         }
@@ -61,7 +57,7 @@ public class ContentService {
         // If a prompt is provided, decide how to incorporate it:
         if (prompt != null && !prompt.isEmpty()) {
             // If your base query doesn't already have a WHERE clause, add one:
-            sqlBuilder.append(" WHERE c.name ILIKE CONCAT('%', :prompt, '%')");
+            sqlBuilder.append(nativeQueryHelper.getWhereFilter());
         }
 
         // Now build dynamic ORDER BY.
@@ -83,7 +79,7 @@ public class ContentService {
         }
         // If no sort is provided but a prompt is present, sort by similarity.
         else if (prompt != null && !prompt.isEmpty()) {
-            sqlBuilder.append(" ORDER BY similarity(c.name, :prompt) DESC");
+            sqlBuilder.append(nativeQueryHelper.getOrderBySimilarity());
         }
         // Otherwise, use default sort.
         else {
