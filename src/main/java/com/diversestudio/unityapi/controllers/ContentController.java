@@ -7,6 +7,7 @@ import com.diversestudio.unityapi.service.ContentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +25,14 @@ public class ContentController {
     // GET /api/content - Fetch all content with timestamps
     @GetMapping()
     public ResponseEntity<Page<ContentDTO>> getAllContent(
+            @RequestParam(defaultValue = "") String prompt,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size)
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort)
     {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ContentDTO> contentList = contentService.getAllContent(pageable);
+        Sort sortOrder = contentService.StringToSort(sort);
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Page<ContentDTO> contentList = contentService.getAllContent(prompt, pageable);
         return ResponseEntity.ok(contentList);
     }
 
