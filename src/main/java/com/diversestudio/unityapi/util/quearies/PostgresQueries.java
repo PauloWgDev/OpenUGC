@@ -56,4 +56,14 @@ public class PostgresQueries implements QueryProvider {
                         "JOIN users u ON c.creator = u.user_id " +
                         "WHERE c.content_id = :id";
     }
+
+    @Override
+    public String getWhereFilter() {
+        return " WHERE c.name ILIKE CONCAT('%', :prompt, '%')";
+    }
+
+    @Override
+    public String getOrderBySimilarity() {
+        return " ORDER BY similarity(c.name, :prompt) DESC";
+    }
 }
