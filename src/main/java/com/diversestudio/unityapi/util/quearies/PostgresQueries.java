@@ -57,13 +57,32 @@ public class PostgresQueries implements QueryProvider {
                         "WHERE c.content_id = :id";
     }
 
+    // can this take a String as an argument that will be the column from which it will be filtered
     @Override
-    public String getWhereFilter() {
-        return " WHERE c.name ILIKE CONCAT('%', :prompt, '%')";
+    public String getWhereFilter(String columnName) {
+        return " WHERE " + columnName + " ILIKE CONCAT('%', :prompt, '%')";
     }
 
     @Override
-    public String getOrderBySimilarity() {
-        return " ORDER BY similarity(c.name, :prompt) DESC";
+    public String getOrderBySimilarity(String columnName)
+    {
+        return " ORDER BY similarity(" + columnName +", :prompt) DESC";
+    }
+
+    @Override
+    public String getFindAllUsers()
+    {
+        return "SELECT " +
+                " u.user_id AS userId, " +
+                " u.username AS username, " +
+                " u.joined_at AS joinedAt, " +
+                " r.role_name AS role, " +
+                " u.profile_picture AS profilePicture, " +
+                " u.about_me AS aboutMe, " +
+                " (SELECT COUNT(*) FROM downloads WHERE user_id = u.user_id) AS downloadsPerformed, " +
+                " (SELECT COUNT(*) FROM downloads d JOIN content c ON d.content_id = c.content_id WHERE c.creator = u.user_id) AS downloadReceived, " +
+                " (SELECT COALESCE(AVG(r.rating), 0) FROM rating r JOIN content c ON r.content_id = c.content_id WHERE c.creator = u.user_id) AS averageRatingsReceive " +
+                "FROM users u " +
+                "JOIN roles r ON u.role_id = r.role_id";
     }
 }

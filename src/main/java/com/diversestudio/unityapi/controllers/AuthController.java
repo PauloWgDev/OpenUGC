@@ -17,11 +17,24 @@ public class AuthController {
         this.authService = authService;
     }
 
+
+    /**
+     * POST /api/auth/register - Registers a new user in the system.
+     *
+     * @param user the {@link User} object containing user registration details
+     * @return a {@link ResponseEntity} with a success message or error description
+     */
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
         return ResponseEntity.ok(authService.register(user));
     }
 
+    /**
+     * POST /api/auth/login - Authenticates a user and returns an authentication token if valid.
+     *
+     * @param request the {@link AuthRequest} containing login credentials (e.g., username and password)
+     * @return a {@link ResponseEntity} containing an {@link AuthResponse} with the authentication token
+     */
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
