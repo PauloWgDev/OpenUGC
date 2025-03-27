@@ -13,7 +13,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +33,6 @@ public class ContentService {
     private final UserRepository userRepository;
     private final NativeQueryHelper nativeQueryHelper;
 
-    public Sort StringToSort(String s) {
-        String[] sortParams = s.split(",");
-        String property = sortParams[0];
-
-        if (sortParams.length == 2 && "desc".equalsIgnoreCase(sortParams[1])) {
-            return Sort.by(property).descending();
-        }
-        return Sort.by(property).ascending();
-    }
-
 
     public ContentService(ContentRepository contentRepository, UserRepository userRepository, NativeQueryHelper nativeQueryHelper){
         this.contentRepository = contentRepository;
@@ -54,10 +43,9 @@ public class ContentService {
     public Page<ContentDTO> getAllContent(String prompt, Pageable pageable) {
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
 
-        // If a prompt is provided, decide how to incorporate it:
+        // If a prompt is provided, add filtering:
         if (prompt != null && !prompt.isEmpty()) {
-            // If your base query doesn't already have a WHERE clause, add one:
-            sqlBuilder.append(nativeQueryHelper.getWhereFilter());
+            sqlBuilder.append(nativeQueryHelper.getWhereFilter("c.name"));
         }
 
         // Now build dynamic ORDER BY.
@@ -79,7 +67,7 @@ public class ContentService {
         }
         // If no sort is provided but a prompt is present, sort by similarity.
         else if (prompt != null && !prompt.isEmpty()) {
-            sqlBuilder.append(nativeQueryHelper.getOrderBySimilarity());
+            sqlBuilder.append(nativeQueryHelper.getOrderBySimilarity("c.name"));
         }
         // Otherwise, use default sort.
         else {
