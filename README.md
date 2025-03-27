@@ -10,31 +10,37 @@ As a response we decided to create our own UGC system.
 ## Requirements
 
 - Set up a postgreSQL database with tables for `user`, `content`, `rating`, `download`, `content_dates`.
-- Configure your `<span>application.properties</span>` file with the database connection details:
-  
-  ```
-  spring.application.name=unity-api
-  
-  # Database configuration
-  
-  # Database Configuration
-  spring.datasource.url=jdbc:postgresql://localhost:5433/U3GC
-  spring.datasource.username=your_user
-  spring.datasource.password=your_password
-  spring.jpa.hibernate.ddl-auto=update
-  spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-  
-  # Server Port
-  server.port=8080
-  
-  # Flyway Migration Configuration
-  spring.flyway.baseline-on-migrate=true
-  spring.flyway.baseline-version=1
-  
-  
-  # Authentication key
-  jwt.secret=aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!
-  ```
+- Configure your `application.properties` file with the database connection details:
+
+```
+spring.application.name=unity-api
+
+
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5433/U3GC
+spring.datasource.username=postgres
+spring.datasource.password=F11215125
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Server Port
+server.port=8080
+
+# Flyway Migration Configuration
+spring.flyway.baseline-on-migrate=true
+spring.flyway.baseline-version=1
+
+
+# Authentication key
+jwt.secret=aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!
+
+# Define Profile for DB
+spring.profiles.active=postgres
+
+# Debug (optional)
+logging.level.org.springframework.security=DEBUG
+```
+
 - Ensure your database schema includes the necessary tables. Consider using Flyway for migrations.
 
 ---
@@ -282,7 +288,6 @@ Uploads new user-generated content.
 
 ## Summary of API Endpoints
 
-
 | Method | Endpoint             | Description                                                        |
 |------- |---------------------|--------------------------------------------------------------------|
 | POST   | /api/auth/register   | Registers a new user.                                              |
@@ -290,6 +295,4 @@ Uploads new user-generated content.
 | GET    | /api/content          | Retrieves all content with search, pagination, and sorting options.|
 | GET    | /api/content/{id}     | Retrieves a specific content item by its ID.                       |
 | POST   | /api/content          | Uploads new content.                                               |
-
-
 
