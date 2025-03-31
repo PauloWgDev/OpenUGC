@@ -114,7 +114,7 @@ public class UserService {
              user.getRole() != null ? user.getRole().getRoleName() : null,
              user.getProfilePicture(),
              user.getAboutMe(),
-             downloadsPerformed, // i should get the statists values
+             downloadsPerformed,
              downloadsReceived,
              averageRating
      );
