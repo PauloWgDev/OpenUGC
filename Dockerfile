@@ -8,11 +8,11 @@ WORKDIR /app
 COPY . .
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests -Dmaven.test.skip=true
 
 # Expose the port that Render will assign (Render injects it via $PORT)
 EXPOSE 8080
 
 # Run the jar file
-CMD ["java", "-jar", "target/unity-api-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/unityapi-0.0.1-SNAPSHOT.jar"]
 
