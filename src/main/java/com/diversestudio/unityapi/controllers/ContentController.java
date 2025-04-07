@@ -33,6 +33,7 @@ public class ContentController {
      * @param page the page number to retrieve (default: 0)
      * @param size the number of items per page (default: 10)
      * @param sort the sorting criteria in the format "property,direction" (e.g., "createdAt,desc")
+     * @param creatorId if set only will return results of contents where this its creator is this creatorId
      * @return a {@link ResponseEntity} containing a page of {@link ContentDTO} objects
      */
     @GetMapping()
@@ -40,11 +41,12 @@ public class ContentController {
             @RequestParam(defaultValue = "") String prompt,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort)
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @RequestParam(required = false) Integer creatorId)
     {
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<ContentDTO> contentList = contentService.getAllContent(prompt, pageable);
+        Page<ContentDTO> contentList = contentService.getAllContents(prompt, creatorId,pageable);
         return ResponseEntity.ok(contentList);
     }
 

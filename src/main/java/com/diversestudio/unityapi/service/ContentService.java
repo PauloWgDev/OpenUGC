@@ -34,20 +34,16 @@ public class ContentService {
     private final NativeQueryHelper nativeQueryHelper;
 
 
+
     public ContentService(ContentRepository contentRepository, UserRepository userRepository, NativeQueryHelper nativeQueryHelper){
         this.contentRepository = contentRepository;
         this.userRepository = userRepository;
         this.nativeQueryHelper = nativeQueryHelper;
     }
 
-    public Page<ContentDTO> getAllContent(String prompt, Pageable pageable) {
-        StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
 
-        // If a prompt is provided, add filtering:
-        if (prompt != null && !prompt.isEmpty()) {
-            sqlBuilder.append(nativeQueryHelper.getWhereFilter("c.name"));
-        }
-
+    private StringBuilder appendOrderAndPagination(String prompt, Pageable pageable, StringBuilder sqlBuilder)
+    {
         // Now build dynamic ORDER BY.
         // If a sort is explicitly provided, use it.
         if (pageable.getSort().isSorted()) {
@@ -77,17 +73,60 @@ public class ContentService {
         // Append pagination.
         sqlBuilder.append(" LIMIT :limit OFFSET :offset");
 
+        return sqlBuilder;
+    }
+
+    private Query buildNativeQueryWithParams(StringBuilder sqlBuilder, String prompt, Integer creatorId, Pageable pageable)
+    {
         // Create and set up the query.
         Query query = entityManager.createNativeQuery(sqlBuilder.toString(), "ContentDTOMapping");
+
         if (prompt != null && !prompt.isEmpty()) {
             query.setParameter("prompt", prompt);
         }
+        if (creatorId != null) {
+            query.setParameter("creatorId", creatorId);
+        }
+
         query.setParameter("limit", pageable.getPageSize());
         query.setParameter("offset", pageable.getOffset());
 
+        return query;
+    }
+
+
+
+    public Page<ContentDTO> getAllContents(String prompt, Integer creatorId, Pageable pageable) {
+        StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
+
+        boolean hasPrompt = prompt != null && !prompt.isEmpty();
+        boolean hasCreator = creatorId != null;
+
+
+        // Append WHERE clauses dynamically
+        if (hasPrompt || hasCreator) {
+            sqlBuilder.append(" WHERE ");
+            List<String> conditions = new ArrayList<>();
+
+            if (hasPrompt) {
+                conditions.add("c.name ILIKE CONCAT('%', :prompt, '%')");
+            }
+            if (hasCreator) {
+                conditions.add("c.creator = :creatorId");
+            }
+
+            sqlBuilder.append(String.join(" AND ", conditions));
+        }
+
+        // Order & Pagination
+        appendOrderAndPagination(prompt, pageable, sqlBuilder);
+
+        // Build Native Query
+        Query query = buildNativeQueryWithParams(sqlBuilder, prompt, creatorId, pageable);
+
         List<ContentDTO> results = query.getResultList();
 
-        // Note: For production, you might want to run a separate COUNT(*) query for total elements.
+        // Note: For production, might want to run a separate COUNT(*) query for total elements.
         long total = results.size();
 
         return new PageImpl<>(results, pageable, total);
@@ -139,5 +178,14 @@ public class ContentService {
         content.setContentDates(contentDates);
 
         return contentRepository.save(content);
+    }
+
+
+    @Transactional
+    public void deleteContent(Long contentId)
+    {
+        // Get Authenticated User
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long currentUserId = Long.parseLong(authentication.getName());
     }
 }
