@@ -7,6 +7,7 @@ import com.diversestudio.unityapi.entities.ContentDates;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.repository.ContentRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
+import com.diversestudio.unityapi.storage.StorageService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -31,16 +32,15 @@ public class ContentService {
     private EntityManager entityManager;
     private final ContentRepository contentRepository;
     private final UserRepository userRepository;
+    private final StorageService storageService;
     private final NativeQueryHelper nativeQueryHelper;
 
-
-
-    public ContentService(ContentRepository contentRepository, UserRepository userRepository, NativeQueryHelper nativeQueryHelper){
+    public ContentService(ContentRepository contentRepository, UserRepository userRepository, StorageService storageService,NativeQueryHelper nativeQueryHelper){
         this.contentRepository = contentRepository;
         this.userRepository = userRepository;
+        this.storageService = storageService;
         this.nativeQueryHelper = nativeQueryHelper;
     }
-
 
     private StringBuilder appendOrderAndPagination(String prompt, Pageable pageable, StringBuilder sqlBuilder)
     {
@@ -94,8 +94,6 @@ public class ContentService {
         return query;
     }
 
-
-
     public Page<ContentDTO> getAllContents(String prompt, Integer creatorId, Pageable pageable) {
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
 
@@ -137,7 +135,7 @@ public class ContentService {
         Query query = entityManager.createNativeQuery(sql, "ContentDTOMapping");
         query.setParameter("id", id);
 
-        List<ContentDTO> results = query.getResultList();
+        List<ContentDTO> results = query.getResultList(); // modify query to support thumbnail
 
         if (results.isEmpty()) {
             return Optional.empty();
@@ -145,7 +143,6 @@ public class ContentService {
             return Optional.of(results.get(0));
         }
     }
-
 
     @Transactional
     public Content createContent(ContentCreationDTO dto) {
@@ -166,6 +163,7 @@ public class ContentService {
         content.setName(dto.name());
         content.setDescription(dto.description());
         content.setData(dto.data());
+        content.setThumbnail(dto.thumbnail());
         content.setVersion(dto.version());
         content.setCreator(userOptional.get());
 
@@ -180,12 +178,36 @@ public class ContentService {
         return contentRepository.save(content);
     }
 
-
     @Transactional
-    public void deleteContent(Long contentId)
-    {
-        // Get Authenticated User
+    public void deleteContent(Long contentId) throws Exception {
+        // Retrieve the authenticated user's ID from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long currentUserId = Long.parseLong(authentication.getName());
+
+        // Fetch the content record to delete
+        Optional<Content> contentOptional = contentRepository.findById(contentId);
+        if (!contentOptional.isPresent()) {
+            throw new Exception("Content with ID " + contentId + " not found.");
+        }
+
+        Content content = contentOptional.get();
+
+        //Check if the current user is authorized to delete this content.
+        if (!content.getCreator().getUserId().equals(currentUserId)) {
+            throw new Exception("Unauthorized deletion attempt.");
+        }
+
+        // Delete the main file from storage if it exists.
+        if (content.getData() != null) {
+            storageService.deleteFile(content.getData());
+        }
+
+        // Delete the thumbnail from storage if it exists.
+        if (content.getThumbnail() != null) {
+            storageService.deleteFile(content.getThumbnail());
+        }
+
+        // Finally, delete the content record from the repository.
+        contentRepository.delete(content);
     }
 }
