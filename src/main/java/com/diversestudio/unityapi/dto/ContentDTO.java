@@ -7,6 +7,7 @@ public record ContentDTO (
         Long creatorId,
         String creatorName,
         String data,
+        String thumbnail,
         String name,
         String description,
         int version,

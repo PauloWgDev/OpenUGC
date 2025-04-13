@@ -1,6 +1,5 @@
 package com.diversestudio.unityapi.entities;
 
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,6 +17,9 @@ public class Content {
 
     @Column(nullable = false)
     private String data;
+
+    @Column
+    private String thumbnail;
 
     @ManyToOne
     @JoinColumn(name = "creator", referencedColumnName = "user_id", nullable = false)

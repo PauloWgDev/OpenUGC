@@ -33,6 +33,6 @@ build/
 .vscode/
 
 ### scirpt to set local environments  ###
-env-local.ps1
+run-project.ps1
 
 
