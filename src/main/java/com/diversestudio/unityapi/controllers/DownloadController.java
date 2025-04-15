@@ -2,7 +2,6 @@ package com.diversestudio.unityapi.controllers;
 
 
 import com.diversestudio.unityapi.entities.Download;
-import com.diversestudio.unityapi.repository.DownloadRepository;
 import com.diversestudio.unityapi.service.DownloadService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DownloadController {
     private final NativeQueryHelper nativeQueryHelper;
     private final DownloadService downloadService;
-
 
     public DownloadController(NativeQueryHelper nativeQueryHelper, DownloadService downloadService)
     {

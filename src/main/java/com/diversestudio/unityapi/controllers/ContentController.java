@@ -3,7 +3,9 @@ package com.diversestudio.unityapi.controllers;
 import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
+import com.diversestudio.unityapi.entities.Download;
 import com.diversestudio.unityapi.service.ContentService;
+import com.diversestudio.unityapi.service.DownloadService;
 import com.diversestudio.unityapi.storage.StorageService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import org.springframework.data.domain.Page;
@@ -22,11 +24,13 @@ import java.util.Optional;
 public class ContentController {
     private final ContentService contentService;
     private final StorageService storageService;
+    private final DownloadService downloadService;
     private final NativeQueryHelper nativeQueryHelper;
 
-    public ContentController(ContentService contentService, StorageService storageService, NativeQueryHelper nativeQueryHelper) {
+    public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,NativeQueryHelper nativeQueryHelper) {
         this.contentService = contentService;
         this.storageService = storageService;
+        this.downloadService = downloadService;
         this.nativeQueryHelper = nativeQueryHelper;
     }
 
@@ -68,6 +72,27 @@ public class ContentController {
         return ResponseEntity.ok(content);
     }
 
+
+
+    //TODO: Right now this returns a 'Download', however i have to check if its better for it to return a 'Content' or the data in bits.
+    /**
+     * GET /api/content/download/{id} Handles the download request for a content item by its unique identifier.
+     *
+     * @param id the unique identifier of the content to be downloaded.
+     * @return a {@link org.springframework.http.ResponseEntity} containing the
+     *         {@link com.diversestudio.unityapi.entities.Download} record if the download is successfully registered,
+     *         or a 404 Not Found response if no content is found for the given {@code id}.
+     */
+    @GetMapping("/download/{id}")
+    public ResponseEntity<Download> downloadContent(@PathVariable Long id) {
+        Optional<ContentDTO> contentOptional = contentService.getContentById(id);
+        if (contentOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Download download = downloadService.registerDownload(contentOptional.get());
+        return ResponseEntity.ok(download);
+    }
 
 
     /**

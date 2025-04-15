@@ -13,6 +13,7 @@ public class PostgresQueries implements QueryProvider {
                 " u.user_id AS creatorId, " +
                 " u.username AS creatorName, " +
                 " c.data, " +
+                "c.thumbnail," +
                 " c.name, " +
                 " c.description, " +
                 " c.version, " +
@@ -39,6 +40,7 @@ public class PostgresQueries implements QueryProvider {
                         " u.user_id AS creatorId, " +
                         " u.username AS creatorName, " +
                         " c.data, " +
+                        "c.thumbnail," +
                         " c.name, " +
                         " c.description, " +
                         " c.version, " +

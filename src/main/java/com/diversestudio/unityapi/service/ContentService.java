@@ -7,6 +7,7 @@ import com.diversestudio.unityapi.entities.ContentDates;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.repository.ContentRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
+import com.diversestudio.unityapi.security.AuthHelper;
 import com.diversestudio.unityapi.storage.StorageService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
@@ -14,8 +15,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -146,11 +145,8 @@ public class ContentService {
 
     @Transactional
     public Content createContent(ContentCreationDTO dto) {
-        // Retrieve the currently authenticated user's id from the SecurityContext
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userIdStr = authentication.getName();
-        Long creatorId = Long.parseLong(userIdStr);
-
+        // Retrieve the authenticated user's ID
+        Long creatorId = AuthHelper.getCurrentUserId();
 
         // Fetch the user from the database
         Optional<User> userOptional = userRepository.findById(creatorId);
@@ -180,9 +176,8 @@ public class ContentService {
 
     @Transactional
     public void deleteContent(Long contentId) throws Exception {
-        // Retrieve the authenticated user's ID from the security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long currentUserId = Long.parseLong(authentication.getName());
+        // Retrieve the authenticated user's ID
+        Long currentUserId = AuthHelper.getCurrentUserId();
 
         // Fetch the content record to delete
         Optional<Content> contentOptional = contentRepository.findById(contentId);
