@@ -35,7 +35,7 @@ public class UserService {
         this.nativeQueryHelper = nativeQueryHelper;
     }
 
-    public Page<UserDTO> getAllUsers(String prompt, Pageable pageable)
+    public Page<UserDTO> getUserPage(String prompt, Pageable pageable)
     {
         // Build the base SQL for users.
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllUsers());

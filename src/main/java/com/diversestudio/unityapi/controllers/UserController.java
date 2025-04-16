@@ -37,7 +37,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing a page of {@link UserDTO} objects
      */
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> getAllUsers(
+    public ResponseEntity<Page<UserDTO>> getUserPage(
             @RequestParam(defaultValue = "") String prompt,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -47,7 +47,7 @@ public class UserController {
         // Convert sort string into Spring's Sort object (you can re-use similar logic as in ContentService)
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<UserDTO> userPage = userService.getAllUsers(prompt, pageable);
+        Page<UserDTO> userPage = userService.getUserPage(prompt, pageable);
         return ResponseEntity.ok(userPage);
     }
 
