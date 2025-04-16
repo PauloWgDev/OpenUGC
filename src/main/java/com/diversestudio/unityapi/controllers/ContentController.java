@@ -8,6 +8,7 @@ import com.diversestudio.unityapi.service.ContentService;
 import com.diversestudio.unityapi.service.DownloadService;
 import com.diversestudio.unityapi.storage.StorageService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,7 @@ public class ContentController {
      * @return a {@link ResponseEntity} containing a page of {@link ContentDTO} objects
      */
     @GetMapping()
-    public ResponseEntity<Page<ContentDTO>> getAllContent(
+    public ResponseEntity<Page<ContentDTO>> getContentPage(
             @RequestParam(defaultValue = "") String prompt,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -55,7 +56,7 @@ public class ContentController {
     {
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<ContentDTO> contentList = contentService.getAllContents(prompt, creatorId,pageable);
+        Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId,pageable);
         return ResponseEntity.ok(contentList);
     }
 
@@ -94,6 +95,8 @@ public class ContentController {
         return ResponseEntity.ok(download);
     }
 
+    @Value("${file.storage.baseUrl}")
+    private String fileBaseUrl;
 
     /**
      * POST /api/content - Uploads a content file and an optional thumbnail, then creates a Content record.
@@ -123,12 +126,18 @@ public class ContentController {
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) throws Exception {
 
         // Upload the main file and retrieve its public URL.
-        String fileUrl = storageService.uploadFile(file);
-
-        // Upload the thumbnail if provided.
+        String fileUrl = "base-url not implemented";
         String thumbnailUrl = null;
-        if (thumbnail != null && !thumbnail.isEmpty()) {
-            thumbnailUrl = storageService.uploadFile(thumbnail);
+
+        // if fileBaseUrl equals 'not_using' avoid calling storageService
+        if (!fileBaseUrl.equals("not_using"))
+        {
+            fileUrl = storageService.uploadFile(file);
+
+            // Upload the thumbnail if provided.
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                thumbnailUrl = storageService.uploadFile(thumbnail);
+            }
         }
 
         // Create an updated DTO with file and thumbnail URLs.
@@ -146,6 +155,7 @@ public class ContentController {
         return ResponseEntity.ok(savedContent);
     }
 
+    //TODO: There should be a soft Delete and Hard Delete endpoints
     /**
      * DELETE /api/content/{id} - Deletes a content record and its associated files.
      * <p>

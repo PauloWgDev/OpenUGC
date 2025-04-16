@@ -93,7 +93,7 @@ public class ContentService {
         return query;
     }
 
-    public Page<ContentDTO> getAllContents(String prompt, Integer creatorId, Pageable pageable) {
+    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, Pageable pageable) {
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
 
         boolean hasPrompt = prompt != null && !prompt.isEmpty();

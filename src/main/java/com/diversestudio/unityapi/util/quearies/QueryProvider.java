@@ -10,8 +10,10 @@ public interface QueryProvider {
     String getFindAllContent();
     String getFindSingleContent();
 
-
-
     // User
     String getFindAllUsers();
+
+    // Rating
+    String getFindRatingsByContent();
+
 }

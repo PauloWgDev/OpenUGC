@@ -87,4 +87,15 @@ public class PostgresQueries implements QueryProvider {
                 "FROM users u " +
                 "JOIN roles r ON u.role_id = r.role_id";
     }
+
+    @Override
+    public String getFindRatingsByContent() {
+        return "SELECT " +
+                " r.content_id AS content_id, " +
+                " r.user_id AS user_id, " +
+                " r.rating, " +
+                " r.comment " +
+                "FROM rating r " +
+                "WHERE r.content_id = :contentId";
+    }
 }

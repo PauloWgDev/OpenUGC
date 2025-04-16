@@ -49,4 +49,7 @@ public class NativeQueryHelper {
     // User
     public String getFindAllUsers(){ return queryProvider.getFindAllUsers(); }
 
+    // Rating
+    public String getFindRatingsByContent(){ return queryProvider.getFindRatingsByContent();}
+
 }
