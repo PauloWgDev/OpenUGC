@@ -44,7 +44,23 @@ public class RatingController
         return ResponseEntity.ok(savedRating);
     }
 
-    // Get /api/rating/{content_id} will return page of ratings associated with the given content id
+    /**
+     * GET /api/rating/{id} - Retrieves a paginated list of ratings for the specified content.
+     * <p>
+     * This endpoint allows clients to fetch a page of rating entries associated with a specific content ID.
+     * Pagination and sorting parameters can be specified through query parameters.
+     * Optionally, clients can filter ratings by a specific rating value.
+     * </p>
+     *
+     * @param id      the unique identifier of the content for which ratings are to be fetched.
+     * @param page    the page number to retrieve (0-based index). Defaults to 0 if not specified.
+     * @param size    the number of items per page. Defaults to 10 if not specified.
+     * @param sort    the sorting criteria, in the format "field,direction" (e.g., "createdAt,desc").
+     *                Defaults to "createdAt,desc".
+     * @param rating  an optional rating filter; if set to a value from 1 to 5, only ratings with that score will be returned.
+     *                Use -1 to fetch all ratings. Defaults to -1.
+     * @return a {@link ResponseEntity} containing a {@link Page} of {@link Rating} entities matching the criteria.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Page<Rating>> getRatingPage(@PathVariable Long id,
                                                       @RequestParam(defaultValue = "0") int page,
