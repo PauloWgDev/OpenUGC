@@ -1,7 +1,9 @@
 package com.diversestudio.unityapi.storage;
 
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 
 /**
  * Common interface for file storage services.
@@ -9,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
  * interface can differ by storing files locally (e.g., on the server's file system) or remotely
  * (e.g., in a cloud storage service like Google Cloud Storage).
  */
+@Service
 public interface StorageService {
 
     /**
