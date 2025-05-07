@@ -15,20 +15,20 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
     private Long contentId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String data;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String thumbnail;
 
     @ManyToOne
     @JoinColumn(name = "creator", referencedColumnName = "user_id", nullable = false)
     private User creator;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column
