@@ -11,6 +11,7 @@ import lombok.Setter;
 public class Role {
     @Id
     @Column(name = "role_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
     private int roleId;
 
     @Column(name = "role_name", nullable = false)
