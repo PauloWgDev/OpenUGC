@@ -8,7 +8,9 @@ import com.diversestudio.unityapi.service.ContentService;
 import com.diversestudio.unityapi.service.DownloadService;
 import com.diversestudio.unityapi.storage.StorageService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,11 +30,26 @@ public class ContentController {
     private final DownloadService downloadService;
     private final NativeQueryHelper nativeQueryHelper;
 
+    @Value("${file.storage.type}")
+    private String storageType;
+
+
     public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,NativeQueryHelper nativeQueryHelper) {
         this.contentService = contentService;
         this.storageService = storageService;
         this.downloadService = downloadService;
         this.nativeQueryHelper = nativeQueryHelper;
+    }
+
+
+    // Helper Function to Extract IP address
+    private String extractClientIp(HttpServletRequest request) {
+        String header = request.getHeader("X-Forwarded-For");
+        if (header == null || header.isEmpty()) {
+            return request.getRemoteAddr();
+        } else {
+            return header.split(",")[0].trim(); // First IP in chain
+        }
     }
 
     /**
@@ -73,26 +90,37 @@ public class ContentController {
         return ResponseEntity.ok(content);
     }
 
-
-
-    //TODO: Right now this returns a 'Download', however i have to check if its better for it to return a 'Content' or the data in bits.
     /**
-     * GET /api/content/download/{id} Handles the download request for a content item by its unique identifier.
+     * GET /api/content/download/{id} - Handles the download request for a content item by its unique identifier.
      *
-     * @param id the unique identifier of the content to be downloaded.
-     * @return a {@link org.springframework.http.ResponseEntity} containing the
-     *         {@link com.diversestudio.unityapi.entities.Download} record if the download is successfully registered,
-     *         or a 404 Not Found response if no content is found for the given {@code id}.
+     * @param id the unique identifier of the content to be downloaded
+     * @param request the HTTP request, used to extract the client IP address
+     * @return a {@link ResponseEntity} with the binary content of the file as an attachment,
+     *         or a 404 response if the content is not found
+     * @throws Exception if file loading or download registration fails
      */
     @GetMapping("/download/{id}")
-    public ResponseEntity<Download> downloadContent(@PathVariable Long id) {
+    public ResponseEntity<?> downloadContent(@PathVariable Long id, HttpServletRequest request) throws Exception {
         Optional<ContentDTO> contentOptional = contentService.getContentById(id);
         if (contentOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        Download download = downloadService.registerDownload(contentOptional.get());
-        return ResponseEntity.ok(download);
+        ContentDTO content = contentOptional.get();
+
+        // Extract client IP and register download
+        String ipAddress = extractClientIp(request);
+        downloadService.registerDownload(content, ipAddress);
+
+        String fileName = content.data(); // works for both local and cloud
+
+        // Load resource from storage (local or cloud)
+        Resource fileResource = storageService.loadFileAsResource(fileName);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .body(fileResource);
     }
 
     @Value("${file.storage.baseUrl}")

@@ -41,18 +41,27 @@ public class GcsStorageService implements StorageService
 
         storage.create(blobInfo, file.getBytes());
 
-        // Optional: generate a signed URL (private access with expiration)
-        URL signedUrl = storage.signUrl(blobInfo, 15, TimeUnit.MINUTES);
-        return signedUrl.toString();
-
-        // Or use public URL if the bucket/object is public:
-        // return fileBaseUrl + fileName;
+        return fileName;
     }
 
     @Override
     public Resource loadFileAsResource(String fileName) throws Exception {
-        String url = fileBaseUrl + fileName;
-        return new UrlResource(url);
+        Blob blob = storage.get(bucketName, fileName);
+
+        if (blob == null || !blob.exists()) {
+            throw new Exception("File not found in GCS: " + fileName);
+        }
+
+        // Read content into a byte array
+        byte[] content = blob.getContent();
+
+        // Return as in-memory Resource
+        return new org.springframework.core.io.ByteArrayResource(content) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        };
     }
 
     @Override

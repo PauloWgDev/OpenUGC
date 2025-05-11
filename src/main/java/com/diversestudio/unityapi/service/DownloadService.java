@@ -26,13 +26,9 @@ public class DownloadService {
 
     public Download registerDownload(ContentDTO content)
     {
-        // Create the download record
         Download download = new Download();
         download.setContentId(content.contentId());
-        // Assuming ContentDTO provides the version as an int. Adapt if necessary.
         download.setContentVersion(content.version());
-
-        // Retrieve the current user id
         Long currentUserId = AuthHelper.getCurrentUserId();
         download.setUserId(currentUserId);
 
@@ -40,5 +36,15 @@ public class DownloadService {
         registerDownload(download);
 
         return download;
+    }
+
+    public Download registerDownload(ContentDTO content, String ipAddress) {
+        Download download = new Download();
+        download.setContentId(content.contentId());
+        download.setContentVersion(content.version());
+        download.setUserId(AuthHelper.getCurrentUserId());
+        download.setDate(new Timestamp(System.currentTimeMillis()));
+        download.setIpAddress(ipAddress);
+        return downloadRepository.save(download);
     }
 }

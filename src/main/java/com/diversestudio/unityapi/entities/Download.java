@@ -27,4 +27,7 @@ public class Download {
 
     @Column(name = "date")
     private Timestamp date;
+
+    @Column(name = "ip_address")
+    private String ipAddress;
 }
