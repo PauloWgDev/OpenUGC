@@ -3,7 +3,6 @@ package com.diversestudio.unityapi.controllers;
 import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
-import com.diversestudio.unityapi.entities.Download;
 import com.diversestudio.unityapi.service.ContentService;
 import com.diversestudio.unityapi.service.DownloadService;
 import com.diversestudio.unityapi.storage.StorageService;
@@ -32,7 +31,6 @@ public class ContentController {
 
     @Value("${file.storage.type}")
     private String storageType;
-
 
     public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,NativeQueryHelper nativeQueryHelper) {
         this.contentService = contentService;

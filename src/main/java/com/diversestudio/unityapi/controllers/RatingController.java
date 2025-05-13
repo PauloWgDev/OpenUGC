@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/rating")
 public class RatingController
@@ -73,4 +75,12 @@ public class RatingController
         Page<Rating> ratingPage = ratingService.getRatingPage(id, rating, pageable);
         return ResponseEntity.ok(ratingPage);
     }
+
+
+    @GetMapping("/{id}/distribution")
+    public ResponseEntity<Map<Integer, Long>> getRatingDistribution(@PathVariable Long id) {
+        Map<Integer, Long> distribution = ratingService.getRatingDistribution(id);
+        return ResponseEntity.ok(distribution);
+    }
+
 }
