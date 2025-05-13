@@ -5,7 +5,6 @@ public interface QueryProvider {
 
     String getWhereFilter(String columnName);
     String getOrderBySimilarity(String columnName);
-
     // Content
     String getFindAllContent();
     String getFindSingleContent();
@@ -15,5 +14,5 @@ public interface QueryProvider {
 
     // Rating
     String getFindRatingsByContent();
-
+    String getRatingDistributionByContent();
 }

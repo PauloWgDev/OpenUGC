@@ -52,4 +52,7 @@ public class NativeQueryHelper {
     // Rating
     public String getFindRatingsByContent(){ return queryProvider.getFindRatingsByContent();}
 
+    public String getRatingDistributionByContent() {
+        return queryProvider.getRatingDistributionByContent();
+    }
 }

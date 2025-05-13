@@ -98,4 +98,15 @@ public class PostgresQueries implements QueryProvider {
                 "FROM rating r " +
                 "WHERE r.content_id = :contentId";
     }
+
+    @Override
+    public String getRatingDistributionByContent() {
+        return """
+        SELECT r.rating, COUNT(*) AS count
+        FROM rating r
+        WHERE r.content_id = :contentId
+        GROUP BY r.rating
+        ORDER BY r.rating
+        """;
+    }
 }

@@ -22,6 +22,6 @@ public class Rating {
     @Column(name = "rating")
     private float rating;
 
-    @Column(name = "comment")
+    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 }

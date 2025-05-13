@@ -13,7 +13,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -93,4 +95,29 @@ public class RatingService {
 
         return new PageImpl<>(results, pageable, total);
     }
+
+
+    public Map<Integer, Long> getRatingDistribution(Long contentId) {
+        String sql = nativeQueryHelper.getRatingDistributionByContent();
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = entityManager
+                .createNativeQuery(sql)
+                .setParameter("contentId", contentId)
+                .getResultList();
+
+        Map<Integer, Long> distribution = new LinkedHashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            distribution.put(i, 0L); // default to 0 for all stars
+        }
+
+        for (Object[] row : results) {
+            int stars = ((Number) row[0]).intValue();
+            long count = ((Number) row[1]).longValue();
+            distribution.put(stars, count);
+        }
+
+        return distribution;
+    }
+
 }
