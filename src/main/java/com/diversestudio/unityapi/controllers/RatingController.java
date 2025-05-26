@@ -75,6 +75,7 @@ public class RatingController
         Page<Rating> ratingPage = ratingService.getRatingPage(id, rating, pageable);
         return ResponseEntity.ok(ratingPage);
     }
+    
 
 
     @GetMapping("/{id}/distribution")
@@ -82,5 +83,4 @@ public class RatingController
         Map<Integer, Long> distribution = ratingService.getRatingDistribution(id);
         return ResponseEntity.ok(distribution);
     }
-
 }
