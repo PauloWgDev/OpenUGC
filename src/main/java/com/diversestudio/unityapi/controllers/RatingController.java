@@ -75,7 +75,7 @@ public class RatingController
         Page<Rating> ratingPage = ratingService.getRatingPage(id, rating, pageable);
         return ResponseEntity.ok(ratingPage);
     }
-    
+
 
 
     @GetMapping("/{id}/distribution")
