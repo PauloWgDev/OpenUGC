@@ -78,6 +78,18 @@ public class RatingController
 
 
 
+    /**
+    * GET /api/rating/{id}/distribution - Retrieves the distribution of ratings for the specified content.
+    * <p>
+    * This endpoint returns a map where the keys represent rating values (typically from 1 to 5),
+    * and the values indicate how many users gave each rating. This allows clients to visualize or analyze
+    * the spread of user ratings for a particular content item.
+    * </p>
+    *
+    * @param id the unique identifier of the content for which the rating distribution is to be fetched.
+    * @return a {@link ResponseEntity} containing a {@link Map} where the key is the rating value
+    *         (e.g., 1 to 5) and the value is the count of how many users gave that rating.
+    */
     @GetMapping("/{id}/distribution")
     public ResponseEntity<Map<Integer, Long>> getRatingDistribution(@PathVariable Long id) {
         Map<Integer, Long> distribution = ratingService.getRatingDistribution(id);
