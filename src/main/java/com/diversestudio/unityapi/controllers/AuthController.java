@@ -16,8 +16,7 @@ public class AuthController {
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-
-
+    
     /**
      * POST /api/auth/register - Registers a new user in the system.
      *
