@@ -71,7 +71,7 @@ public class ContentController {
     {
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId,pageable);
+        Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId, pageable);
         return ResponseEntity.ok(contentList);
     }
 
@@ -124,6 +124,9 @@ public class ContentController {
     @Value("${file.storage.baseUrl}")
     private String fileBaseUrl;
 
+    @Value("${file.cloud.baseUrl}")
+    private String fileBaseUrl_cloud;
+
     /**
      * POST /api/content - Uploads a content file and an optional thumbnail, then creates a Content record.
      * <p>
@@ -156,7 +159,7 @@ public class ContentController {
         String thumbnailUrl = null;
 
         // if fileBaseUrl equals 'not_using' avoid calling storageService
-        if (!fileBaseUrl.equals("not_using"))
+        if (!fileBaseUrl.equals("not_using") || !fileBaseUrl_cloud.equals("not_using"))
         {
             fileUrl = storageService.uploadFile(file);
 
