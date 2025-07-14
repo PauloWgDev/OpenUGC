@@ -1,6 +1,7 @@
 package com.diversestudio.unityapi.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,5 +23,6 @@ public class Tag {
     private String name;
 
     @ManyToMany(mappedBy = "tags")
+    @JsonBackReference
     private Set<Content> contents = new HashSet<>();
 }
