@@ -4,8 +4,10 @@ import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.entities.ContentDates;
+import com.diversestudio.unityapi.entities.Tag;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.repository.ContentRepository;
+import com.diversestudio.unityapi.repository.TagRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.security.AuthHelper;
 import com.diversestudio.unityapi.storage.StorageService;
@@ -13,6 +15,7 @@ import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ContentService {
@@ -143,6 +144,24 @@ public class ContentService {
         }
     }
 
+    @Autowired
+    private TagRepository tagRepository;
+
+    private Set<Tag> processTags(List<String> tagNames) {
+        Set<Tag> tags = new HashSet<>();
+        for (String tagName : tagNames) {
+            Tag tag = tagRepository.findByName(tagName)
+                    .orElseGet(() -> {
+                        Tag newTag = new Tag();
+                        newTag.setName(tagName);
+                        return newTag;
+                    });
+            tags.add(tag);
+        }
+        return tags;
+    }
+
+
     @Transactional
     public Content createContent(ContentCreationDTO dto) {
         // Retrieve the authenticated user's ID
@@ -154,6 +173,8 @@ public class ContentService {
             throw new IllegalArgumentException("User with ID " + creatorId + " not found.");
         }
 
+        // create Set<Tag> from list of strings tag in dto
+
         // Map DTO fields to the Content entity
         Content content = new Content();
         content.setName(dto.name());
@@ -162,6 +183,11 @@ public class ContentService {
         content.setThumbnail(dto.thumbnail());
         content.setVersion(dto.version());
         content.setCreator(userOptional.get());
+
+        // Convert tag names to Tag entities
+        if (!dto.tags().isEmpty()) {
+            content.setTags(processTags(dto.tags()));
+        }
 
         // Create and set ContentDates
         ContentDates contentDates = new ContentDates();

@@ -10,6 +10,7 @@ public record ContentDTO (
         String thumbnail,
         String name,
         String description,
+        String tags,
         int version,
         Long downloadsCount, // total number of downloads
         Long latestDownloadsCount, // number of downloads in the last 7 days
