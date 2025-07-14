@@ -150,7 +150,7 @@ public class ContentService {
     private Set<Tag> processTags(List<String> tagNames) {
         Set<Tag> tags = new HashSet<>();
         for (String tagName : tagNames) {
-            Tag tag = tagRepository.findByName(tagName)
+            Tag tag = tagRepository.findByName(tagName.trim().toLowerCase())
                     .orElseGet(() -> {
                         Tag newTag = new Tag();
                         newTag.setName(tagName);
@@ -184,7 +184,6 @@ public class ContentService {
         content.setVersion(dto.version());
         content.setCreator(userOptional.get());
 
-        // Convert tag names to Tag entities
         if (!dto.tags().isEmpty()) {
             content.setTags(processTags(dto.tags()));
         }
