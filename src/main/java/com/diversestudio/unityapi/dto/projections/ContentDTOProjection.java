@@ -18,6 +18,7 @@ import java.sql.Timestamp;
                         @ColumnResult(name = "thumbnail", type = String.class),
                         @ColumnResult(name = "name", type = String.class),
                         @ColumnResult(name = "description", type = String.class),
+                        @ColumnResult(name = "tags", type = String[].class),
                         @ColumnResult(name = "version", type = Integer.class),
                         @ColumnResult(name = "downloadsCount", type = Long.class),
                         @ColumnResult(name = "latestDownloadsCount", type = Long.class),
