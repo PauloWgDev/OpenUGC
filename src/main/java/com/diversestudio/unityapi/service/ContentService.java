@@ -76,7 +76,7 @@ public class ContentService {
         return sqlBuilder;
     }
 
-    private Query buildNativeQueryWithParams(StringBuilder sqlBuilder, String prompt, Integer creatorId, Pageable pageable)
+    private Query buildNativeQueryWithParams(StringBuilder sqlBuilder, String prompt, Integer creatorId, List<String> tags, Pageable pageable)
     {
         // Create and set up the query.
         Query query = entityManager.createNativeQuery(sqlBuilder.toString(), "ContentDTOMapping");
@@ -87,6 +87,10 @@ public class ContentService {
         if (creatorId != null) {
             query.setParameter("creatorId", creatorId);
         }
+        if (tags != null && !tags.isEmpty())
+        {
+            query.setParameter("tags", tags);
+        }
 
         query.setParameter("limit", pageable.getPageSize());
         query.setParameter("offset", pageable.getOffset());
@@ -94,12 +98,12 @@ public class ContentService {
         return query;
     }
 
-    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, Pageable pageable) {
+    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, List<String> tags, Pageable pageable) {
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
 
         boolean hasPrompt = prompt != null && !prompt.isEmpty();
         boolean hasCreator = creatorId != null;
-
+        boolean hasTags = tags != null && !tags.isEmpty();
 
         // Append WHERE clauses dynamically
         if (hasPrompt || hasCreator) {
@@ -112,6 +116,10 @@ public class ContentService {
             if (hasCreator) {
                 conditions.add("c.creator = :creatorId");
             }
+            if (hasTags)
+            {
+                conditions.add("EXISTS (SELECT 1 FROM content_tag ct2 JOIN tags t2 ON ct2.tag_id = t2.tag_id WHERE ct2.content_id = c.content_id AND t2.name = ANY(:tags))");
+            }
 
             sqlBuilder.append(String.join(" AND ", conditions));
         }
@@ -120,7 +128,7 @@ public class ContentService {
         appendOrderAndPagination(prompt, pageable, sqlBuilder);
 
         // Build Native Query
-        Query query = buildNativeQueryWithParams(sqlBuilder, prompt, creatorId, pageable);
+        Query query = buildNativeQueryWithParams(sqlBuilder, prompt, creatorId, tags, pageable);
 
         List<ContentDTO> results = query.getResultList();
 

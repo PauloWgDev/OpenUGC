@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -67,11 +68,12 @@ public class ContentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort,
-            @RequestParam(required = false) Integer creatorId)
+            @RequestParam(required = false) Integer creatorId,
+            @RequestParam(required = false) List<String> tags)
     {
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId, pageable);
+        Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId, tags, pageable);
         return ResponseEntity.ok(contentList);
     }
 
