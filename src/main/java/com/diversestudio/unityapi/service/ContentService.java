@@ -106,7 +106,7 @@ public class ContentService {
         boolean hasTags = tags != null && !tags.isEmpty();
 
         // Append WHERE clauses dynamically
-        if (hasPrompt || hasCreator) {
+        if (hasPrompt || hasCreator || hasTags) {
             sqlBuilder.append(" WHERE ");
             List<String> conditions = new ArrayList<>();
 
