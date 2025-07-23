@@ -44,7 +44,6 @@ public class ContentService {
 
     private StringBuilder appendOrderAndPagination(String prompt, Pageable pageable, StringBuilder sqlBuilder)
     {
-        // Now build dynamic ORDER BY.
         // If a sort is explicitly provided, use it.
         if (pageable.getSort().isSorted()) {
             sqlBuilder.append(" ORDER BY ");
@@ -73,6 +72,8 @@ public class ContentService {
         // Append pagination.
         sqlBuilder.append(" LIMIT :limit OFFSET :offset");
 
+        System.out.println("ORDER BY clause appended: " + sqlBuilder);
+
         return sqlBuilder;
     }
 
@@ -99,56 +100,68 @@ public class ContentService {
     }
 
     public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, List<String> tags, Pageable pageable) {
-        StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllContents());
+        StringBuilder sql = new StringBuilder(nativeQueryHelper.getFindAllContents());
 
-        boolean hasPrompt = prompt != null && !prompt.isEmpty();
-        boolean hasCreator = creatorId != null;
-        boolean hasTags = tags != null && !tags.isEmpty();
+        // Dummy 'Where'
+        sql.append(" WHERE 1=1 ");
 
-        // Append WHERE clauses dynamically
-        if (hasPrompt || hasCreator || hasTags) {
-            sqlBuilder.append(" WHERE ");
-            List<String> conditions = new ArrayList<>();
-
-            if (hasPrompt) {
-                conditions.add("c.name ILIKE CONCAT('%', :prompt, '%')");
-            }
-            if (hasCreator) {
-                conditions.add("c.creator = :creatorId");
-            }
-            if (hasTags)
-            {
-                conditions.add("EXISTS (SELECT 1 FROM content_tag ct2 JOIN tags t2 ON ct2.tag_id = t2.tag_id WHERE ct2.content_id = c.content_id AND t2.name = ANY(:tags))");
-            }
-
-            sqlBuilder.append(String.join(" AND ", conditions));
+        if (prompt != null && !prompt.isEmpty()) {
+            sql.append(" AND c.name ILIKE CONCAT('%', :prompt, '%') ");
+        }
+        if (creatorId != null) {
+            sql.append(" AND c.creator = :creatorId ");
+        }
+        if (tags != null && !tags.isEmpty()) {
+            sql.append(" AND EXISTS (")
+                    .append(" SELECT 1")
+                    .append(" FROM content_tag ct2")
+                    .append(" JOIN tags t2 ON ct2.tag_id = t2.tag_id")
+                    .append(" WHERE ct2.content_id = c.content_id")
+                    .append(" AND t2.name IN (:tags)")
+                    .append(") ");
         }
 
-        // Order & Pagination
-        appendOrderAndPagination(prompt, pageable, sqlBuilder);
+        // GROUP BY
+        sql.append(" ").append(nativeQueryHelper.getFindAllContentGroupBy());
 
-        // Build Native Query
-        Query query = buildNativeQueryWithParams(sqlBuilder, prompt, creatorId, tags, pageable);
+        // ORDER & PAGINATION
+        appendOrderAndPagination(prompt, pageable, sql);
 
-        List<ContentDTO> results = query.getResultList();
+        // Build & execute
+        Query q = entityManager
+                .createNativeQuery(sql.toString(), "ContentDTOMapping")
+                .setParameter("limit", pageable.getPageSize())
+                .setParameter("offset", pageable.getOffset());
 
-        // Note: For production, might want to run a separate COUNT(*) query for total elements.
-        long total = results.size();
+        if (prompt != null && !prompt.isEmpty())
+            q.setParameter("prompt", prompt);
+        if (creatorId != null)
+            q.setParameter("creatorId", creatorId);
+        if (tags != null && !tags.isEmpty())
+            q.setParameter("tags", tags);
 
-        return new PageImpl<>(results, pageable, total);
+        List<ContentDTO> items = q.getResultList();
+        long total = items.size();
+
+        return new PageImpl<>(items, pageable, total);
     }
 
     public Optional<ContentDTO> getContentById(Long id) {
-        String sql = nativeQueryHelper.getFindSingleContent();
-        Query query = entityManager.createNativeQuery(sql, "ContentDTOMapping");
+        StringBuilder sql = new StringBuilder(nativeQueryHelper.getFindSingleContent());
+
+        // GROUP BY
+        sql.append(" ").append(nativeQueryHelper.getFindAllContentGroupBy());
+
+
+        Query query = entityManager.createNativeQuery(sql.toString(), "ContentDTOMapping");
         query.setParameter("id", id);
 
-        List<ContentDTO> results = query.getResultList(); // modify query to support thumbnail
+        List<ContentDTO> item = query.getResultList(); // modify query to support thumbnail
 
-        if (results.isEmpty()) {
+        if (item.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(results.get(0));
+            return Optional.of(item.get(0));
         }
     }
 

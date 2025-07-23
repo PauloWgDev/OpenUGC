@@ -8,6 +8,7 @@ public interface QueryProvider {
     // Content
     String getFindAllContent();
     String getFindSingleContent();
+    String getFindAllContentGroupBy();
 
     // User
     String getFindAllUsers();

@@ -39,6 +39,7 @@ public class NativeQueryHelper {
     public String getOrderBySimilarity(String columnName) {
         return queryProvider.getOrderBySimilarity(columnName);
     }
+    public String getFindAllContentGroupBy() {return queryProvider.getFindAllContentGroupBy(); }
 
     // Content
     public String getFindAllContents() { return queryProvider.getFindAllContent(); }
