@@ -41,7 +41,6 @@ public class Content {
     @JsonManagedReference
     private ContentDates contentDates;
 
-
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "content_tag",

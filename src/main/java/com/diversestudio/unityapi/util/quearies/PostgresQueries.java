@@ -31,8 +31,7 @@ public class PostgresQueries implements QueryProvider {
                 "JOIN content_dates cd ON c.content_id = cd.content_id " +
                 "JOIN \"users\" u ON c.creator = u.user_id " +
                 "LEFT JOIN content_tag ct ON c.content_id = ct.content_id " +
-                "LEFT JOIN tags t ON t.tag_id = ct.tag_id " +
-                "GROUP BY c.content_id, u.user_id, cd.created_at, cd.updated_at";
+                "LEFT JOIN tags t ON t.tag_id = ct.tag_id ";
     }
 
     @Override
@@ -56,16 +55,26 @@ public class PostgresQueries implements QueryProvider {
                         "      AND cd.created_at >= NOW() - INTERVAL '7 days') AS latestDownloadsCount, " +
                         " (SELECT AVG(rating)::float FROM rating WHERE content_id = c.content_id) AS avgRating, " +
                         " cd.created_at AS createdAt, " +
-                        " cd.updated_at AS updatedAt " +
+                        " cd.updated_at AS updatedAt, " +
                         " COALESCE(ARRAY_AGG(t.name), ARRAY[]::VARCHAR[]) AS tags " +
                         "FROM content c " +
                         "JOIN content_dates cd ON c.content_id = cd.content_id " +
                         "JOIN users u ON c.creator = u.user_id " +
                         "LEFT JOIN content_tag ct ON c.content_id = ct.content_id " +
                         "LEFT JOIN tags t ON t.tag_id = ct.tag_id " +
-                        "WHERE c.content_id = :id" +
-                        "GROUP BY c.content_id, u.user_id, cd.created_at, cd.updated_at ";
+                        "WHERE c.content_id = :id";
     }
+
+
+    @Override
+    public String getFindAllContentGroupBy() {
+        return "GROUP BY "
+                + " c.content_id, u.user_id, u.username, "
+                + " c.data, c.thumbnail, c.name, c.description, c.version, "
+                + " cd.created_at, cd.updated_at";
+    }
+
+
 
     // can this take a String as an argument that will be the column from which it will be filtered
     @Override
