@@ -5,6 +5,9 @@ import com.diversestudio.unityapi.dto.AuthRequest;
 import com.diversestudio.unityapi.dto.AuthResponse;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.service.AuthService;
+import com.diversestudio.unityapi.service.RateLimiterService;
+import io.github.bucket4j.Bucket;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final RateLimiterService rateLimiterService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, RateLimiterService rateLimiterService) {
         this.authService = authService;
+        this.rateLimiterService = rateLimiterService;
     }
     
     /**
@@ -24,8 +29,16 @@ public class AuthController {
      * @return a {@link ResponseEntity} with a success message or error description
      */
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        return ResponseEntity.ok(authService.register(user));
+    public ResponseEntity<?> register(@RequestBody User user, HttpServletRequest httpRequest) {
+        String clientIp = httpRequest.getRemoteAddr();
+        Bucket bucket = rateLimiterService.resolveBucket("register:" + clientIp);
+
+        //return ResponseEntity.ok(authService.register(user));
+        if (bucket.tryConsume(1)) {
+            return ResponseEntity.ok(authService.register(user));
+        } else {
+            return ResponseEntity.status(429).body("Too many registration attempts. Please try again later.");
+        }
     }
 
     /**
@@ -35,7 +48,14 @@ public class AuthController {
      * @return a {@link ResponseEntity} containing an {@link AuthResponse} with the authentication token
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletRequest httpRequest) {
+        String clientIp = httpRequest.getRemoteAddr(); // or getHeader("X-Forwarded-For") for proxies
+        Bucket bucket = rateLimiterService.resolveBucket("login:" + clientIp);
+
+        if (bucket.tryConsume(1)) {
+            return ResponseEntity.ok(authService.login(request));
+        } else {
+            return ResponseEntity.status(429).body("Too many login attempts. Please try again later.");
+        }
     }
 }
