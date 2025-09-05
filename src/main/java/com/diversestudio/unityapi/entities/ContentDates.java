@@ -22,6 +22,11 @@ public class ContentDates {
     @Column(nullable = false)
     private Timestamp updatedAt;
 
+    @Column(nullable = true)
+    private Timestamp deletedAt;
+
+    @Column(nullable = true)
+    private Timestamp recoveredAt;
 
     @OneToOne
     @MapsId // Ensures content_id is the same as in Content
