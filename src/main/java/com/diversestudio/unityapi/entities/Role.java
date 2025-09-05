@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.EnumMap;
+
 @Entity
 @Table(name = "roles")
 @Getter
@@ -17,3 +19,6 @@ public class Role {
     @Column(name = "role_name", nullable = false)
     private String roleName;
 }
+
+
+

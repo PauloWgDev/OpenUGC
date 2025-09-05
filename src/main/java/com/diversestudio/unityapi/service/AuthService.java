@@ -31,8 +31,6 @@ public class AuthService {
 
     public AuthResponse login(AuthRequest request)
     {
-        // How could I check if the same IP is trying to log in many times?
-
         Optional<User> userOptional = userRepository.findByUsername(request.username());
         if (userOptional.isEmpty() || !passwordEncoder.matches(request.credential(), userOptional.get().getCredential())) {
             throw new IllegalArgumentException("Invalid credentials");

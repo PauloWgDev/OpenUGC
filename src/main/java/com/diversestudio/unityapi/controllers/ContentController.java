@@ -199,8 +199,19 @@ public class ContentController {
      * @throws Exception if the content is not found or file deletion fails
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteContent(@PathVariable Long id) throws Exception {
-        contentService.deleteContent(id);
+    public ResponseEntity<Void> deleteContent(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false", required = false) boolean hardDelete)
+            throws Exception {
+
+        if (hardDelete)
+        {
+            contentService.hardDeleteContent(id);
+        }
+        else {
+            contentService.softDeleteContent(id);
+        }
+
         return ResponseEntity.noContent().build();
     }
 }

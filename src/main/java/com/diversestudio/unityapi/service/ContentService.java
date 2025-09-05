@@ -1,11 +1,14 @@
 package com.diversestudio.unityapi.service;
 
+import ch.qos.logback.classic.Logger;
+import com.diversestudio.unityapi.define.RoleName;
 import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.entities.ContentDates;
 import com.diversestudio.unityapi.entities.Tag;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.exeption.UnauthorizedActionException;
 import com.diversestudio.unityapi.repository.ContentRepository;
 import com.diversestudio.unityapi.repository.TagRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
@@ -15,6 +18,7 @@ import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,6 +38,7 @@ public class ContentService {
     private final UserRepository userRepository;
     private final StorageService storageService;
     private final NativeQueryHelper nativeQueryHelper;
+    private static final Logger logger = (Logger) LoggerFactory.getLogger(ContentService.class);
 
     public ContentService(ContentRepository contentRepository, UserRepository userRepository, StorageService storageService,NativeQueryHelper nativeQueryHelper){
         this.contentRepository = contentRepository;
@@ -220,23 +225,52 @@ public class ContentService {
         return contentRepository.save(content);
     }
 
-    @Transactional
-    public void deleteContent(Long contentId) throws Exception {
-        // Retrieve the authenticated user's ID
+    private boolean isUserAuthorize(Long contentId) {
         Long currentUserId = AuthHelper.getCurrentUserId();
 
-        // Fetch the content record to delete
         Optional<Content> contentOptional = contentRepository.findById(contentId);
-        if (!contentOptional.isPresent()) {
-            throw new Exception("Content with ID " + contentId + " not found.");
+        if (contentOptional.isEmpty()) {
+            logger.warn("Content with ID {} not found.", contentId);
+            return false;
         }
 
         Content content = contentOptional.get();
 
-        //Check if the current user is authorized to delete this content.
-        if (!content.getCreator().getUserId().equals(currentUserId)) {
-            throw new Exception("Unauthorized deletion attempt.");
+        boolean isAuthorized = false;
+
+        // Check if the current user is authorized to modify this content
+        if (
+                content.getCreator().getUserId().equals(currentUserId) ||
+                content.getCreator().getRole().getRoleId() == RoleName.ADMIN.getId())
+        {
+            isAuthorized = true;
         }
+
+        return isAuthorized;
+    }
+
+    // Flags the content as deleted
+    @Transactional
+    public void softDeleteContent(Long contentId) throws Exception {
+        if (!isUserAuthorize(contentId)) {
+            throw new UnauthorizedActionException("User not authorized to soft delete this content");
+        }
+
+        Optional<Content> contentOptional = contentRepository.findById(contentId);
+        Content content = contentOptional.get();
+
+        Timestamp now = Timestamp.from(Instant.now());
+        content.getContentDates().setDeletedAt(now);
+    }
+
+    // Removes all data from the content
+    @Transactional
+    public void hardDeleteContent(Long contentId) throws Exception {
+        if (!isUserAuthorize(contentId)) {
+            throw new UnauthorizedActionException("User not authorized to hard delete this content");
+        }
+        Optional<Content> contentOptional = contentRepository.findById(contentId);
+        Content content = contentOptional.get();
 
         // Delete the main file from storage if it exists.
         if (content.getData() != null) {
@@ -248,7 +282,7 @@ public class ContentService {
             storageService.deleteFile(content.getThumbnail());
         }
 
-        // Finally, delete the content record from the repository.
+        // Delete the content record from the repository.
         contentRepository.delete(content);
     }
 }
