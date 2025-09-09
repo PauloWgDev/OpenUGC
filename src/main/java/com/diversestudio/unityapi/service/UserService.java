@@ -2,8 +2,10 @@ package com.diversestudio.unityapi.service;
 
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.entities.Role;
 import com.diversestudio.unityapi.repository.DownloadRepository;
 import com.diversestudio.unityapi.repository.RatingRepository;
+import com.diversestudio.unityapi.repository.RoleRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
@@ -26,13 +28,16 @@ public class UserService {
     private final DownloadRepository downloadRepository;
     private final RatingRepository ratingRepository;
     private final NativeQueryHelper nativeQueryHelper;
+    private final RoleRepository roleRepository;
 
     public UserService(UserRepository userRepository, DownloadRepository downloadRepository,
-                       RatingRepository ratingRepository, NativeQueryHelper nativeQueryHelper){
+                       RatingRepository ratingRepository, NativeQueryHelper nativeQueryHelper,
+                       RoleRepository roleRepository){
         this.userRepository = userRepository;
         this.downloadRepository = downloadRepository;
         this.ratingRepository = ratingRepository;
         this.nativeQueryHelper = nativeQueryHelper;
+        this.roleRepository = roleRepository;
     }
 
     public Page<UserDTO> getUserPage(String prompt, Pageable pageable)
@@ -100,6 +105,20 @@ public class UserService {
     public UserDTO createUser(User user) {
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
+    }
+
+    public UserDTO updateRole(Long userId, String roleName)
+    {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id " + userId));
+
+        Role role = roleRepository.findByRoleName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
+
+        user.setRole(role);
+        User updatedUser = userRepository.save(user);
+
+        return convertToDTO(updatedUser);
     }
 
     private UserDTO convertToDTO(User user){
