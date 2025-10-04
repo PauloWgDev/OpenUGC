@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkopen_ugc_docs=self.webpackChunkopen_ugc_docs||[]).push([[472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/blog/welcome","unlisted":false,"date":"2025-09-28T00:00:00.000Z"},{"title":"First Blog Post","permalink":"/blog/first-blog-post","unlisted":false,"date":"2025-09-27T00:00:00.000Z"}]}')}}]);
