@@ -1,0 +1,8 @@
+{
+  "label": "Third-Parties - Set-Up",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+     "description": "We decided to also include a tutorial on how to set-up OpenUGC with third parties so users can quickly have a working version of their UGC."
+  }
+}
