@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkopen_ugc_docs=self.webpackChunkopen_ugc_docs||[]).push([[903],{1912:e=>{e.exports=JSON.parse('{"blogBasePath":"/OpenUGC/blog","blogTitle":"Blog","authorsListPath":"/OpenUGC/blog/authors"}')}}]);
