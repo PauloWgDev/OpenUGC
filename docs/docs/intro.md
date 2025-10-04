@@ -18,7 +18,7 @@ Before running OpenUGC, you will need the following:
 ### Requirements
 
 - **Hosting for the API**  
-  You can deploy OpenUGC anywhere, on the [Hosting Tutorial](./tutorial/) we will show how to **self-host** and how to host using **Render**. 
+  You can deploy OpenUGC anywhere, on the [Hosting Tutorial] we will show how to **self-host** and how to host using **Render**. 
 
 - **PostgreSQL database**  
   Used to store metadata and content information.
@@ -32,9 +32,3 @@ Before running OpenUGC, you will need the following:
 
 
 ---
-
-Once you have these components in place, you’ll be ready to install and run OpenUGC.  
-👉 Next: [Setup Database](./tutorial-setup/host-database.md)
-
-
-
