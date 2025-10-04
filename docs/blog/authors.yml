@@ -1,0 +1,21 @@
+paulowg: 
+  name: Paulo Waimberg
+  title: Developer of OpenUGC
+  url: https://paulowgdev.github.io/
+  image_url: https://paulowgdev.github.io/assets/PW.webp
+  page: true
+  socials:
+    linkedin: https://www.linkedin.com/in/paulo-waimberg/
+    github: https://github.com/PauloWgDev
+    itch: https://paulowgg.itch.io/
+
+vixterdev:
+  name: Victor Cano
+  title: Developer of U3GC
+  url: https://github.com/soyvixterdev
+  image_url: https://avatars.githubusercontent.com/u/137210756?v=4
+  page: true
+  socials:
+   github: https://github.com/soyvixterdev
+   itch: https://github.com/SoyVixterDev
+   linkedin: https://www.linkedin.com/in/soyvixterdev/
