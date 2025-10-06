@@ -11,7 +11,11 @@ As a response we decided to create our own UGC system.
 
 ## Documentation
 
-The documentation and hosting guide is available at: https://paulowgdev.github.io/OpenUGC/
+Documentation and a hosting guide is available here:
+
+-> OpenUGC Documentation & Hosting Guide
+
+!! Note: The documentation is still under development. Your feedback and contributions are always welcome!
 
 Note: the documentation is still a work in progress. Any constructive feedback is appreciated.
 
@@ -32,4 +36,5 @@ Note: the documentation is still a work in progress. Any constructive feedback i
 | Rating          | GET    | /api/rating/{id}      | Retrieves a paginated list of ratings for the specific account |
 | Rating          | GET    | /api/rating/{id}/distribution | Returns a map where the keys represent rating values and the values indicate how many users gave each rating |
 | Rating          | POST   | /api/rating/{id}      | Registers a user's rating for the specific content |
+
 
