@@ -1,13 +1,11 @@
 package com.diversestudio.unityapi.controllers;
 
 import com.diversestudio.unityapi.dto.UserDTO;
+import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
 import com.diversestudio.unityapi.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/admin")
@@ -26,4 +24,11 @@ public class AdminController {
         return ResponseEntity.ok(userDto);
     }
     // admin endpoints here
+
+    @PatchMapping("/users/{id}/role/{roleName}")
+    public ResponseEntity<Object> updateRole(@PathVariable Long id, @PathVariable String roleName)
+    {
+        UserDTO userDto = userService.updateRole(id, roleName);
+        return ResponseEntity.ok(userDto);
+    }
 }
