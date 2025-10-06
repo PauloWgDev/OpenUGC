@@ -16,7 +16,7 @@ const config: Config = {
 
   // Set the production url of your site here
   url: 'https://PauloWgDev.github.io',
-  baseUrl: '/',
+  baseUrl: '/OpenUGC/',
 
 
   // GitHub pages deployment config.
