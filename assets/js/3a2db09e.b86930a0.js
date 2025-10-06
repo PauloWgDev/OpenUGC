@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkopen_ugc_docs=self.webpackChunkopen_ugc_docs||[]).push([[121],{8070:e=>{e.exports=JSON.parse('{"tags":[{"label":"Hola","permalink":"/blog/tags/hola","description":"Hola tag description","count":2}]}')}}]);
