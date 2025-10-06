@@ -1,6 +1,6 @@
 # OpenUGC
 
-![Logo](.\docs\static\img\logo3.svg)
+![Logo](./docs/static/img/logo3.svg)
 
 This REST API serves as an intermediary between a PostgreSQL database and **your game engine**, enabling an easy integration of user-generated content (UGC) into your projects.
 
