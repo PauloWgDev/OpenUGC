@@ -81,4 +81,17 @@ public class UserController {
         UserDTO savedUser = userService.createUser(user);
         return ResponseEntity.status(201).body(savedUser);
     }
+
+    //TODO: Implement following patch endpoints
+    @PatchMapping("/{id}")
+    public ResponseEntity<Object> updateUserData(@PathVariable Long id)
+    {
+        return ResponseEntity.status(69).body("Endpoint not implemented yet, sorry :/");
+    }
+
+    @PatchMapping("/{id}/password")
+    public ResponseEntity<Object> updatePassword(@PathVariable Long id)
+    {
+        return ResponseEntity.status(69).body("Endpoint not implemented yet, sorry :/");
+    }
 }

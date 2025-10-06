@@ -109,6 +109,7 @@ public class ContentService {
 
         // Dummy 'Where'
         sql.append(" WHERE 1=1 ");
+        sql.append(" AND cd.deleted_at IS NULL "); // filter out soft-deleted contents
 
         if (prompt != null && !prompt.isEmpty()) {
             sql.append(" AND c.name ILIKE CONCAT('%', :prompt, '%') ");
