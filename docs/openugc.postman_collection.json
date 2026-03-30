@@ -1,0 +1,310 @@
+{
+  "info": {
+    "_postman_id": "607f811d-07be-406e-bdd2-e5a2e2b53107",
+    "name": "OpenUGC",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52496023",
+    "_collection_link": "https://go.postman.co/collection/52496023-607f811d-07be-406e-bdd2-e5a2e2b53107?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "authorization",
+      "item": [
+        {
+          "name": "login",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"random_user21\",\r\n  \"password\": \"password\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/auth/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "register",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "one content",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "multiple contents",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "download content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/download{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "download{id}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "upload content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete content",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "retrieve users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/users",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "retrieve one user",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "upload user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ratings",
+      "item": [
+        {
+          "name": "Get Ratings of a content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/rating/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rating",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get rating distribution",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/api/rating/{id}/distribution",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "api",
+                "rating",
+                "{id}",
+                "distribution"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "submt rating for a content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/api/rating/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "api",
+                "rating",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
