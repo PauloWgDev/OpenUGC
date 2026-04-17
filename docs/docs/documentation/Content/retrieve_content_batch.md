@@ -82,5 +82,3 @@ Retrieves all user-generated content with support for advanced search, paginatio
 * `200 OK` – Returns content list
 * `403 Forbidden` – Invalid or missing token
 * `500 Internal Server Error` – Database issue
-
-
