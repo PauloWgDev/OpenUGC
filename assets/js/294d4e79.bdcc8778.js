@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkopen_ugc_docs=self.webpackChunkopen_ugc_docs||[]).push([[1425],{6845:e=>{e.exports=JSON.parse('{"metadata":{"permalink":"/OpenUGC/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

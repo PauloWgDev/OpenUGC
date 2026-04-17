@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkopen_ugc_docs=globalThis.webpackChunkopen_ugc_docs||[]).push([[7591],{8506(o){o.exports=JSON.parse('{"tags":[{"label":"Hola","permalink":"/OpenUGC/blog/tags/hola","description":"Hola tag description","count":2}]}')}}]);
