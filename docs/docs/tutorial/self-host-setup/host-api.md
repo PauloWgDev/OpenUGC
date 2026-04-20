@@ -142,7 +142,7 @@ curl -X GET "http://localhost:8080/api/content?page=0&size=5" \
   -H "Authorization: Bearer <your-jwt-token>"
 ```
 
-✅ Returns a paginated list of content, e.g.:
+Returns a paginated list of content, e.g.:
 
 ```
 {
