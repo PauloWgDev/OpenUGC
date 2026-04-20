@@ -9,7 +9,7 @@ For detailed request/response examples, see the dedicated sections for each cont
 
 ---
 
-## 🔑 Authorization
+## Authorization
 
 | Method | Endpoint             | Description                                   |
 |--------|----------------------|-----------------------------------------------|
@@ -18,7 +18,7 @@ For detailed request/response examples, see the dedicated sections for each cont
 
 ---
 
-## 📦 Content
+## Content
 
 | Method | Endpoint              | Description                                        |
 |--------|-----------------------|----------------------------------------------------|
@@ -30,7 +30,7 @@ For detailed request/response examples, see the dedicated sections for each cont
 
 ---
 
-## 👤 Users
+## Users
 
 | Method | Endpoint             | Description                                            |
 |--------|----------------------|--------------------------------------------------------|
@@ -40,7 +40,7 @@ For detailed request/response examples, see the dedicated sections for each cont
 
 ---
 
-## ⭐ Ratings
+## Ratings
 
 | Method | Endpoint                                | Description                                                      |
 |--------|-----------------------------------------|------------------------------------------------------------------|
@@ -50,4 +50,4 @@ For detailed request/response examples, see the dedicated sections for each cont
 
 ---
 
-✅ Use the **Authorization token** (`Bearer <JWT>`) for all protected routes (Content, Users, Ratings).
+Use the **Authorization token** (`Bearer <JWT>`) for all protected routes (Content, Users, Ratings).
