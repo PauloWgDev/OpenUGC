@@ -28,14 +28,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-
         // Skip token checking for auth endpoints
         String path = request.getRequestURI();
         if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
-
 
         String authorizationHeader = request.getHeader("Authorization");
 
@@ -44,24 +42,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Long userId = jwtUtil.extractUserId(token);
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // Authenticate
 
-                    // Extract the authorities from the token
+                    // Extract the authorities (role) from the token
                     Collection<? extends GrantedAuthority> authorities = jwtUtil.extractAuthorities(token);
 
-                    // Create an authentication token with empty authorities for now.
+                    // Create an authentication token with empty authorities.
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userId.toString(), null, authorities);
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+                // Already authenticated
             } catch (JwtException e) {
-                // Invalid token, you can log or handle the exception accordingly.
-                // Optionally, you can clear the SecurityContext.
+                // Invalid token
                 SecurityContextHolder.clearContext();
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }
