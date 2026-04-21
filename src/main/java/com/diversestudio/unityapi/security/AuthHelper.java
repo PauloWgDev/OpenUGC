@@ -5,10 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 
 /**
- * A utility class for accessing authentication information from the security context.
- * <p>
  * This class provides helper methods to retrieve details about the currently authenticated user.
- * </p>
  */
 public class AuthHelper
 {
