@@ -84,9 +84,10 @@ public class UserController {
 
     //TODO: Implement following patch endpoints
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateUserData(@PathVariable Long id)
+    public ResponseEntity<Object> updateUserData(@PathVariable Long id, @RequestBody UserDTO user)
     {
-        return ResponseEntity.status(69).body("Endpoint not implemented yet, sorry :/");
+        userService.patchRole(id, user);
+        return ResponseEntity.status(200).body("User Patched Successfully");
     }
 
     @PatchMapping("/{id}/password")

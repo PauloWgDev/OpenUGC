@@ -12,7 +12,7 @@ public record UserDTO(
         String role, // Role name
         String profilePicture,
         String aboutMe,
-        int downloadsPerformed,
-        int downloadReceived,
-        float averageRatingsReceive
+        Integer downloadsPerformed,
+        Integer downloadReceived,
+        Float averageRatingsReceive
 ) { }
