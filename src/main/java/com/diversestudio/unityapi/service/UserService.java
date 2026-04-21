@@ -10,6 +10,7 @@ import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional // changes on instances of an Entity automatically update the Database
 public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
@@ -92,8 +94,6 @@ public class UserService {
         return new PageImpl<>(results, pageable, total);
     }
 
-
-
     public Optional<UserDTO> getUserById(Long id){
         return userRepository.findById(id).map(this::convertToDTO);
     }
@@ -105,6 +105,19 @@ public class UserService {
     public UserDTO createUser(User user) {
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
+    }
+
+    /*
+        Service that allows to update username, profilePicture and aboutMe
+    */
+    public void patchRole(Long userId, UserDTO dto)
+    {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional.ofNullable(dto.username()).ifPresent(user::setUsername);
+        Optional.ofNullable(dto.profilePicture()).ifPresent(user::setProfilePicture);
+        Optional.ofNullable(dto.aboutMe()).ifPresent(user::setAboutMe);
     }
 
     public UserDTO updateRole(Long userId, String roleName)
