@@ -1,8 +1,8 @@
-# Retrieve All Content
+# Get Contents Page
 
-Retrieves all user-generated content with support for advanced search, pagination, and sorting.
+Returns a page of contents with support for advanced search, pagination options, and sorting.
 
-## Endpoint retrieve all contents
+## Endpoint
 
 - URL:
   `GET http://<your-domain>/api/content`
@@ -16,7 +16,7 @@ Retrieves all user-generated content with support for advanced search, paginatio
 
 ## Response Example
 
-```js
+```json
 {
   "content": [
     {
@@ -47,7 +47,7 @@ Retrieves all user-generated content with support for advanced search, paginatio
       "createdAt": "2025-03-10T00:50:57.150+00:00",
       "updatedAt": "2025-03-10T00:50:57.150+00:00"
     }
-    // ... additional content objects
+    // ... more content objects
   ],
   "pageable": {
     "pageNumber": 0,
@@ -79,6 +79,6 @@ Retrieves all user-generated content with support for advanced search, paginatio
 
 ## Responses Status
 
-* `200 OK` – Returns content list
+* `200 OK` – Returns page of contents 
 * `403 Forbidden` – Invalid or missing token
-* `500 Internal Server Error` – Database issue
+* `500 Internal Server Error` – Server issue

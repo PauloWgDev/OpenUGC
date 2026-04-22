@@ -32,11 +32,12 @@ For detailed request/response examples, see the dedicated sections for each cont
 
 ## Users
 
-| Method | Endpoint             | Description                                            |
-|--------|----------------------|--------------------------------------------------------|
-| GET    | `/api/users`         | Get all users (with pagination, search, sorting)       |
-| GET    | `/api/users/{id}`    | Get a specific user by ID                              |
-| POST   | `/api/users`         | Create a new user account (admin or system use only)   |
+| Method | Endpoint             | Description                                          |
+|-------|----------------------|------------------------------------------------------|
+| GET   | `/api/users`         | Get all users (with pagination, search, sorting)     |
+| GET   | `/api/users/{id}`    | Get a specific user by ID                            |
+| POST  | `/api/users`         | Create a new user account (admin or system use only) |
+| PATCH | `/api/users`         | Allows to update username, aboutMe or profilePicture |
 
 ---
 

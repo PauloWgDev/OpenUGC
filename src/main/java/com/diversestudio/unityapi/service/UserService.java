@@ -107,10 +107,11 @@ public class UserService {
         return convertToDTO(savedUser);
     }
 
+
     /*
         Service that allows to update username, profilePicture and aboutMe
     */
-    public void patchRole(Long userId, UserDTO dto)
+    public void patchUser(Long userId, UserDTO dto)
     {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
