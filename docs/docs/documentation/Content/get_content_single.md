@@ -2,14 +2,14 @@
 
 Fetches a specific content item by its ID.
 
-## Endpoint retrieve all contents
+## Endpoint 
 
 - URL:
   `GET http://<your-domain>/api/content/{id}`
 - **Headers:**
     - `Authorization: Bearer <token>`
 
-```js
+```json
 {
   "contentId": 1,
   "creatorId": 1,
@@ -28,9 +28,9 @@ Fetches a specific content item by its ID.
 
 ## Responses Status
 
-* `200 OK` – Returns content list
+* `200 OK` – Returns content
 * `403 Forbidden` – Invalid or missing token
 * `404 Not Found`- Content not found
-* `500 Internal Server Error` – Database issue
+* `500 Internal Server Error` – Server issue
 
 ---

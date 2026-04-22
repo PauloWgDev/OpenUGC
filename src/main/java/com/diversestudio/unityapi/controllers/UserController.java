@@ -3,6 +3,7 @@ package com.diversestudio.unityapi.controllers;
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.security.AuthHelper;
 import com.diversestudio.unityapi.service.UserService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import org.springframework.data.domain.Page;
@@ -82,11 +83,11 @@ public class UserController {
         return ResponseEntity.status(201).body(savedUser);
     }
 
-    //TODO: Implement following patch endpoints
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateUserData(@PathVariable Long id, @RequestBody UserDTO user)
+    @PatchMapping()
+    public ResponseEntity<Object> updateUserData(@RequestBody UserDTO user)
     {
-        userService.patchRole(id, user);
+        Long userId = AuthHelper.getCurrentUserId();
+        userService.patchUser(userId, user);
         return ResponseEntity.status(200).body("User Patched Successfully");
     }
 
