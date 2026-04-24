@@ -1,5 +1,6 @@
 package com.diversestudio.unityapi.service;
 
+import com.diversestudio.unityapi.dto.ChangePassword;
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.entities.Role;
@@ -14,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.Query;
 
@@ -31,15 +33,17 @@ public class UserService {
     private final RatingRepository ratingRepository;
     private final NativeQueryHelper nativeQueryHelper;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, DownloadRepository downloadRepository,
                        RatingRepository ratingRepository, NativeQueryHelper nativeQueryHelper,
-                       RoleRepository roleRepository){
+                       RoleRepository roleRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.downloadRepository = downloadRepository;
         this.ratingRepository = ratingRepository;
         this.nativeQueryHelper = nativeQueryHelper;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Page<UserDTO> getUserPage(String prompt, Pageable pageable)
@@ -119,6 +123,21 @@ public class UserService {
         Optional.ofNullable(dto.username()).ifPresent(user::setUsername);
         Optional.ofNullable(dto.profilePicture()).ifPresent(user::setProfilePicture);
         Optional.ofNullable(dto.aboutMe()).ifPresent(user::setAboutMe);
+    }
+
+    public void changePassword(Long userId, ChangePassword changePasswordObject)
+    {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not Found"));
+
+        String currentPassword = changePasswordObject.currentPassword();
+        String newPassword = changePasswordObject.newPassword();
+
+        if (passwordEncoder.matches(user.getCredential(), currentPassword))
+        {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        user.setCredential(passwordEncoder.encode(newPassword));
     }
 
     public UserDTO updateRole(Long userId, String roleName)

@@ -1,5 +1,6 @@
 package com.diversestudio.unityapi.controllers;
 
+import com.diversestudio.unityapi.dto.ChangePassword;
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
 import com.diversestudio.unityapi.entities.User;
@@ -91,9 +92,13 @@ public class UserController {
         return ResponseEntity.status(200).body("User Patched Successfully");
     }
 
-    @PatchMapping("/{id}/password")
-    public ResponseEntity<Object> updatePassword(@PathVariable Long id)
+    @PatchMapping("/password")
+    public ResponseEntity<Object> updatePassword(@RequestBody ChangePassword changePasswordObject)
     {
-        return ResponseEntity.status(69).body("Endpoint not implemented yet, sorry :/");
+        Long userId = AuthHelper.getCurrentUserId();
+
+        userService.changePassword(userId, changePasswordObject);
+
+        return ResponseEntity.status(200).body("Password changed successfully");
     }
 }
