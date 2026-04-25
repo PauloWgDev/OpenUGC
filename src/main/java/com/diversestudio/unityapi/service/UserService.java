@@ -4,6 +4,7 @@ import com.diversestudio.unityapi.dto.ChangePassword;
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.entities.Role;
+import com.diversestudio.unityapi.exeption.InvalidPasswordException;
 import com.diversestudio.unityapi.repository.DownloadRepository;
 import com.diversestudio.unityapi.repository.RatingRepository;
 import com.diversestudio.unityapi.repository.RoleRepository;
@@ -134,7 +135,7 @@ public class UserService {
 
         if (passwordEncoder.matches(user.getCredential(), currentPassword))
         {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new InvalidPasswordException("Password is incorrect");
         }
 
         user.setCredential(passwordEncoder.encode(newPassword));
