@@ -52,7 +52,6 @@ public class UserService {
         // Build the base SQL for users.
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindAllUsers());
 
-
         // If a prompt is provided, add filtering.
         if (prompt != null && !prompt.isEmpty()) {
             sqlBuilder.append(nativeQueryHelper.getWhereFilter("u.username"));
@@ -94,7 +93,7 @@ public class UserService {
         query.setParameter("offset", pageable.getOffset());
 
         List<UserDTO> results = query.getResultList();
-        long total = results.size();  // For production, you might want a COUNT(*) query.
+        long total = results.size();  // here needs a COUNT(*) query.
 
         return new PageImpl<>(results, pageable, total);
     }
