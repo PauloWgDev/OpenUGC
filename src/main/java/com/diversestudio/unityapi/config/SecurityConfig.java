@@ -35,13 +35,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // allow unauthenticated access to auth endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // restrict admin endpoints
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     // Bean to encode passwords with BCrypt
     @Bean
