@@ -4,6 +4,8 @@ import com.diversestudio.unityapi.dto.AuthRequest;
 import com.diversestudio.unityapi.dto.AuthResponse;
 import com.diversestudio.unityapi.entities.Role;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.exeption.IncorrectPasswordException;
+import com.diversestudio.unityapi.exeption.InvalidPasswordException;
 import com.diversestudio.unityapi.exeption.UsernameAlreadyExistsException;
 import com.diversestudio.unityapi.repository.RoleRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
@@ -33,7 +35,7 @@ public class AuthService {
     {
         Optional<User> userOptional = userRepository.findByUsername(request.username());
         if (userOptional.isEmpty() || !passwordEncoder.matches(request.credential(), userOptional.get().getCredential())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IncorrectPasswordException("Incorrect credentials");
         }
 
         String token = jwtUtil.generateToken(userOptional.get().getUserId(), userOptional.get().getUsername(), Collections.singletonList(userOptional.get().getRole().getRoleName()));
