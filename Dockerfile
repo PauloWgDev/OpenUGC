@@ -1,18 +1,26 @@
-# Use an official OpenJDK runtime as a parent image
-FROM eclipse-temurin:17-jdk
+# Build
 
-# Set the working directory inside the container
+FROM maven:3.9-eclipse-temurin-17 AS builder
 WORKDIR /app
 
-# Copy the Maven wrapper and project files
-COPY . .
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
 
-# Build the application
+RUN chmod +x ./mvnw
+
+COPY src ./src
+
 RUN ./mvnw clean package -DskipTests -Dmaven.test.skip=true
 
-# Expose the port that Render will assign (Render injects it via $PORT)
+# Run
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the jar file
-CMD ["java", "-jar", "target/unityapi-0.0.1-SNAPSHOT.jar"]
+# HEALTHCHECK CMD curl -f http://localhost:8080/api/healthcheck || exit 1
+
+CMD ["java", "-jar", "app.jar"]
 
