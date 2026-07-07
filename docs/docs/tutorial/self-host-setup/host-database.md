@@ -12,7 +12,7 @@ In this guide, we’ll install PostgreSQL locally, use **pgAdmin** to manage it,
 ### 1. Install PostgreSQL and pgAdmin
 
 Download and install PostgreSQL from the official website:  
-👉 [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+[https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 
 During installation, you’ll also have the option to install **pgAdmin**, a graphical tool to manage your PostgreSQL server.  
 - Choose a password for the default `postgres` user (keep it safe — you’ll need it later).  
