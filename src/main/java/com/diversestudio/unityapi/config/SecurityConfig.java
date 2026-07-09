@@ -38,6 +38,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
+                                "/v3/api-docs.yaml",
                                 "/error"
                             ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // restrict admin endpoints
