@@ -3,8 +3,12 @@ package com.diversestudio.unityapi.controllers;
 import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
+import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.repository.UserRepository;
+import com.diversestudio.unityapi.security.AuthHelper;
 import com.diversestudio.unityapi.service.ContentService;
 import com.diversestudio.unityapi.service.DownloadService;
+import com.diversestudio.unityapi.service.PermissionsService;
 import com.diversestudio.unityapi.storage.StorageService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,15 +33,19 @@ public class ContentController {
     private final StorageService storageService;
     private final DownloadService downloadService;
     private final NativeQueryHelper nativeQueryHelper;
+    private final PermissionsService permissionsService;
+    private final UserRepository userRepository;
 
     @Value("${file.storage.type}")
     private String storageType;
 
-    public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,NativeQueryHelper nativeQueryHelper) {
+    public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,NativeQueryHelper nativeQueryHelper, PermissionsService permissionsService, UserRepository userRepository) {
         this.contentService = contentService;
         this.storageService = storageService;
         this.downloadService = downloadService;
         this.nativeQueryHelper = nativeQueryHelper;
+        this.permissionsService = permissionsService;
+        this.userRepository = userRepository;
     }
 
 
@@ -155,6 +163,13 @@ public class ContentController {
             @RequestPart("content") ContentCreationDTO contentCreationDTO,
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) throws Exception {
+
+        Long currentUserId = AuthHelper.getCurrentUserId();
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+
+        if (!permissionsService.canPost(user))
+            return ResponseEntity.status(403).build(); //TODO: Construir mensaje de respuesta y analizar 403 es el status correcto
 
         // Upload the main file and retrieve its public URL.
         String fileUrl = "base-url not implemented";

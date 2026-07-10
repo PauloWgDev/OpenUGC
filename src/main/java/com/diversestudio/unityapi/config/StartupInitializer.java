@@ -27,6 +27,13 @@ public class StartupInitializer {
                 user.setRoleName("USER");
                 roleRepository.save(user);
             }
+
+            if (roleRepository.findByRoleName("GUEST").isEmpty())
+            {
+                Role guest = new Role();
+                guest.setRoleName("GUEST");
+                roleRepository.save(guest);
+            }
         };
     }
 }

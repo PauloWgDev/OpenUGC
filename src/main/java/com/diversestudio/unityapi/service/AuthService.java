@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -62,6 +63,42 @@ public class AuthService {
         user.setCredential(passwordEncoder.encode(user.getCredential())); // Encrypt password
         userRepository.save(user);
         return "User registered successfully!";
+    }
+
+
+    public AuthResponse guestLogin()
+    {
+        Role guestRole = roleRepository.findByRoleName("GUEST")
+                .orElseThrow(() ->
+                        new IllegalStateException("Guest role not found"));
+
+        User guest = new User();
+
+        guest.setUsername(generateGuestUsername());
+        guest.setCredential(passwordEncoder.encode(UUID.randomUUID().toString())); // o un valor aleatorio
+        guest.setRole(guestRole);
+        guest.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+
+        userRepository.save(guest);
+
+        String token = jwtUtil.generateToken(
+                guest.getUserId(),
+                guest.getUsername(),
+                Collections.singletonList(guest.getRole().getRoleName())
+        );
+
+        return new AuthResponse(token);
+    }
+
+    private String generateGuestUsername() {
+
+        String username;
+
+        do {
+            username = "guest_" + UUID.randomUUID().toString().substring(0, 8);
+        } while (userRepository.findByUsername(username).isPresent());
+
+        return username;
     }
 
     public boolean authenticate(String username, String rawPassword) {

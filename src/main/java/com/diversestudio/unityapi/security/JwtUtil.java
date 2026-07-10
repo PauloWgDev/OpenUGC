@@ -20,7 +20,6 @@ public class JwtUtil {
 
     private final SecretKey key;
 
-
     // Load secret key from application.properties
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
