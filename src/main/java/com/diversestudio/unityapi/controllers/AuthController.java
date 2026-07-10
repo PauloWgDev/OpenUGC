@@ -1,6 +1,7 @@
 package com.diversestudio.unityapi.controllers;
 
 
+import com.diversestudio.unityapi.config.GuestProperties;
 import com.diversestudio.unityapi.dto.AuthRequest;
 import com.diversestudio.unityapi.dto.AuthResponse;
 import com.diversestudio.unityapi.entities.User;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final RateLimiterService rateLimiterService;
+    private final GuestProperties guestProperties;
 
-    public AuthController(AuthService authService, RateLimiterService rateLimiterService) {
+    public AuthController(AuthService authService, RateLimiterService rateLimiterService, GuestProperties guestProperties) {
         this.authService = authService;
         this.rateLimiterService = rateLimiterService;
+        this.guestProperties = guestProperties;
     }
     
     /**
@@ -57,5 +60,25 @@ public class AuthController {
         } else {
             return ResponseEntity.status(429).body("Too many login attempts. Please try again later.");
         }
+    }
+
+
+    @PostMapping("/guest")
+    public ResponseEntity<?> guestLogin(HttpServletRequest httpRequest) {
+
+        if (!guestProperties.isEnabled()) {
+            return ResponseEntity.status(403)
+                    .body("Guest users are disabled.");
+        }
+
+        String clientIp = httpRequest.getRemoteAddr();
+        Bucket bucket = rateLimiterService.resolveBucket("guest:" + clientIp);
+
+        if (!bucket.tryConsume(1)) {
+            return ResponseEntity.status(429)
+                    .body("Too many guest login attempts.");
+        }
+
+        return ResponseEntity.ok(authService.guestLogin());
     }
 }
