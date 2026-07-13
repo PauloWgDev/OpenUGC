@@ -1,0 +1,561 @@
+{
+  "info": {
+    "_postman_id": "607f811d-07be-406e-bdd2-e5a2e2b53107",
+    "name": "OpenUGC",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52496023",
+    "_collection_link": "https://go.postman.co/collection/52496023-607f811d-07be-406e-bdd2-e5a2e2b53107?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "authorization",
+      "item": [
+        {
+          "name": "login",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login response status\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401, 429]);\r",
+                  "});\r",
+                  "\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    let jsonData;\r",
+                  "\r",
+                  "    try {\r",
+                  "        jsonData = pm.response.json();\r",
+                  "    } catch (e) {\r",
+                  "        console.error(\"Response is not JSON:\", pm.response.text());\r",
+                  "        return;\r",
+                  "    }\r",
+                  "\r",
+                  "    // Adjust this depending on your AuthResponse structure\r",
+                  "    const token = jsonData.token || jsonData.jwt || jsonData.accessToken;\r",
+                  "\r",
+                  "    if (token) {\r",
+                  "        pm.environment.set(\"token\", token);\r",
+                  "        console.log(\"Token saved:\", token);\r",
+                  "    } else {\r",
+                  "        console.warn(\"⚠️ Token not found in response:\", jsonData);\r",
+                  "    }\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"credential\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "register",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generate random user data (only if not already set)\r",
+                  "if (true) {\r",
+                  "    const randomId = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "    const password = \"Test1234!\";\r",
+                  "    const username = `user${randomId}`;\r",
+                  "\r",
+                  "    pm.environment.set(\"password\", password);\r",
+                  "    pm.environment.set(\"username\", username);\r",
+                  "\r",
+                  "    console.log(\"Generated test user:\", {password, username });\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"credential\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "one content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/{i",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "{i"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "multiple contents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content?prompt=random name&page=10&size=15&sort=avgRating,desc",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content"
+              ],
+              "query": [
+                {
+                  "key": "prompt",
+                  "value": "random name",
+                  "type": "text"
+                },
+                {
+                  "key": "page",
+                  "value": "10",
+                  "type": "text"
+                },
+                {
+                  "key": "size",
+                  "value": "15",
+                  "type": "text"
+                },
+                {
+                  "key": "sort",
+                  "value": "avgRating,desc",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "download content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/download{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "download{id}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "upload content",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (true)\r",
+                  "{\r",
+                  "    const randomId = Math.floor(Math.random() * 1000000);\r",
+                  "    const name = `Content ${randomId}`;\r",
+                  "    const description = `This is just a test ${randomId}`;\r",
+                  "    const tag = `tag${Math.floor(Math.random() * 10) + 1}`; // Random tag between tag1 and tag10\r",
+                  "\r",
+                  "    const content = {\r",
+                  "    name: name,\r",
+                  "    description: description,\r",
+                  "    version: 1,\r",
+                  "    tags: [tag]\r",
+                  "    };\r",
+                  "\r",
+                  "    pm.environment.set(\"content_body\", JSON.stringify(content));\r",
+                  "\r",
+                  "    console.log(\"Generated content:\", content);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "content",
+                  "value": "{{content_body}}",
+                  "type": "text",
+                  "uuid": "ce2e5ca6-ed43-4de9-a432-4fbd4de3e461",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "4bd16602-e181-4875-a339-2af2fbd5e3a5",
+                  "src": "/C:/Users/pnwp/Documents/Proyectos/ws_bcp_proxy.postman_collection.json"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:8080/api/content",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete content",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "retrieve users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/users",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "retrieve one user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/users/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "patch user",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"pochoclo\",\r\n    \"aboutMe\": \"just another test user\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/users/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ratings",
+      "item": [
+        {
+          "name": "Get Ratings of a content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/rating/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rating",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get rating distribution",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/api/rating/{id}/distribution",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "api",
+                "rating",
+                "{id}",
+                "distribution"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "submt rating for a content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/api/content/api/rating/{id}",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "content",
+                "api",
+                "rating",
+                "{id}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

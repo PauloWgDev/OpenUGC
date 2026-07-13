@@ -1,0 +1,8 @@
+{
+  "label": "Self-Host - Set-Up",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "We consider that self-hosting is always the cooler way to go. But it's also the one that requires the most work and knowledge. If it is your first time doing this kind of work we recommend you go with the third-parties options since it is more straing forward."
+  }
+}
