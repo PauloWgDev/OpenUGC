@@ -1,46 +1,104 @@
 package com.diversestudio.unityapi.controllers;
 
-import com.diversestudio.unityapi.repository.UserRepository;
+import com.diversestudio.unityapi.dto.ChangePassword;
+import com.diversestudio.unityapi.dto.UserDTO;
+import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.security.AuthHelper;
+import com.diversestudio.unityapi.service.UserService;
+import com.diversestudio.unityapi.util.NativeQueryHelper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    private final UserRepository userRepository;
 
-    public UserController(UserRepository userRepository){
-        this.userRepository = userRepository;
+    private  final UserService userService;
+    private final NativeQueryHelper nativeQueryHelper;
+
+    public UserController(UserService userService, NativeQueryHelper nativeQueryHelper)
+    {
+        this.userService = userService;
+        this.nativeQueryHelper = nativeQueryHelper;
     }
 
-    // Retrieve all users (just for testing)
+    /**
+     * GET /api/users - Retrieves a paginated list of users, optionally filtered by a prompt
+     * and sorted by a specified field and direction.
+     *
+     * @param prompt optional filter string to match against user data (default: empty string)
+     * @param page the page number to retrieve (default: 0)
+     * @param size the number of users per page (default: 10)
+     * @param sort the sort criteria in the format "property,direction" (e.g., "joinedAt,desc")
+     * @return a {@link ResponseEntity} containing a page of {@link UserDTO} objects
+     */
     @GetMapping
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
+    public ResponseEntity<Page<UserDTO>> getUserPage(
+            @RequestParam(defaultValue = "") String prompt,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "joinedAt,desc") String sort
+    )
+    {
+        // Convert sort string into Spring's Sort object (you can re-use similar logic as in ContentService)
+        Sort sortOrder = nativeQueryHelper.StringToSort(sort);
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Page<UserDTO> userPage = userService.getUserPage(prompt, pageable);
+        return ResponseEntity.ok(userPage);
     }
 
-    // Retrieve a single user by ID
+
+    /**
+     * GET /api/users/{id} - Retrieves a specific user by their ID.
+     *
+     * @param id the ID of the user to retrieve
+     * @return a {@link ResponseEntity} containing the {@link UserDTO}
+     * @throws ResourceNotFoundException if the user with the specified ID does not exist
+     */
     @GetMapping("/{id}")
-    public Optional<ResponseEntity<User>> getUserById(@PathVariable Long id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.map(ResponseEntity::ok);
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO userDto = userService.getUserById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return ResponseEntity.ok(userDto);
     }
 
-
-    // Create a new user
+    /**
+     * POST /api/users - Creates a new user account.
+     *
+     * @param user the {@link User} object containing the registration details
+     * @return a {@link ResponseEntity} with HTTP 201 and the saved {@link UserDTO} if successful,
+     * or HTTP 400 with an error message if the username is already taken
+     */
     @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody User user) {
-        // Check if username already exists
-        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-        if (existingUser.isPresent()) {
+        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.status(400).body("Username already taken");
         }
+        UserDTO savedUser = userService.createUser(user);
+        return ResponseEntity.status(201).body(savedUser);
+    }
 
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.status(201).body(savedUser); // 201 Created
+    @PatchMapping()
+    public ResponseEntity<Object> updateUserData(@RequestBody UserDTO user)
+    {
+        Long userId = AuthHelper.getCurrentUserId();
+        userService.patchUser(userId, user);
+        return ResponseEntity.status(200).body("User Patched Successfully");
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Object> updatePassword(@RequestBody ChangePassword changePasswordObject)
+    {
+        Long userId = AuthHelper.getCurrentUserId();
+
+        userService.changePassword(userId, changePasswordObject);
+
+        return ResponseEntity.status(200).body("Password changed successfully");
     }
 }

@@ -1,0 +1,18 @@
+package com.diversestudio.unityapi.util.quearies;
+
+public interface QueryProvider {
+
+    String getWhereFilter(String columnName);
+    String getOrderBySimilarity(String columnName);
+    // Content
+    String getFindAllContent();
+    String getFindSingleContent();
+    String getFindAllContentGroupBy();
+
+    // User
+    String getFindAllUsers();
+
+    // Rating
+    String getFindRatingsByContent();
+    String getRatingDistributionByContent();
+}
