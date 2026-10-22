@@ -4,7 +4,7 @@ package com.diversestudio.unityapi.controllers;
 import com.diversestudio.unityapi.config.GuestProperties;
 import com.diversestudio.unityapi.dto.AuthRequest;
 import com.diversestudio.unityapi.dto.AuthResponse;
-import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.dto.RegisterRequest;
 import com.diversestudio.unityapi.service.AuthService;
 import com.diversestudio.unityapi.service.RateLimiterService;
 import io.github.bucket4j.Bucket;
@@ -28,17 +28,16 @@ public class AuthController {
     /**
      * POST /api/auth/register - Registers a new user in the system.
      *
-     * @param user the {@link User} object containing user registration details
+     * @param request the {@link RegisterRequest} with the new username and password
      * @return a {@link ResponseEntity} with a success message or error description
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         String clientIp = httpRequest.getRemoteAddr();
         Bucket bucket = rateLimiterService.resolveBucket("register:" + clientIp);
 
-        //return ResponseEntity.ok(authService.register(user));
         if (bucket.tryConsume(1)) {
-            return ResponseEntity.ok(authService.register(user));
+            return ResponseEntity.ok(authService.register(request));
         } else {
             return ResponseEntity.status(429).body("Too many registration attempts. Please try again later.");
         }
