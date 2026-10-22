@@ -2,10 +2,12 @@ package com.diversestudio.unityapi.service;
 
 import com.diversestudio.unityapi.dto.AuthRequest;
 import com.diversestudio.unityapi.dto.AuthResponse;
+import com.diversestudio.unityapi.dto.RegisterRequest;
 import com.diversestudio.unityapi.entities.Role;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.exeption.IncorrectPasswordException;
 import com.diversestudio.unityapi.exeption.InvalidPasswordException;
+import com.diversestudio.unityapi.exeption.InvalidRequestException;
 import com.diversestudio.unityapi.exeption.UsernameAlreadyExistsException;
 import com.diversestudio.unityapi.repository.RoleRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
@@ -43,24 +45,30 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
-    public String register(User user) {
+    public String register(RegisterRequest request) {
+        String username = request.username() == null ? null : request.username().trim();
+        String credential = request.credential();
+
+        if (username == null || username.isEmpty() || credential == null || credential.isBlank()) {
+            throw new InvalidRequestException("Username and password are required");
+        }
 
         // Check if the username already exists
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(username).isPresent()) {
             throw new UsernameAlreadyExistsException("Username already exists");
         }
 
-        // Set joinedAt to current timestamp if not provided
-        if (user.getJoinedAt() == null) {
-            user.setJoinedAt(new Timestamp(System.currentTimeMillis()));
-        }
-
-        // Set role to USER
         Role defaultRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new IllegalStateException("Default role not found"));
-        user.setRole(defaultRole);
 
-        user.setCredential(passwordEncoder.encode(user.getCredential())); // Encrypt password
+        // Always build a fresh entity on the server. userId stays null so save() can only INSERT,
+        // and role/joinedAt are never taken from the client.
+        User user = new User();
+        user.setUsername(username);
+        user.setCredential(passwordEncoder.encode(credential));
+        user.setRole(defaultRole);
+        user.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+
         userRepository.save(user);
         return "User registered successfully!";
     }
