@@ -17,13 +17,19 @@ public class AdminController {
         this.userService = userService;
     }
 
+    /**
+     * GET /api/admin/{id} - Retrieves any user by their ID. ADMIN only (enforced in SecurityConfig for /api/admin/**).
+     *
+     * @param id the ID of the user to retrieve
+     * @return HTTP 200 with the {@link UserDTO}
+     * @throws ResourceNotFoundException if no user exists with that ID (404)
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         UserDTO userDto = userService.getUserById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return ResponseEntity.ok(userDto);
     }
-    // admin endpoints here
 
     /**
      * POST /api/admin/users - Creates a user account. ADMIN only (enforced in SecurityConfig for /api/admin/**).
@@ -39,6 +45,17 @@ public class AdminController {
         return ResponseEntity.status(201).body(created);
     }
 
+    /**
+     * PATCH /api/admin/users/{id}/role/{roleName} - Changes a user's role. ADMIN only (enforced in SecurityConfig for /api/admin/**).
+     * <p>
+     * The new role applies to permission checks that read the role from the database right away.
+     * Tokens the user already holds keep their old role until they expire (up to 1 day).
+     *
+     * @param id       the ID of the user to update
+     * @param roleName the exact role name to assign (ADMIN, USER or GUEST; case-sensitive)
+     * @return HTTP 200 with the updated {@link UserDTO}
+     * @throws IllegalArgumentException if the user or role doesn't exist (currently returns 500)
+     */
     @PatchMapping("/users/{id}/role/{roleName}")
     public ResponseEntity<Object> updateRole(@PathVariable Long id, @PathVariable String roleName)
     {
