@@ -32,7 +32,7 @@ Note: the documentation is still a work in progress. Any constructive feedback i
 | Content         | DELETE | /api/content/{id}     | Deletes a content record and its associated files |
 | User            | GET    | /api/users            | Retrieves a paginated list of users, optionally filtered by a prompt and sorted by a specified field and direction |
 | User            | GET    | /api/users/{id}       | Retrieves a specific user by their ID            |
-| User            | POST   | /api/users            | Creates a new user account                       |
+| Admin           | POST   | /api/admin/users      | Creates a user account with a chosen role (ADMIN only) |
 | Rating          | GET    | /api/rating/{id}      | Retrieves a paginated list of ratings for the specific account |
 | Rating          | GET    | /api/rating/{id}/distribution | Returns a map where the keys represent rating values and the values indicate how many users gave each rating |
 | Rating          | POST   | /api/rating/{id}      | Registers a user's rating for the specific content |

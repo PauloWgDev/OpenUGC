@@ -6,9 +6,6 @@ import com.diversestudio.unityapi.dto.RegisterRequest;
 import com.diversestudio.unityapi.entities.Role;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.exeption.IncorrectPasswordException;
-import com.diversestudio.unityapi.exeption.InvalidPasswordException;
-import com.diversestudio.unityapi.exeption.InvalidRequestException;
-import com.diversestudio.unityapi.exeption.UsernameAlreadyExistsException;
 import com.diversestudio.unityapi.repository.RoleRepository;
 import com.diversestudio.unityapi.repository.UserRepository;
 import com.diversestudio.unityapi.security.JwtUtil;
@@ -26,12 +23,15 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
-    public AuthService(UserRepository userRepository, RoleRepository roleRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, RoleRepository roleRepository, JwtUtil jwtUtil,
+                       PasswordEncoder passwordEncoder, UserService userService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     public AuthResponse login(AuthRequest request)
@@ -46,30 +46,8 @@ public class AuthService {
     }
 
     public String register(RegisterRequest request) {
-        String username = request.username() == null ? null : request.username().trim();
-        String credential = request.credential();
-
-        if (username == null || username.isEmpty() || credential == null || credential.isBlank()) {
-            throw new InvalidRequestException("Username and password are required");
-        }
-
-        // Check if the username already exists
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new UsernameAlreadyExistsException("Username already exists");
-        }
-
-        Role defaultRole = roleRepository.findByRoleName("USER")
-                .orElseThrow(() -> new IllegalStateException("Default role not found"));
-
-        // Always build a fresh entity on the server. userId stays null so save() can only INSERT,
-        // and role/joinedAt are never taken from the client.
-        User user = new User();
-        user.setUsername(username);
-        user.setCredential(passwordEncoder.encode(credential));
-        user.setRole(defaultRole);
-        user.setJoinedAt(new Timestamp(System.currentTimeMillis()));
-
-        userRepository.save(user);
+        // Self-registration always gets the USER role; validation and entity building live in UserService.
+        userService.createUser(request.username(), request.credential(), "USER");
         return "User registered successfully!";
     }
 
