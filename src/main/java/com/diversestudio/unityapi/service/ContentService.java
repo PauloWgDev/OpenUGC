@@ -1,13 +1,13 @@
 package com.diversestudio.unityapi.service;
 
 import ch.qos.logback.classic.Logger;
-import com.diversestudio.unityapi.define.RoleName;
 import com.diversestudio.unityapi.dto.ContentCreationDTO;
 import com.diversestudio.unityapi.dto.ContentDTO;
 import com.diversestudio.unityapi.entities.Content;
 import com.diversestudio.unityapi.entities.ContentDates;
 import com.diversestudio.unityapi.entities.Tag;
 import com.diversestudio.unityapi.entities.User;
+import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
 import com.diversestudio.unityapi.exeption.UnauthorizedActionException;
 import com.diversestudio.unityapi.repository.ContentRepository;
 import com.diversestudio.unityapi.repository.TagRepository;
@@ -226,39 +226,40 @@ public class ContentService {
         return contentRepository.save(content);
     }
 
-    private boolean isUserAuthorize(Long contentId) {
+    /**
+     * Loads a content item and checks that the <b>current</b> user may modify it:
+     * either they created it, or they are an ADMIN.
+     * <p>
+     * The role is read from the database rather than the JWT, so a demoted admin
+     * loses moderation rights immediately instead of when their token expires.
+     *
+     * @throws ResourceNotFoundException   if the content does not exist (404)
+     * @throws UnauthorizedActionException if the current user may not modify it (403)
+     */
+    private Content getContentIfAuthorized(Long contentId, String action) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found"));
+
         Long currentUserId = AuthHelper.getCurrentUserId();
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new UnauthorizedActionException("Authenticated user no longer exists"));
 
-        Optional<Content> contentOptional = contentRepository.findById(contentId);
-        if (contentOptional.isEmpty()) {
-            logger.warn("Content with ID {} not found.", contentId);
-            return false;
+        boolean isOwner = content.getCreator().getUserId().equals(currentUserId);
+        boolean isAdmin = "ADMIN".equals(currentUser.getRole().getRoleName());
+
+        if (!isOwner && !isAdmin) {
+            logger.warn("User {} tried to {} content {} owned by user {}",
+                    currentUserId, action, contentId, content.getCreator().getUserId());
+            throw new UnauthorizedActionException("User not authorized to " + action + " this content");
         }
 
-        Content content = contentOptional.get();
-
-        boolean isAuthorized = false;
-
-        // Check if the current user is authorized to modify this content
-        if (
-                content.getCreator().getUserId().equals(currentUserId) ||
-                content.getCreator().getRole().getRoleId() == RoleName.ADMIN.getId())
-        {
-            isAuthorized = true;
-        }
-
-        return isAuthorized;
+        return content;
     }
 
     // Flags the content as deleted
     @Transactional
     public void softDeleteContent(Long contentId) throws Exception {
-        if (!isUserAuthorize(contentId)) {
-            throw new UnauthorizedActionException("User not authorized to soft delete this content");
-        }
-
-        Optional<Content> contentOptional = contentRepository.findById(contentId);
-        Content content = contentOptional.get();
+        Content content = getContentIfAuthorized(contentId, "soft delete");
 
         Timestamp now = Timestamp.from(Instant.now());
         content.getContentDates().setDeletedAt(now);
@@ -267,11 +268,7 @@ public class ContentService {
     // Removes all data from the content
     @Transactional
     public void hardDeleteContent(Long contentId) throws Exception {
-        if (!isUserAuthorize(contentId)) {
-            throw new UnauthorizedActionException("User not authorized to hard delete this content");
-        }
-        Optional<Content> contentOptional = contentRepository.findById(contentId);
-        Content content = contentOptional.get();
+        Content content = getContentIfAuthorized(contentId, "hard delete");
 
         // Delete the main file from storage if it exists.
         if (content.getData() != null) {

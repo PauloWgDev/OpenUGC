@@ -5,6 +5,8 @@ import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.entities.Role;
 import com.diversestudio.unityapi.exeption.InvalidPasswordException;
+import com.diversestudio.unityapi.exeption.InvalidRequestException;
+import com.diversestudio.unityapi.exeption.UsernameAlreadyExistsException;
 import com.diversestudio.unityapi.repository.DownloadRepository;
 import com.diversestudio.unityapi.repository.RatingRepository;
 import com.diversestudio.unityapi.repository.RoleRepository;
@@ -20,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.Query;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -106,9 +109,39 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public UserDTO createUser(User user) {
-        User savedUser = userRepository.save(user);
-        return convertToDTO(savedUser);
+    /**
+     * Creates a new account. This is the only place users are created from a username and password:
+     * both /api/auth/register (always role USER) and the admin endpoint go through here.
+     * <p>
+     * The entity is always built on the server, so userId stays null (save() can only INSERT)
+     * and role/joinedAt never come from the client.
+     *
+     * @param roleName role to assign; null or blank means USER
+     * @throws InvalidRequestException        if username or password is blank, or the role doesn't exist (400)
+     * @throws UsernameAlreadyExistsException if the username is taken
+     */
+    public UserDTO createUser(String username, String credential, String roleName) {
+        String cleanUsername = username == null ? null : username.trim();
+
+        if (cleanUsername == null || cleanUsername.isEmpty() || credential == null || credential.isBlank()) {
+            throw new InvalidRequestException("Username and password are required");
+        }
+
+        if (userRepository.findByUsername(cleanUsername).isPresent()) {
+            throw new UsernameAlreadyExistsException("Username already exists");
+        }
+
+        String cleanRoleName = (roleName == null || roleName.isBlank()) ? "USER" : roleName.trim().toUpperCase();
+        Role role = roleRepository.findByRoleName(cleanRoleName)
+                .orElseThrow(() -> new InvalidRequestException("Role not found: " + cleanRoleName));
+
+        User user = new User();
+        user.setUsername(cleanUsername);
+        user.setCredential(passwordEncoder.encode(credential));
+        user.setRole(role);
+        user.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+
+        return convertToDTO(userRepository.save(user));
     }
 
 
