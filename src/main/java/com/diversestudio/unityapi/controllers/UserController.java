@@ -3,7 +3,6 @@ package com.diversestudio.unityapi.controllers;
 import com.diversestudio.unityapi.dto.ChangePassword;
 import com.diversestudio.unityapi.dto.UserDTO;
 import com.diversestudio.unityapi.exeption.ResourceNotFoundException;
-import com.diversestudio.unityapi.entities.User;
 import com.diversestudio.unityapi.security.AuthHelper;
 import com.diversestudio.unityapi.service.UserService;
 import com.diversestudio.unityapi.util.NativeQueryHelper;
@@ -68,21 +67,8 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
-    /**
-     * POST /api/users - Creates a new user account.
-     *
-     * @param user the {@link User} object containing the registration details
-     * @return a {@link ResponseEntity} with HTTP 201 and the saved {@link UserDTO} if successful,
-     * or HTTP 400 with an error message if the username is already taken
-     */
-    @PostMapping
-    public ResponseEntity<Object> createUser(@RequestBody User user) {
-        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.status(400).body("Username already taken");
-        }
-        UserDTO savedUser = userService.createUser(user);
-        return ResponseEntity.status(201).body(savedUser);
-    }
+    // Account creation is not exposed here: players use POST /api/auth/register,
+    // and admins use POST /api/admin/users.
 
     @PatchMapping()
     public ResponseEntity<Object> updateUserData(@RequestBody UserDTO user)

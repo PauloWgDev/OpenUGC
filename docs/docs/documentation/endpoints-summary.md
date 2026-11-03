@@ -36,8 +36,18 @@ For detailed request/response examples, see the dedicated sections for each cont
 |-------|----------------------|------------------------------------------------------|
 | GET   | `/api/users`         | Get all users (with pagination, search, sorting)     |
 | GET   | `/api/users/{id}`    | Get a specific user by ID                            |
-| POST  | `/api/users`         | Create a new user account (admin or system use only) |
 | PATCH | `/api/users`         | Allows to update username, aboutMe or profilePicture |
+
+---
+
+## Admin
+
+Requires a token with the `ADMIN` role.
+
+| Method | Endpoint                               | Description                                                        |
+|--------|----------------------------------------|--------------------------------------------------------------------|
+| POST   | `/api/admin/users`                     | Create a user account (`username`, `password`, optional `role`, default `USER`) |
+| PATCH  | `/api/admin/users/{id}/role/{roleName}`| Change a user's role                                               |
 
 ---
 
