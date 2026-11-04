@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.diversestudio</groupId>
-	<artifactId>unityapi</artifactId>
+	<artifactId>openugc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>unity-api</name>
-	<description>REST API for the Unofficial Unity user-generated content system</description>
+	<name>openugc</name>
+	<description>Open Source REST API to support user-generated content system</description>
 	<url/>
 	<licenses>
 		<license/>
