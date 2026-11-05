@@ -25,6 +25,7 @@ import jakarta.persistence.Query;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -38,6 +39,15 @@ public class UserService {
     private final NativeQueryHelper nativeQueryHelper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // Whitelist of fields a client may sort users by: API name -> safe column/alias.
+    private static final Map<String, String> USER_SORT = Map.of(
+            "joinedAt",              "joinedAt",
+            "username",              "username",
+            "downloadsPerformed",    "downloadsPerformed",
+            "downloadReceived",      "downloadReceived",
+            "averageRatingsReceive", "averageRatingsReceive"
+    );
 
     public UserService(UserRepository userRepository, DownloadRepository downloadRepository,
                        RatingRepository ratingRepository, NativeQueryHelper nativeQueryHelper,
@@ -65,13 +75,13 @@ public class UserService {
             sqlBuilder.append(" ORDER BY ");
             List<String> orderList = new ArrayList<>();
             pageable.getSort().forEach(order -> {
-                String property = order.getProperty();
+                String column = nativeQueryHelper.resolveSortColumn(USER_SORT, order.getProperty());
                 String direction = order.getDirection().toString();
                 // For fields like averageRatingsReceive, add NULLS LAST if needed.
-                if ("averageRatingsReceive".equals(property)) {
-                    orderList.add(property + " " + direction + " NULLS LAST");
+                if ("averageRatingsReceive".equals(column)) {
+                    orderList.add(column + " " + direction + " NULLS LAST");
                 } else {
-                    orderList.add(property + " " + direction);
+                    orderList.add(column + " " + direction);
                 }
             });
             sqlBuilder.append(String.join(", ", orderList));
@@ -165,7 +175,7 @@ public class UserService {
         String currentPassword = changePasswordObject.currentPassword();
         String newPassword = changePasswordObject.newPassword();
 
-        if (passwordEncoder.matches(user.getCredential(), currentPassword))
+        if (!passwordEncoder.matches(user.getCredential(), currentPassword))
         {
             throw new InvalidPasswordException("Password is incorrect");
         }
