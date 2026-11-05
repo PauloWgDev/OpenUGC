@@ -188,9 +188,39 @@ public class ContentService {
         return tags;
     }
 
+    /**
+     * Maps a freshly created {@link Content} to the public {@link ContentDTO}.
+     * <p>
+     * Only the creator's id and username are copied, so no other user data
+     * (credential hash, role, ...) can leak into the response.
+     * A new item has no downloads or ratings yet, so those stats start at 0 / null.
+     */
+    private ContentDTO toNewContentDTO(Content content) {
+        String[] tagNames = content.getTags().stream()
+                .map(Tag::getName)
+                .toArray(String[]::new);
+
+        return new ContentDTO(
+                content.getContentId(),
+                content.getCreator().getUserId(),
+                content.getCreator().getUsername(),
+                content.getData(),
+                content.getThumbnail(),
+                content.getName(),
+                content.getDescription(),
+                tagNames,
+                content.getVersion(),
+                0L,   // downloadsCount
+                0L,   // latestDownloadsCount
+                null, // avgRating: no ratings yet
+                content.getContentDates().getCreatedAt(),
+                content.getContentDates().getUpdatedAt()
+        );
+    }
+    
 
     @Transactional
-    public Content createContent(ContentCreationDTO dto) {
+    public ContentDTO createContent(ContentCreationDTO dto) {
         // Retrieve the authenticated user's ID
         Long creatorId = AuthHelper.getCurrentUserId();
 
@@ -223,7 +253,8 @@ public class ContentService {
         contentDates.setContent(content);
         content.setContentDates(contentDates);
 
-        return contentRepository.save(content);
+        Content saved = contentRepository.save(content);
+        return toNewContentDTO(saved);
     }
 
     /**

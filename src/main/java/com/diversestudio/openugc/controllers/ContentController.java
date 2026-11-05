@@ -143,23 +143,31 @@ public class ContentController {
      * Expects a multipart/form-data request with the following parts:
      * <ul>
      *     <li><strong>content</strong>: JSON payload mapping to {@link ContentCreationDTO}
-     *         (excluding file URL and thumbnail URL).</li>
-     *     <li><strong>file</strong>: The main file to be uploaded. Its public URL will be set as the {@code data} field.</li>
-     *     <li><strong>thumbnail</strong> (optional): An optional thumbnail file to be uploaded. Its public URL
-     *         will be set as the {@code thumbnail} field.</li>
+     *         (name, description, version, tags). The {@code data} and {@code thumbnail} fields
+     *         are ignored, because the server sets them after uploading the files.</li>
+     *     <li><strong>file</strong>: The main file to be uploaded. Its public URL is stored in the {@code data} field.</li>
+     *     <li><strong>thumbnail</strong> (optional): A thumbnail image. Its public URL is stored in the
+     *         {@code thumbnail} field.</li>
      * </ul>
+     * Each part is limited by {@code spring.servlet.multipart.max-file-size} (1MB by default).
      * <p>
-     * The endpoint first uploads the main file and, if provided, the thumbnail.
-     * It then updates the received DTO with these URLs and creates the Content record.
+     * The endpoint checks that the authenticated user is allowed to post, uploads the main file and,
+     * if provided, the thumbnail, then creates the Content record. If both storage base URLs are set
+     * to {@code not_using}, no files are uploaded and {@code data} is set to a placeholder.
+     * <p>
+     * The response is a {@link ContentDTO}, the same shape returned by {@code GET /api/content/{id}}.
+     * It exposes only the creator's id and username, never the full user entity. Because the content
+     * is new, {@code downloadsCount} and {@code latestDownloadsCount} are 0 and {@code avgRating} is null.
      *
-     * @param contentCreationDTO the content metadata (name, description, version, etc.)
+     * @param contentCreationDTO the content metadata (name, description, version, tags)
      * @param file the main file to upload
      * @param thumbnail (optional) the thumbnail image file to upload
-     * @return a ResponseEntity containing the created Content
+     * @return HTTP 200 with the created content as a {@link ContentDTO};
+     *         HTTP 403 with an empty body if the user is not allowed to post (e.g. a guest when {@code guest.can-post=false})
      * @throws Exception if file upload or content creation fails
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Content> uploadContent(
+    public ResponseEntity<ContentDTO> uploadContent(
             @RequestPart("content") ContentCreationDTO contentCreationDTO,
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) throws Exception {
@@ -197,7 +205,7 @@ public class ContentController {
         );
 
         // Create the Content record using the updated DTO.
-        Content savedContent = contentService.createContent(updatedDTO);
+        ContentDTO savedContent = contentService.createContent(updatedDTO);
         return ResponseEntity.ok(savedContent);
     }
 

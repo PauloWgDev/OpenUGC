@@ -10,8 +10,8 @@ services:
       DATABASE_PROFILE: postgres
 
       DATABASE_URL: jdbc:postgresql://postgres:5432/openapitest
-      DATABASE_USERNAME: username
-      DATABASE_PASSWORD: password
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
 
       JWT_SECRET: aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!
 
