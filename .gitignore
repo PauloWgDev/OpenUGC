@@ -38,6 +38,7 @@ run-project.ps1
 run.sh
 run.ps1
 setEnvVars.ps1
+docker-compose.yml
 
 storage
 
