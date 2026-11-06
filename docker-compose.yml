@@ -10,8 +10,8 @@ services:
       DATABASE_PROFILE: postgres
 
       DATABASE_URL: jdbc:postgresql://postgres:5432/openapitest
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
+      DATABASE_USERNAME: pnwp
+      DATABASE_PASSWORD: pnwp
 
       JWT_SECRET: aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!
 
@@ -39,8 +39,8 @@ services:
 
     environment:
       POSTGRES_DB: openapitest
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: pnwp
+      POSTGRES_PASSWORD: pnwp
 
     ports:
       - "5432:5432"
