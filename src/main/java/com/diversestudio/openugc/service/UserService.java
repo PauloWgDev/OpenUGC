@@ -175,7 +175,7 @@ public class UserService {
         String currentPassword = changePasswordObject.currentPassword();
         String newPassword = changePasswordObject.newPassword();
 
-        if (!passwordEncoder.matches(user.getCredential(), currentPassword))
+        if (!passwordEncoder.matches(currentPassword, user.getCredential()))
         {
             throw new InvalidPasswordException("Password is incorrect");
         }
