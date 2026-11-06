@@ -7,6 +7,7 @@ import com.diversestudio.openugc.entities.Content;
 import com.diversestudio.openugc.entities.ContentDates;
 import com.diversestudio.openugc.entities.Tag;
 import com.diversestudio.openugc.entities.User;
+import com.diversestudio.openugc.exeption.InvalidRequestException;
 import com.diversestudio.openugc.exeption.ResourceNotFoundException;
 import com.diversestudio.openugc.exeption.UnauthorizedActionException;
 import com.diversestudio.openugc.repository.ContentRepository;
@@ -40,6 +41,17 @@ public class ContentService {
     private final NativeQueryHelper nativeQueryHelper;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(ContentService.class);
 
+    // Whitelist of fields a client may sort content by: API name -> safe column/alias.
+    private static final Map<String, String> CONTENT_SORT = Map.of(
+            "createdAt",            "createdAt",
+            "updatedAt",            "updatedAt",
+            "name",                 "name",
+            "version",              "version",
+            "avgRating",            "avgRating",
+            "downloadsCount",       "downloadsCount",
+            "latestDownloadsCount", "latestDownloadsCount"
+    );
+
     public ContentService(ContentRepository contentRepository, UserRepository userRepository, StorageService storageService,NativeQueryHelper nativeQueryHelper){
         this.contentRepository = contentRepository;
         this.userRepository = userRepository;
@@ -54,13 +66,13 @@ public class ContentService {
             sqlBuilder.append(" ORDER BY ");
             List<String> orderList = new ArrayList<>();
             pageable.getSort().forEach(order -> {
-                String property = order.getProperty();
+                String column = nativeQueryHelper.resolveSortColumn(CONTENT_SORT, order.getProperty());
                 String direction = order.getDirection().toString();
                 // If sorting on avgRating, add NULLS LAST as before
-                if ("avgRating".equals(property)) {
-                    orderList.add(property + " " + direction + " NULLS LAST");
+                if ("avgRating".equals(column)) {
+                    orderList.add(column + " " + direction + " NULLS LAST");
                 } else {
-                    orderList.add(property + " " + direction);
+                    orderList.add(column + " " + direction);
                 }
             });
             sqlBuilder.append(String.join(", ", orderList));
