@@ -1,11 +1,11 @@
 package com.diversestudio.openugc.service;
 
-import com.diversestudio.openugc.dto.AuthRequest;
-import com.diversestudio.openugc.dto.AuthResponse;
-import com.diversestudio.openugc.dto.RegisterRequest;
-import com.diversestudio.openugc.entities.Role;
-import com.diversestudio.openugc.entities.User;
-import com.diversestudio.openugc.exeption.IncorrectPasswordException;
+import com.diversestudio.openugc.dto.AuthRequestDTO;
+import com.diversestudio.openugc.dto.AuthResponseDTO;
+import com.diversestudio.openugc.dto.RegisterRequestDTO;
+import com.diversestudio.openugc.entity.Role;
+import com.diversestudio.openugc.entity.User;
+import com.diversestudio.openugc.exception.IncorrectPasswordException;
 import com.diversestudio.openugc.repository.RoleRepository;
 import com.diversestudio.openugc.repository.UserRepository;
 import com.diversestudio.openugc.security.JwtUtil;
@@ -34,7 +34,7 @@ public class AuthService {
         this.userService = userService;
     }
 
-    public AuthResponse login(AuthRequest request)
+    public AuthResponseDTO login(AuthRequestDTO request)
     {
         Optional<User> userOptional = userRepository.findByUsername(request.username());
         if (userOptional.isEmpty() || !passwordEncoder.matches(request.credential(), userOptional.get().getCredential())) {
@@ -42,17 +42,17 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(userOptional.get().getUserId(), userOptional.get().getUsername(), Collections.singletonList(userOptional.get().getRole().getRoleName()));
-        return new AuthResponse(token);
+        return new AuthResponseDTO(token);
     }
 
-    public String register(RegisterRequest request) {
+    public String register(RegisterRequestDTO request) {
         // Self-registration always gets the USER role; validation and entity building live in UserService.
         userService.createUser(request.username(), request.credential(), "USER");
         return "User registered successfully!";
     }
 
 
-    public AuthResponse guestLogin()
+    public AuthResponseDTO guestLogin()
     {
         Role guestRole = roleRepository.findByRoleName("GUEST")
                 .orElseThrow(() ->
@@ -73,7 +73,7 @@ public class AuthService {
                 Collections.singletonList(guest.getRole().getRoleName())
         );
 
-        return new AuthResponse(token);
+        return new AuthResponseDTO(token);
     }
 
     private String generateGuestUsername() {

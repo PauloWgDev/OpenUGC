@@ -1,7 +1,7 @@
 package com.diversestudio.openugc.repository;
 
 import com.diversestudio.openugc.dto.StatsDTO;
-import com.diversestudio.openugc.entities.Content;
+import com.diversestudio.openugc.entity.Content;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
