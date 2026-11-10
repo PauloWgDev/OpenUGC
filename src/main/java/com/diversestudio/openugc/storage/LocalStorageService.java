@@ -1,74 +1,83 @@
 package com.diversestudio.openugc.storage;
 
+import com.diversestudio.openugc.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 @Service
 @ConditionalOnProperty(name = "file.storage.type", havingValue = "local", matchIfMissing = true)
 public class LocalStorageService implements StorageService {
 
     private final Path fileStorageLocation;
+    private final String fileBaseUrl;
 
-    // Inject the base URL defined in application.properties
-    @Value("${file.storage.baseUrl}")
-    private String fileBaseUrl;
-
-    public LocalStorageService(@Value("${file.storage.location}") String storageLocation) throws Exception {
+    public LocalStorageService(@Value("${file.storage.location}") String storageLocation,
+                               @Value("${file.storage.baseUrl}") String fileBaseUrl) throws IOException {
         this.fileStorageLocation = Paths.get(storageLocation).toAbsolutePath().normalize();
+        this.fileBaseUrl = fileBaseUrl;
         Files.createDirectories(this.fileStorageLocation);
     }
 
     @Override
-    public String uploadFile(MultipartFile file) throws Exception {
-        String fileName = file.getOriginalFilename();
-
-        //TODO: MAKE SURE THE SECURITY CANNOT BE BROKEN
-        // Simple security check to prevent path traversal attacks.
-        if(fileName.contains("..")){
-            throw new Exception("Invalid file name: " + fileName);
+    public void uploadFile(String key, MultipartFile file, String contentType) throws IOException {
+        Path target = resolveInsideStorage(key);
+        try (InputStream in = file.getInputStream()) {
+            // No REPLACE_EXISTING: an existing file is never overwritten.
+            Files.copy(in, target);
         }
-
-        // Determine target location and save the file.
-        Path targetLocation = this.fileStorageLocation.resolve(fileName);
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-        // Return the public URL
-        return fileBaseUrl + fileName;
     }
 
     @Override
-    public Resource loadFileAsResource(String fileName) throws Exception {
+    public Resource loadFileAsResource(String storedValue) {
+        Path filePath = resolveInsideStorage(StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl));
+        if (!Files.isRegularFile(filePath) || !Files.isReadable(filePath)) {
+            throw new ResourceNotFoundException("File not found");
+        }
+        return new FileSystemResource(filePath);
+    }
+
+    @Override
+    public void deleteFile(String storedValue) throws IOException {
+        Path filePath = resolveInsideStorage(StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl));
+        Files.deleteIfExists(filePath);
+    }
+
+    @Override
+    public String getPublicUrl(String storedValue) {
+        if (storedValue == null) {
+            return null;
+        }
+        return fileBaseUrl + StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl);
+    }
+
+    /**
+     * Resolves a key to a path directly inside the storage directory, rejecting anything that
+     * would land elsewhere (absolute paths, {@code ..}, sub-directories, invalid characters).
+     */
+    private Path resolveInsideStorage(String key) {
+        if (key == null || key.isBlank()) {
+            throw new IllegalArgumentException("Storage key is empty");
+        }
+        Path resolved;
         try {
-            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists() && resource.isReadable()) {
-                return resource;
-            } else {
-                throw new Exception("File not found or not readable: " + fileName);
-            }
-        } catch (MalformedURLException ex) {
-            throw new Exception("File not found: " + fileName, ex);
+            resolved = fileStorageLocation.resolve(key).normalize();
+        } catch (InvalidPathException e) {
+            throw new IllegalArgumentException("Invalid storage key", e);
         }
-    }
-
-    @Override
-    public void deleteFile(String fileUrl) throws Exception {
-        // Ensure the fileUrl starts with the fileBaseUrl. Then extract the file name.
-        if (!fileUrl.startsWith(fileBaseUrl)) {
-            throw new Exception("File URL does not match the base URL.");
+        if (!fileStorageLocation.equals(resolved.getParent())) {
+            throw new IllegalArgumentException("Storage key resolves outside the storage directory");
         }
-        String fileName = fileUrl.substring(fileBaseUrl.length());
-        Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
-        Files.deleteIfExists(targetLocation);
+        return resolved;
     }
 }
