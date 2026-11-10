@@ -1,6 +1,6 @@
 package com.diversestudio.openugc.repository;
 
-import com.diversestudio.openugc.entities.User;
+import com.diversestudio.openugc.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

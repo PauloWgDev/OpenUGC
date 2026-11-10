@@ -1,6 +1,6 @@
 package com.diversestudio.openugc.config;
 
-import com.diversestudio.openugc.entities.Role;
+import com.diversestudio.openugc.entity.Role;
 import com.diversestudio.openugc.repository.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

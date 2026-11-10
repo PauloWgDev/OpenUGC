@@ -1,7 +1,7 @@
 package com.diversestudio.openugc.repository;
 
-import com.diversestudio.openugc.entities.Download;
-import com.diversestudio.openugc.entities.DownloadId;
+import com.diversestudio.openugc.entity.Download;
+import com.diversestudio.openugc.entity.DownloadId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

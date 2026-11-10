@@ -1,7 +1,7 @@
 package com.diversestudio.openugc.repository;
 
-import com.diversestudio.openugc.entities.Rating;
-import com.diversestudio.openugc.entities.RatingId;
+import com.diversestudio.openugc.entity.Rating;
+import com.diversestudio.openugc.entity.RatingId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
