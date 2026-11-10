@@ -1,13 +1,11 @@
 package com.diversestudio.openugc;
 
+import com.diversestudio.openugc.support.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class UnityApiApplicationTests {
+class UnityApiApplicationTests extends AbstractIntegrationTest {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }
