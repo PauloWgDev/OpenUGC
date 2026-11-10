@@ -1,7 +1,7 @@
 package com.diversestudio.openugc.service;
 
 import com.diversestudio.openugc.dto.ContentDTO;
-import com.diversestudio.openugc.entities.Rating;
+import com.diversestudio.openugc.entity.Rating;
 import com.diversestudio.openugc.repository.RatingRepository;
 import com.diversestudio.openugc.security.AuthHelper;
 import com.diversestudio.openugc.util.NativeQueryHelper;

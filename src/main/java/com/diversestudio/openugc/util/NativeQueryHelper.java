@@ -1,8 +1,8 @@
 package com.diversestudio.openugc.util;
 
 
-import com.diversestudio.openugc.exeption.InvalidRequestException;
-import com.diversestudio.openugc.util.quearies.QueryProvider;
+import com.diversestudio.openugc.exception.InvalidRequestException;
+import com.diversestudio.openugc.util.queries.QueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;

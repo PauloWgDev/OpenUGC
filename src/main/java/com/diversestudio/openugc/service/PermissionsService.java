@@ -1,7 +1,7 @@
 package com.diversestudio.openugc.service;
 
 import com.diversestudio.openugc.config.GuestProperties;
-import com.diversestudio.openugc.entities.User;
+import com.diversestudio.openugc.entity.User;
 import org.springframework.stereotype.Service;
 
 @Service

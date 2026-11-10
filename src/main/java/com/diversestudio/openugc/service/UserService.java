@@ -1,12 +1,12 @@
 package com.diversestudio.openugc.service;
 
-import com.diversestudio.openugc.dto.ChangePassword;
+import com.diversestudio.openugc.dto.ChangePasswordDTO;
 import com.diversestudio.openugc.dto.UserDTO;
-import com.diversestudio.openugc.entities.User;
-import com.diversestudio.openugc.entities.Role;
-import com.diversestudio.openugc.exeption.InvalidPasswordException;
-import com.diversestudio.openugc.exeption.InvalidRequestException;
-import com.diversestudio.openugc.exeption.UsernameAlreadyExistsException;
+import com.diversestudio.openugc.entity.User;
+import com.diversestudio.openugc.entity.Role;
+import com.diversestudio.openugc.exception.InvalidPasswordException;
+import com.diversestudio.openugc.exception.InvalidRequestException;
+import com.diversestudio.openugc.exception.UsernameAlreadyExistsException;
 import com.diversestudio.openugc.repository.DownloadRepository;
 import com.diversestudio.openugc.repository.RatingRepository;
 import com.diversestudio.openugc.repository.RoleRepository;
@@ -168,7 +168,7 @@ public class UserService {
         Optional.ofNullable(dto.aboutMe()).ifPresent(user::setAboutMe);
     }
 
-    public void changePassword(Long userId, ChangePassword changePasswordObject)
+    public void changePassword(Long userId, ChangePasswordDTO changePasswordObject)
     {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not Found"));
 

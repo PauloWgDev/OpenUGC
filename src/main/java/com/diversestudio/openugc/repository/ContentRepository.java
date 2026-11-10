@@ -1,6 +1,6 @@
 package com.diversestudio.openugc.repository;
 
-import com.diversestudio.openugc.entities.Content;
+import com.diversestudio.openugc.entity.Content;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

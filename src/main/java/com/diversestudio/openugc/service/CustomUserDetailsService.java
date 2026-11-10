@@ -1,6 +1,6 @@
 package com.diversestudio.openugc.service;
 
-import com.diversestudio.openugc.entities.User;
+import com.diversestudio.openugc.entity.User;
 import com.diversestudio.openugc.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
