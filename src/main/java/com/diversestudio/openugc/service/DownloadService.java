@@ -1,7 +1,7 @@
 package com.diversestudio.openugc.service;
 
 import com.diversestudio.openugc.dto.ContentDTO;
-import com.diversestudio.openugc.entities.Download;
+import com.diversestudio.openugc.entity.Download;
 import com.diversestudio.openugc.repository.DownloadRepository;
 import com.diversestudio.openugc.security.AuthHelper;
 import org.springframework.stereotype.Service;
