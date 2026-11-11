@@ -47,10 +47,13 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
     @Value("${file.storage.baseUrl}")
     String baseUrl;
 
-    String token;
+    static String token;
 
     @BeforeEach
-    void registerAndLogin() throws Exception {
+    void registerAndLoginOnce() throws Exception {
+        if (token != null) {
+            return;
+        }
         String credentials = """
                 {"username":"upload_%s","credential":"s3cret-pass"}
                 """.formatted(UUID.randomUUID().toString().substring(0, 8));
