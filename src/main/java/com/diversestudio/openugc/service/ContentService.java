@@ -157,13 +157,30 @@ public class ContentService {
         if (tags != null && !tags.isEmpty())
             q.setParameter("tags", tags);
 
-        List<ContentDTO> items = q.getResultList();
+        List<ContentDTO> items = ((List<ContentDTO>) q.getResultList()).stream()
+                .map(this::withPublicUrls)
+                .toList();
         long total = items.size();
 
         return new PageImpl<>(items, pageable, total);
     }
 
+    /**
+     * Returns a content item as exposed by the API: {@code data} and {@code thumbnail} are public URLs.
+     */
     public Optional<ContentDTO> getContentById(Long id) {
+        return findContentById(id).map(this::withPublicUrls);
+    }
+
+    /**
+     * Returns a content item with {@code data} and {@code thumbnail} as stored in the database
+     * (storage keys), for loading the file from storage. Not meant to be returned to clients.
+     */
+    public Optional<ContentDTO> getContentForDownload(Long id) {
+        return findContentById(id);
+    }
+
+    private Optional<ContentDTO> findContentById(Long id) {
         StringBuilder sql = new StringBuilder(nativeQueryHelper.getFindSingleContent());
 
         // GROUP BY
@@ -180,6 +197,26 @@ public class ContentService {
         } else {
             return Optional.of(item.get(0));
         }
+    }
+
+    /** Replaces the stored keys in {@code data} and {@code thumbnail} with their public URLs. */
+    private ContentDTO withPublicUrls(ContentDTO c) {
+        return new ContentDTO(
+                c.contentId(),
+                c.creatorId(),
+                c.creatorName(),
+                storageService.getPublicUrl(c.data()),
+                storageService.getPublicUrl(c.thumbnail()),
+                c.name(),
+                c.description(),
+                c.tags(),
+                c.version(),
+                c.downloadsCount(),
+                c.latestDownloadsCount(),
+                c.avgRating(),
+                c.createdAt(),
+                c.updatedAt()
+        );
     }
 
     @Autowired
@@ -215,8 +252,8 @@ public class ContentService {
                 content.getContentId(),
                 content.getCreator().getUserId(),
                 content.getCreator().getUsername(),
-                content.getData(),
-                content.getThumbnail(),
+                storageService.getPublicUrl(content.getData()),
+                storageService.getPublicUrl(content.getThumbnail()),
                 content.getName(),
                 content.getDescription(),
                 tagNames,
