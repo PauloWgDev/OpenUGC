@@ -1,6 +1,5 @@
 package com.diversestudio.openugc.service;
 
-import ch.qos.logback.classic.Logger;
 import com.diversestudio.openugc.dto.ContentCreationDTO;
 import com.diversestudio.openugc.dto.ContentDTO;
 import com.diversestudio.openugc.entity.Content;
@@ -18,6 +17,7 @@ import com.diversestudio.openugc.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,7 +38,7 @@ public class ContentService {
     private final UserRepository userRepository;
     private final StorageService storageService;
     private final NativeQueryHelper nativeQueryHelper;
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(ContentService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ContentService.class);
 
     // Whitelist of fields a client may sort content by: API name -> safe column/alias.
     private static final Map<String, String> CONTENT_SORT = Map.of(
@@ -88,7 +88,7 @@ public class ContentService {
         // Append pagination.
         sqlBuilder.append(" LIMIT :limit OFFSET :offset");
 
-        System.out.println("ORDER BY clause appended: " + sqlBuilder);
+        logger.debug("Content query: {}", sqlBuilder);
 
         return sqlBuilder;
     }
