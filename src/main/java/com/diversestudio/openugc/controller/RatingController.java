@@ -29,11 +29,11 @@ public class RatingController
      * <p>
      * This endpoint extracts the content ID from the URL, accepts a rating value and an optional comment as request parameters,
      * verifies that the content exists, and then registers the rating associated with the currently authenticated user.
-     * If the content is not found, an error is thrown.
+     * If the content is not found, 404 is returned.
      * </p>
      *
      * @param id      the unique identifier of the content to rate.
-     * @param rating  the numeric rating provided by the user.
+     * @param rating  the numeric rating provided by the user, from 1 to 5. Anything else returns 400.
      * @param comment an optional comment about the content.
      * @return a {@link ResponseEntity} containing the saved {@link Rating} record.
      */
