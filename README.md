@@ -143,7 +143,7 @@ All settings are read from environment variables.
 **Other defaults worth knowing**
 
 - Uploads are limited to **1 MB per request** (`spring.servlet.multipart.max-*` in `application.properties`). Raise it if your content is larger.
-- Security and SQL debug logging are **on** by default. Turn them off in `application.properties` for production.
+- Security and SQL debug logging are **off** by default. To turn them on while developing, set `LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG` and/or `SPRING_JPA_SHOW_SQL=true`.
 - **Running behind a reverse proxy** (nginx, Render, etc): the client IP used for rate limits and download records comes from `X-Forwarded-For`, but only when the request arrives from a trusted proxy. By default those are private and loopback addresses. If your proxy connects from a public IP, set `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES`. Don't let clients reach the app directly from a private network while it trusts that network, because they could then set the header themselves.
 - The schema is managed by Hibernate (`ddl-auto=update`), so tables are created on first start.
 
@@ -192,7 +192,7 @@ All endpoints except `/api/auth/**` and the Swagger docs require an `Authorizati
 
 | Method | Endpoint                          | Description                                                        |
 |--------|-----------------------------------|--------------------------------------------------------------------|
-| POST   | `/api/rating/{contentId}`         | Rate content. Query params: `rating`, optional `comment`.          |
+| POST   | `/api/rating/{contentId}`         | Rate content. Query params: `rating` (1-5), optional `comment`.    |
 | GET    | `/api/rating/{contentId}`         | Paginated ratings; filter by a single value with `rating`.         |
 | GET    | `/api/rating/{contentId}/distribution` | Count of ratings per value                                    |
 | GET    | `/api/stats/{contentId}`          | Downloads (total and last 7 days), rating count and average        |
