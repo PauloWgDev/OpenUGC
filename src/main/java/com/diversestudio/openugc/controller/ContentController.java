@@ -55,16 +55,6 @@ public class ContentController {
     }
 
 
-    // Helper Function to Extract IP address
-    private String extractClientIp(HttpServletRequest request) {
-        String header = request.getHeader("X-Forwarded-For");
-        if (header == null || header.isEmpty()) {
-            return request.getRemoteAddr();
-        } else {
-            return header.split(",")[0].trim(); // First IP in chain
-        }
-    }
-
     /**
      * GET /api/content - Retrieves a paginated list of content entries, optionally filtered by prompt
      * and sorted according to a specified property and direction.
@@ -108,7 +98,7 @@ public class ContentController {
      * GET /api/content/download/{id} - Handles the download request for a content item by its unique identifier.
      *
      * @param id the unique identifier of the content to be downloaded
-     * @param request the HTTP request, used to extract the client IP address
+     * @param request the HTTP request; {@code getRemoteAddr()} gives the client IP
      * @return a {@link ResponseEntity} with the binary content of the file as an attachment,
      *         or a 404 response if the content is not found
      * @throws Exception if file loading or download registration fails
@@ -125,9 +115,7 @@ public class ContentController {
         // Load the file first, so a download is only counted if the file actually exists.
         Resource fileResource = storageService.loadFileAsResource(content.data());
 
-        // Extract client IP and register download
-        String ipAddress = extractClientIp(request);
-        downloadService.registerDownload(content, ipAddress);
+        downloadService.registerDownload(content, request.getRemoteAddr());
 
         // Offer "<content name>.<stored extension>"; ContentDisposition escapes and encodes it.
         ContentDisposition disposition = ContentDisposition.attachment()

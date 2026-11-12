@@ -48,7 +48,7 @@ And because you host it yourself, you own the data, the storage and the rules, s
 - **Rate limiting** on register, login and guest login (5 requests per minute per IP).
 - **OpenAPI / Swagger UI** generated from the code.
 
-## Tech stack
+## Built with
 
 | Layer          | Technology                                   |
 |----------------|----------------------------------------------|
@@ -138,11 +138,13 @@ All settings are read from environment variables.
 | `PORT`                           | no              | HTTP port (default `8080`)                                                  |
 | `GUEST_ENABLED`                  | no              | Allow `POST /api/auth/guest` (default `true`)                               |
 | `GUEST_CANPOST`                  | no              | Allow guests to upload content (default `false`)                            |
+| `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`  |
 
 **Other defaults worth knowing**
 
 - Uploads are limited to **1 MB per request** (`spring.servlet.multipart.max-*` in `application.properties`). Raise it if your content is larger.
 - Security and SQL debug logging are **on** by default. Turn them off in `application.properties` for production.
+- **Running behind a reverse proxy** (nginx, Render, etc): the client IP used for rate limits and download records comes from `X-Forwarded-For`, but only when the request arrives from a trusted proxy. By default those are private and loopback addresses. If your proxy connects from a public IP, set `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES`. Don't let clients reach the app directly from a private network while it trusts that network, because they could then set the header themselves.
 - The schema is managed by Hibernate (`ddl-auto=update`), so tables are created on first start.
 
 ## Creating the first admin
@@ -231,14 +233,7 @@ npm install
 npm start
 ```
 
-The documentation is still a work in progress, and feedback is very welcome.
-
-## Roadmap
-
-- Engine client SDKs (starting with Unity)
-- Support for more databases besides PostgreSQL
-- Moderation tools (reporting, review queue)
-- Health-check endpoint for container orchestration
+The documentation is still a work in progress, and feedback welcome :)
 
 ## Contributing
 

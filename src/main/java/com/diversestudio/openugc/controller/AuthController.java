@@ -51,7 +51,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDTO request, HttpServletRequest httpRequest) {
-        String clientIp = httpRequest.getRemoteAddr(); // or getHeader("X-Forwarded-For") for proxies
+        String clientIp = httpRequest.getRemoteAddr();
         Bucket bucket = rateLimiterService.resolveBucket("login:" + clientIp);
 
         if (bucket.tryConsume(1)) {
