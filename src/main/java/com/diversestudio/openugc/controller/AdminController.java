@@ -1,5 +1,7 @@
 package com.diversestudio.openugc.controller;
 
+import jakarta.validation.Valid;
+
 import com.diversestudio.openugc.dto.CreateUserRequestDTO;
 import com.diversestudio.openugc.dto.UserDTO;
 import com.diversestudio.openugc.exception.ResourceNotFoundException;
@@ -39,7 +41,7 @@ public class AdminController {
      * @return HTTP 201 with the created {@link UserDTO}; 400 for missing fields or an unknown role
      */
     @PostMapping("/users")
-    public ResponseEntity<UserDTO> createUser(@RequestBody CreateUserRequestDTO request)
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request)
     {
         UserDTO created = userService.createUser(request.username(), request.credential(), request.role());
         return ResponseEntity.status(201).body(created);

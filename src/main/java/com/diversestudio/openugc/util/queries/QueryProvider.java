@@ -8,11 +8,14 @@ public interface QueryProvider {
     String getFindAllContent();
     String getFindSingleContent();
     String getFindAllContentGroupBy();
+    String getCountContent();
 
     // User
     String getFindAllUsers();
+    String getCountUsers();
 
     // Rating
     String getFindRatingsByContent();
+    String getCountRatingsByContent();
     String getRatingDistributionByContent();
 }

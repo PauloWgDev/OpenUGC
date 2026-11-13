@@ -10,7 +10,7 @@ import com.diversestudio.openugc.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -82,9 +82,10 @@ public class RatingService {
     // rating default value could be -1, and when rating is -1 it will not filter by rating value
     // if rating has a valid value (1 to 5) it will filter and only show ratings with that value.
     public Page<Rating> getRatingPage(Long contentId, Integer ratingFilter, Pageable pageable) {
+        boolean filterByRating = ratingFilter != null && ratingFilter >= MIN_RATING && ratingFilter <= MAX_RATING;
         StringBuilder sqlBuilder = new StringBuilder(nativeQueryHelper.getFindRatingsByContent());
 
-        if (ratingFilter != null && ratingFilter >= MIN_RATING && ratingFilter <= MAX_RATING) {
+        if (filterByRating) {
             sqlBuilder.append(" AND r.rating = :ratingFilter");
         }
 
@@ -94,17 +95,26 @@ public class RatingService {
         query.setParameter("contentId", contentId);
         query.setParameter("limit", pageable.getPageSize());
         query.setParameter("offset", pageable.getOffset());
-        if (ratingFilter != null && ratingFilter >= MIN_RATING && ratingFilter <= MAX_RATING) {
+        if (filterByRating) {
             query.setParameter("ratingFilter", ratingFilter);
         }
 
         @SuppressWarnings("unchecked")
         List<Rating> results = query.getResultList();
 
-        //TODO: run a COUNT query for correct total.
-        long total = results.size();
-
-        return new PageImpl<>(results, pageable, total);
+        // The COUNT query only runs when the total can't be worked out from this page alone.
+        return PageableExecutionUtils.getPage(results, pageable, () -> {
+            StringBuilder countSql = new StringBuilder(nativeQueryHelper.getCountRatingsByContent());
+            if (filterByRating) {
+                countSql.append(" AND r.rating = :ratingFilter");
+            }
+            var count = entityManager.createNativeQuery(countSql.toString());
+            count.setParameter("contentId", contentId);
+            if (filterByRating) {
+                count.setParameter("ratingFilter", ratingFilter);
+            }
+            return ((Number) count.getSingleResult()).longValue();
+        });
     }
 
 

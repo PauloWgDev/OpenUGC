@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -93,31 +93,12 @@ public class ContentService {
         return sqlBuilder;
     }
 
-    private Query buildNativeQueryWithParams(StringBuilder sqlBuilder, String prompt, Integer creatorId, List<String> tags, Pageable pageable)
-    {
-        // Create and set up the query.
-        Query query = entityManager.createNativeQuery(sqlBuilder.toString(), "ContentDTOMapping");
-
-        if (prompt != null && !prompt.isEmpty()) {
-            query.setParameter("prompt", prompt);
-        }
-        if (creatorId != null) {
-            query.setParameter("creatorId", creatorId);
-        }
-        if (tags != null && !tags.isEmpty())
-        {
-            query.setParameter("tags", tags);
-        }
-
-        query.setParameter("limit", pageable.getPageSize());
-        query.setParameter("offset", pageable.getOffset());
-
-        return query;
-    }
-
-    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, List<String> tags, Pageable pageable) {
-        StringBuilder sql = new StringBuilder(nativeQueryHelper.getFindAllContents());
-
+    /**
+     * Appends the list filters (soft delete, prompt, creator, tags) to a query whose FROM
+     * aliases content as {@code c} and content_dates as {@code cd}. Shared by the page query
+     * and its COUNT query, so the total always matches the filtered rows.
+     */
+    private void appendContentFilters(StringBuilder sql, String prompt, Integer creatorId, List<String> tags) {
         // Dummy 'Where'
         sql.append(" WHERE 1=1 ");
         sql.append(" AND cd.deleted_at IS NULL "); // filter out soft-deleted contents
@@ -137,6 +118,24 @@ public class ContentService {
                     .append(" AND t2.name IN (:tags)")
                     .append(") ");
         }
+    }
+
+    /** Binds the parameters used by {@link #appendContentFilters}. */
+    private void bindContentFilters(Query query, String prompt, Integer creatorId, List<String> tags) {
+        if (prompt != null && !prompt.isEmpty()) {
+            query.setParameter("prompt", prompt);
+        }
+        if (creatorId != null) {
+            query.setParameter("creatorId", creatorId);
+        }
+        if (tags != null && !tags.isEmpty()) {
+            query.setParameter("tags", tags);
+        }
+    }
+
+    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, List<String> tags, Pageable pageable) {
+        StringBuilder sql = new StringBuilder(nativeQueryHelper.getFindAllContents());
+        appendContentFilters(sql, prompt, creatorId, tags);
 
         // GROUP BY
         sql.append(" ").append(nativeQueryHelper.getFindAllContentGroupBy());
@@ -149,20 +148,25 @@ public class ContentService {
                 .createNativeQuery(sql.toString(), "ContentDTOMapping")
                 .setParameter("limit", pageable.getPageSize())
                 .setParameter("offset", pageable.getOffset());
+        bindContentFilters(q, prompt, creatorId, tags);
 
-        if (prompt != null && !prompt.isEmpty())
-            q.setParameter("prompt", prompt);
-        if (creatorId != null)
-            q.setParameter("creatorId", creatorId);
-        if (tags != null && !tags.isEmpty())
-            q.setParameter("tags", tags);
-
+        @SuppressWarnings("unchecked")
         List<ContentDTO> items = ((List<ContentDTO>) q.getResultList()).stream()
                 .map(this::withPublicUrls)
                 .toList();
-        long total = items.size();
 
-        return new PageImpl<>(items, pageable, total);
+        // The COUNT query only runs when the total can't be worked out from this page alone.
+        return PageableExecutionUtils.getPage(items, pageable, () -> countContent(prompt, creatorId, tags));
+    }
+
+    /** Number of content items matching the list filters, across all pages. */
+    private long countContent(String prompt, Integer creatorId, List<String> tags) {
+        StringBuilder sql = new StringBuilder(nativeQueryHelper.getCountContent());
+        appendContentFilters(sql, prompt, creatorId, tags);
+
+        Query count = entityManager.createNativeQuery(sql.toString());
+        bindContentFilters(count, prompt, creatorId, tags);
+        return ((Number) count.getSingleResult()).longValue();
     }
 
     /**
