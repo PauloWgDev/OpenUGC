@@ -6,6 +6,7 @@ import com.diversestudio.openugc.entity.User;
 import com.diversestudio.openugc.entity.Role;
 import com.diversestudio.openugc.exception.InvalidPasswordException;
 import com.diversestudio.openugc.exception.InvalidRequestException;
+import com.diversestudio.openugc.exception.ResourceNotFoundException;
 import com.diversestudio.openugc.exception.UsernameAlreadyExistsException;
 import com.diversestudio.openugc.repository.DownloadRepository;
 import com.diversestudio.openugc.repository.RatingRepository;
@@ -161,7 +162,7 @@ public class UserService {
     public void patchUser(Long userId, UserDTO dto)
     {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Optional.ofNullable(dto.username()).ifPresent(user::setUsername);
         Optional.ofNullable(dto.profilePicture()).ifPresent(user::setProfilePicture);
@@ -170,7 +171,7 @@ public class UserService {
 
     public void changePassword(Long userId, ChangePasswordDTO changePasswordObject)
     {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not Found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String currentPassword = changePasswordObject.currentPassword();
         String newPassword = changePasswordObject.newPassword();
@@ -186,10 +187,10 @@ public class UserService {
     public UserDTO updateRole(Long userId, String roleName)
     {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
         Role role = roleRepository.findByRoleName(roleName)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
+                .orElseThrow(() -> new InvalidRequestException("Role not found: " + roleName));
 
         user.setRole(role);
         User updatedUser = userRepository.save(user);
