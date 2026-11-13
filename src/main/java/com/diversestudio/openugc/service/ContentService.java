@@ -25,6 +25,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -152,7 +153,7 @@ public class ContentService {
 
         @SuppressWarnings("unchecked")
         List<ContentDTO> items = ((List<ContentDTO>) q.getResultList()).stream()
-                .map(this::withPublicUrls)
+                .map(this::withApiUrls)
                 .toList();
 
         // The COUNT query only runs when the total can't be worked out from this page alone.
@@ -170,10 +171,11 @@ public class ContentService {
     }
 
     /**
-     * Returns a content item as exposed by the API: {@code data} and {@code thumbnail} are public URLs.
+     * Returns a content item as exposed by the API: {@code data} and {@code thumbnail} are API URLs
+     * (see {@link #withApiUrls}).
      */
     public Optional<ContentDTO> getContentById(Long id) {
-        return findContentById(id).map(this::withPublicUrls);
+        return findContentById(id).map(this::withApiUrls);
     }
 
     /**
@@ -204,13 +206,19 @@ public class ContentService {
     }
 
     /** Replaces the stored keys in {@code data} and {@code thumbnail} with their public URLs. */
-    private ContentDTO withPublicUrls(ContentDTO c) {
+    /**
+     * Replaces the storage keys in {@code data} and {@code thumbnail} with the API URLs that serve them:
+     * {@code data} → {@code GET /api/content/download/{id}} (needs a token, counted as a download),
+     * {@code thumbnail} → {@code GET /api/content/thumbnail/{id}} (public), or {@code null} if there is none.
+     * Files are never linked directly, so local storage and GCS behave the same.
+     */
+    private ContentDTO withApiUrls(ContentDTO c) {
         return new ContentDTO(
                 c.contentId(),
                 c.creatorId(),
                 c.creatorName(),
-                storageService.getPublicUrl(c.data()),
-                storageService.getPublicUrl(c.thumbnail()),
+                downloadUrl(c.contentId()),
+                thumbnailUrl(c.contentId(), c.thumbnail()),
                 c.name(),
                 c.description(),
                 c.tags(),
@@ -241,6 +249,29 @@ public class ContentService {
     }
 
     /**
+     * Absolute URL of {@code GET /api/content/download/{id}}, built from the current request.
+     * Behind a reverse proxy the host and scheme come from the forwarded headers
+     * ({@code server.forward-headers-strategy=native}).
+     */
+    private static String downloadUrl(Long contentId) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/content/download/{id}")
+                .buildAndExpand(contentId)
+                .toUriString();
+    }
+
+    /** Absolute URL of {@code GET /api/content/thumbnail/{id}}, or {@code null} if the content has no thumbnail. */
+    private static String thumbnailUrl(Long contentId, String thumbnailKey) {
+        if (thumbnailKey == null || thumbnailKey.isBlank()) {
+            return null;
+        }
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/content/thumbnail/{id}")
+                .buildAndExpand(contentId)
+                .toUriString();
+    }
+
+    /**
      * Maps a freshly created {@link Content} to the public {@link ContentDTO}.
      * <p>
      * Only the creator's id and username are copied, so no other user data
@@ -256,8 +287,8 @@ public class ContentService {
                 content.getContentId(),
                 content.getCreator().getUserId(),
                 content.getCreator().getUsername(),
-                storageService.getPublicUrl(content.getData()),
-                storageService.getPublicUrl(content.getThumbnail()),
+                downloadUrl(content.getContentId()),
+                thumbnailUrl(content.getContentId(), content.getThumbnail()),
                 content.getName(),
                 content.getDescription(),
                 tagNames,

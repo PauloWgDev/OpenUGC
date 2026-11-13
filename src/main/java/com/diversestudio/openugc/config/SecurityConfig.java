@@ -2,6 +2,7 @@ package com.diversestudio.openugc.config;
 
 import com.diversestudio.openugc.security.JwtAuthenticationFilter;
 import com.diversestudio.openugc.security.JwtUtil;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +42,9 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml",
                                 "/error"
                             ).permitAll()
+                        // Thumbnails are public so browsers and game clients can show them without a token.
+                        // Content files (/api/content/download/{id}) still require authentication.
+                        .requestMatchers(HttpMethod.GET, "/api/content/thumbnail/*").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // restrict admin endpoints
                         .anyRequest().authenticated()
                 )

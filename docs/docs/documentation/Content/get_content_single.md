@@ -13,8 +13,9 @@ Fetches a specific content item by its ID.
 {
   "contentId": 1,
   "creatorId": 1,
-  "creatorName": "Alice",
-  "data": "some data",
+  "creatorName": "Pepe",
+  "data": "http://<your-domain>/api/content/download/1",
+  "thumbnail": "http://<your-domain>/api/content/thumbnail/1",
   "name": "My Content",
   "description": "This is a test content",
   "version": 1,
@@ -25,6 +26,11 @@ Fetches a specific content item by its ID.
   "updatedAt": "2025-02-25T19:02:10.914+00:00"
 }
 ```
+
+`data` and `thumbnail` are API URLs, not direct links to storage:
+
+* `data` → `GET /api/content/download/{id}`: needs the `Authorization` header and is counted as a download.
+* `thumbnail` → `GET /api/content/thumbnail/{id}`: public, so it can be used directly as an image source. `null` if the content has no thumbnail.
 
 ## Responses Status
 

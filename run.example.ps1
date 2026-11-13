@@ -16,11 +16,9 @@ $env:STORAGE_TYPE = "local"
 
 # Local Storage Settings
 $env:STORAGE_LOCATION = "C:=/path/to/storage/"
-$env:STORAGE_BASEURL = "http://localhost:8080/storage/"
 
 # Cloud Storage Settings
 $env:CLOUD_BUCKET = "your-bucket"
-$env:CLOUD_BASEURL = "https://storage.googleapis.com/example-url/"
 
 # Google
 $env:GOOGLE_APPLICATION_CREDENTIALS = "F:/path/to/credentials/arched-sorter-123-45-67890.json"

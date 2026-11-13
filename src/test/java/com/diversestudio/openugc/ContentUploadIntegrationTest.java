@@ -18,13 +18,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -44,8 +49,8 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
     @Value("${file.storage.location}")
     String storageLocation;
 
-    @Value("${file.storage.baseUrl}")
-    String baseUrl;
+    /** MockMvc requests go to http://localhost, so that's the base of the URLs in responses. */
+    private static final String API_BASE = "http://localhost/api/content/";
 
     static String token;
 
@@ -106,18 +111,30 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         }
     }
 
+    private Set<String> storedFileNames() throws Exception {
+        try (Stream<Path> files = Files.list(storageRoot())) {
+            return files.map(path -> path.getFileName().toString()).collect(Collectors.toSet());
+        }
+    }
+
+    /** Names of the files that appeared in storage since {@code before} was taken. */
+    private Set<String> newStoredFiles(Set<String> before) throws Exception {
+        Set<String> after = new HashSet<>(storedFileNames());
+        after.removeAll(before);
+        return after;
+    }
+
     @Test
     void twoUploadsWithTheSameName_doNotOverwriteEachOther() throws Exception {
         String first = uploadAndGetBody(mainFile("same.zip", "first"), null);
         String second = uploadAndGetBody(mainFile("same.zip", "second"), null);
 
-        String firstUrl = JsonPath.read(first, "$.data");
-        String secondUrl = JsonPath.read(second, "$.data");
-        assertThat(firstUrl).isNotEqualTo(secondUrl);
-        assertThat(firstUrl.substring(baseUrl.length())).matches(KEY_RE).endsWith(".zip");
-
         Integer firstId = JsonPath.read(first, "$.contentId");
         Integer secondId = JsonPath.read(second, "$.contentId");
+
+        // data links to the counted, authenticated download endpoint, never to storage.
+        assertThat((String) JsonPath.read(first, "$.data")).isEqualTo(API_BASE + "download/" + firstId);
+        assertThat((String) JsonPath.read(second, "$.data")).isEqualTo(API_BASE + "download/" + secondId);
 
         MvcResult download = mockMvc.perform(get("/api/content/download/" + firstId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
@@ -138,11 +155,14 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void pathTraversalName_isStoredInsideStorageUnderGeneratedKey() throws Exception {
-        String body = uploadAndGetBody(mainFile("../../evil.zip", "payload"), null);
+        Set<String> before = storedFileNames();
 
-        String url = JsonPath.read(body, "$.data");
-        String key = url.substring(baseUrl.length());
-        assertThat(key).matches(KEY_RE);
+        uploadAndGetBody(mainFile("../../evil.zip", "payload"), null);
+
+        Set<String> added = newStoredFiles(before);
+        assertThat(added).hasSize(1);
+        String key = added.iterator().next();
+        assertThat(key).matches(KEY_RE).endsWith(".zip");
         assertThat(storageRoot().resolve(key)).hasContent("payload");
         assertThat(storageRoot().getParent().resolve("evil.zip")).doesNotExist();
     }
@@ -151,10 +171,62 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
     void imageThumbnail_isStoredWithItsRealType() throws Exception {
         MockMultipartFile thumbnail = new MockMultipartFile("thumbnail", "evil.svg", "image/svg+xml", PNG);
 
+        Set<String> before = storedFileNames();
+
         String body = uploadAndGetBody(mainFile("level.zip", "data"), thumbnail);
 
-        String thumbnailUrl = JsonPath.read(body, "$.thumbnail");
-        assertThat(thumbnailUrl).startsWith(baseUrl).endsWith(".png");
+        Integer id = JsonPath.read(body, "$.contentId");
+        assertThat((String) JsonPath.read(body, "$.thumbnail")).isEqualTo(API_BASE + "thumbnail/" + id);
+        // Stored with the detected type's extension, not the client's ".svg".
+        assertThat(newStoredFiles(before)).anySatisfy(key -> assertThat(key).matches(KEY_RE).endsWith(".png"));
+    }
+
+    @Test
+    void thumbnail_isPublicInlineCachedAndNotCounted() throws Exception {
+        MockMultipartFile thumbnail = new MockMultipartFile("thumbnail", "thumb.png", "image/png", PNG);
+        String body = uploadAndGetBody(mainFile("level.zip", "data"), thumbnail);
+        Integer id = JsonPath.read(body, "$.contentId");
+
+        // No Authorization header.
+        MvcResult result = mockMvc.perform(get("/api/content/thumbnail/" + id))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "image/png"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline"))
+                .andReturn();
+        assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(PNG);
+        assertThat(result.getResponse().getHeader(HttpHeaders.CACHE_CONTROL))
+                .contains("max-age=86400").contains("public");
+
+        // Fetching the thumbnail is not a download.
+        mockMvc.perform(get("/api/content/" + id)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.downloadsCount").value(0));
+    }
+
+    @Test
+    void thumbnail_contentWithoutThumbnail_isNotFound() throws Exception {
+        String body = uploadAndGetBody(mainFile("level.zip", "data"), null);
+        Integer id = JsonPath.read(body, "$.contentId");
+
+        assertThat((String) JsonPath.read(body, "$.thumbnail")).isNull();
+        mockMvc.perform(get("/api/content/thumbnail/" + id))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void thumbnail_missingContent_isNotFound() throws Exception {
+        mockMvc.perform(get("/api/content/thumbnail/999999999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void download_stillRequiresToken() throws Exception {
+        String body = uploadAndGetBody(mainFile("level.zip", "data"), null);
+        Integer id = JsonPath.read(body, "$.contentId");
+
+        MvcResult result = mockMvc.perform(get("/api/content/download/" + id)).andReturn();
+        assertThat(result.getResponse().getStatus()).isIn(401, 403);
     }
 
     @Test

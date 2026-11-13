@@ -18,10 +18,8 @@ services:
       STORAGE_TYPE: local
 
       STORAGE_LOCATION: /storage
-      STORAGE_BASEURL: http://localhost:8080/storage/
 
       CLOUD_BUCKET: your-bucket
-      CLOUD_BASEURL: https://storage.googleapis.com/example-url/
 
       GOOGLE_APPLICATION_CREDENTIALS: /credentials/google.json
 
