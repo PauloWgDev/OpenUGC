@@ -68,15 +68,18 @@ public class NativeQueryHelper {
 
     // Content
     public String getFindAllContents() { return queryProvider.getFindAllContent(); }
+    public String getCountContent() { return queryProvider.getCountContent(); }
     public String getFindSingleContent() {
         return queryProvider.getFindSingleContent();
     }
 
     // User
     public String getFindAllUsers(){ return queryProvider.getFindAllUsers(); }
+    public String getCountUsers(){ return queryProvider.getCountUsers(); }
 
     // Rating
     public String getFindRatingsByContent(){ return queryProvider.getFindRatingsByContent();}
+    public String getCountRatingsByContent(){ return queryProvider.getCountRatingsByContent();}
 
     public String getRatingDistributionByContent() {
         return queryProvider.getRatingDistributionByContent();

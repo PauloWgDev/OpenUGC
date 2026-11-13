@@ -51,4 +51,5 @@ Uploads new user-generated content.
 ## Response Status:
 
 * `201 Created` – Content successfully uploaded
+* `400 Bad Request` – Invalid metadata: `name` is required (max 255 characters), `description` max 10,000 characters, `version` must be 0 or more, at most 20 `tags` of up to 50 characters each. The body lists each invalid field under `errors`
 * `403 Forbidden` – Invalid or missing token / User does not exist

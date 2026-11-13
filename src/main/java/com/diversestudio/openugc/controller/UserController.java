@@ -1,5 +1,7 @@
 package com.diversestudio.openugc.controller;
 
+import jakarta.validation.Valid;
+
 import com.diversestudio.openugc.dto.ChangePasswordDTO;
 import com.diversestudio.openugc.dto.UserDTO;
 import com.diversestudio.openugc.exception.ResourceNotFoundException;
@@ -71,7 +73,7 @@ public class UserController {
     // and admins use POST /api/admin/users.
 
     @PatchMapping()
-    public ResponseEntity<Object> updateUserData(@RequestBody UserDTO user)
+    public ResponseEntity<Object> updateUserData(@Valid @RequestBody UserDTO user)
     {
         Long userId = AuthHelper.getCurrentUserId();
         userService.patchUser(userId, user);
@@ -79,7 +81,7 @@ public class UserController {
     }
 
     @PatchMapping("/password")
-    public ResponseEntity<Object> updatePassword(@RequestBody ChangePasswordDTO changePasswordObject)
+    public ResponseEntity<Object> updatePassword(@Valid @RequestBody ChangePasswordDTO changePasswordObject)
     {
         Long userId = AuthHelper.getCurrentUserId();
 

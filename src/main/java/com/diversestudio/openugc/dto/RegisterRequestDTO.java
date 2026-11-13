@@ -1,5 +1,8 @@
 package com.diversestudio.openugc.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 /**
@@ -10,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
  * "password" is accepted as an alias of "credential" to match the published docs.
  */
 public record RegisterRequestDTO(
-        String username,
-        @JsonAlias("password") String credential
+        @NotBlank @Size(min = UserLimits.USERNAME_MIN, max = UserLimits.USERNAME_MAX) String username,
+        @JsonAlias("password")
+        @NotBlank @Size(min = UserLimits.PASSWORD_MIN, max = UserLimits.PASSWORD_MAX) String credential
 ) { }

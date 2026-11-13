@@ -17,7 +17,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -106,10 +106,26 @@ public class UserService {
         query.setParameter("limit", pageable.getPageSize());
         query.setParameter("offset", pageable.getOffset());
 
+        @SuppressWarnings("unchecked")
         List<UserDTO> results = query.getResultList();
-        long total = results.size();  // here needs a COUNT(*) query.
 
-        return new PageImpl<>(results, pageable, total);
+        // The COUNT query only runs when the total can't be worked out from this page alone.
+        return PageableExecutionUtils.getPage(results, pageable, () -> countUsers(prompt));
+    }
+
+    /** Number of users matching the list filter, across all pages. */
+    private long countUsers(String prompt) {
+        StringBuilder sql = new StringBuilder(nativeQueryHelper.getCountUsers());
+        boolean hasPrompt = prompt != null && !prompt.isEmpty();
+        if (hasPrompt) {
+            sql.append(nativeQueryHelper.getWhereFilter("u.username"));
+        }
+
+        Query count = entityManager.createNativeQuery(sql.toString());
+        if (hasPrompt) {
+            count.setParameter("prompt", prompt);
+        }
+        return ((Number) count.getSingleResult()).longValue();
     }
 
     public Optional<UserDTO> getUserById(Long id){
@@ -164,7 +180,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Optional.ofNullable(dto.username()).ifPresent(user::setUsername);
+        if (dto.username() != null) {
+            String newUsername = dto.username().trim();
+            if (!newUsername.equals(user.getUsername())
+                    && userRepository.findByUsername(newUsername).isPresent()) {
+                throw new UsernameAlreadyExistsException("Username already exists");
+            }
+            user.setUsername(newUsername);
+        }
         Optional.ofNullable(dto.profilePicture()).ifPresent(user::setProfilePicture);
         Optional.ofNullable(dto.aboutMe()).ifPresent(user::setAboutMe);
     }

@@ -4,12 +4,21 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Translates the API's custom exceptions into a single, consistent error body.
@@ -26,10 +35,14 @@ import java.time.Instant;
  * }
  * </pre>
  * Spring's own built-in errors (404 no route, 405, malformed body, ...) use the same
- * shape thanks to {@code spring.mvc.problemdetails.enabled=true} in application.properties.
+ * shape: they are handled by {@link ResponseEntityExceptionHandler}, which this class extends
+ * (Spring Boot's own ProblemDetail handler backs off when one is present).
+ * <p>
+ * A failed {@code @Valid} check returns 400 with an {@code errors} map of field to message, e.g.
+ * {@code "errors": {"username": "size must be between 3 and 32"}}.
  */
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
@@ -85,5 +98,23 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         logger.debug("Data integrity violation", ex);
         return problem(HttpStatus.CONFLICT, "The request conflicts with existing data");
+    }
+
+    /** {@code @Valid} failed on a request body or part: 400 listing every invalid field. */
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status,
+                                                                  WebRequest request) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            errors.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+
+        ProblemDetail body = ex.getBody();
+        body.setDetail("Request validation failed");
+        body.setProperty("errors", errors);
+        body.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(status).headers(headers).body(body);
     }
 }
