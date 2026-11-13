@@ -26,7 +26,8 @@ For detailed request/response examples, see the dedicated sections for each cont
 | GET    | `/api/content/{id}`   | Get a specific content item by ID                  |
 | POST   | `/api/content`        | Upload new content (optionally with thumbnail/tags)|
 | DELETE | `/api/content/{id}`   | Delete a content record and its files              |
-| GET    | `/api/download/{id}`  | Download a specific content item                   |
+| GET    | `/api/content/download/{id}`  | Download a content file (needs a token; counted as a download) |
+| GET    | `/api/content/thumbnail/{id}` | Get a content thumbnail (public; not counted)                  |
 
 ---
 

@@ -20,10 +20,14 @@ import java.nio.file.Paths;
 public class LocalStorageService implements StorageService {
 
     private final Path fileStorageLocation;
+    /**
+     * Only used to read rows saved before storage keys existed, which stored the full URL
+     * ({@code <baseUrl><file name>}). Optional: leave it empty on a new install.
+     */
     private final String fileBaseUrl;
 
     public LocalStorageService(@Value("${file.storage.location}") String storageLocation,
-                               @Value("${file.storage.baseUrl}") String fileBaseUrl) throws IOException {
+                               @Value("${file.storage.baseUrl:}") String fileBaseUrl) throws IOException {
         this.fileStorageLocation = Paths.get(storageLocation).toAbsolutePath().normalize();
         this.fileBaseUrl = fileBaseUrl;
         Files.createDirectories(this.fileStorageLocation);
@@ -51,14 +55,6 @@ public class LocalStorageService implements StorageService {
     public void deleteFile(String storedValue) throws IOException {
         Path filePath = resolveInsideStorage(StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl));
         Files.deleteIfExists(filePath);
-    }
-
-    @Override
-    public String getPublicUrl(String storedValue) {
-        if (storedValue == null) {
-            return null;
-        }
-        return fileBaseUrl + StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl);
     }
 
     /**
