@@ -10,22 +10,30 @@
 	</parent>
 	<groupId>com.diversestudio</groupId>
 	<artifactId>openugc</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>openugc</name>
 	<description>Open Source REST API to support user-generated content system</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+    <url>https://github.com/PauloWgDev/OpenUGC</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>PauloWgDev</id>
+            <name>PauloWg</name>
+            <url>https://github.com/PauloWgDev</url>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/PauloWgDev/OpenUGC</url>
+        <connection>scm:git:https://github.com/PauloWgDev/OpenUGC.git</connection>
+        <developerConnection>scm:git:git@github.com:PauloWgDev/OpenUGC.git</developerConnection>
+        <tag>v0.0.1</tag>
+    </scm>
 	<properties>
 		<java.version>17</java.version>
         <testcontainers.version>1.21.4</testcontainers.version>
