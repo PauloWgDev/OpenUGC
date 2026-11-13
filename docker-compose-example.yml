@@ -10,18 +10,18 @@ services:
       DATABASE_PROFILE: postgres
 
       DATABASE_URL: jdbc:postgresql://postgres:5432/openapitest
-      DATABASE_USERNAME: username
-      DATABASE_PASSWORD: password
+      DATABASE_USERNAME: username     # change this
+      DATABASE_PASSWORD: password     # change this
 
-      JWT_SECRET: aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!
+      JWT_SECRET: aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong! # change this
 
       STORAGE_TYPE: local
 
       STORAGE_LOCATION: /storage
       STORAGE_BASEURL: http://localhost:8080/storage/
 
-      CLOUD_BUCKET: u3gc-uploads
-      CLOUD_BASEURL: https://storage.googleapis.com/open-uploads/
+      CLOUD_BUCKET: your-bucket
+      CLOUD_BASEURL: https://storage.googleapis.com/example-url/
 
       GOOGLE_APPLICATION_CREDENTIALS: /credentials/google.json
 
@@ -39,8 +39,8 @@ services:
 
     environment:
       POSTGRES_DB: openapitest
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: username     # change this
+      POSTGRES_PASSWORD: password # change this
 
     ports:
       - "5432:5432"

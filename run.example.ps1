@@ -5,11 +5,11 @@ $env:DATABASE_PROFILE = "postgres"
 
 # Local PostgreSQL Database Configuration
 $env:DATABASE_URL = "jdbc:postgresql://<domain>"
-$env:DATABASE_USERNAME = "user"
-$env:DATABASE_PASSWORD = "secretPassword"
+$env:DATABASE_USERNAME = "user"             # change this
+$env:DATABASE_PASSWORD = "secretPassword"   # change this
 
 # JWT Secret for local auth
-$env:JWT_SECRET = "aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!"
+$env:JWT_SECRET = "aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!"      # change this
 
 # Storage Type
 $env:STORAGE_TYPE = "local"
@@ -19,11 +19,11 @@ $env:STORAGE_LOCATION = "C:=/path/to/storage/"
 $env:STORAGE_BASEURL = "http://localhost:8080/storage/"
 
 # Cloud Storage Settings
-$env:CLOUD_BUCKET = "u3gc-uploads"
-$env:CLOUD_BASEURL = "https://storage.googleapis.com/openugc-uploads/"
+$env:CLOUD_BUCKET = "your-bucket"
+$env:CLOUD_BASEURL = "https://storage.googleapis.com/example-url/"
 
 # Google
-$env:GOOGLE_APPLICATION_CREDENTIALS = "F:/path/to/credentials/arched-sorter-459106-f6-be936d47ab6a.json"
+$env:GOOGLE_APPLICATION_CREDENTIALS = "F:/path/to/credentials/arched-sorter-123-45-67890.json"
 
 # Run Project
 mvn spring-boot:run
