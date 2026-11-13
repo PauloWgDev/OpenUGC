@@ -3,6 +3,8 @@ package com.diversestudio.openugc.controller;
 import com.diversestudio.openugc.dto.ContentCreationDTO;
 import com.diversestudio.openugc.dto.ContentDTO;
 import com.diversestudio.openugc.entity.User;
+import com.diversestudio.openugc.exception.ResourceNotFoundException;
+import com.diversestudio.openugc.exception.UnauthorizedActionException;
 import com.diversestudio.openugc.repository.UserRepository;
 import com.diversestudio.openugc.security.AuthHelper;
 import com.diversestudio.openugc.service.ContentService;
@@ -30,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/content")
@@ -85,12 +86,12 @@ public class ContentController {
      * GET /api/content/{id} - Retrieves a specific content item by its ID.
      *
      * @param id the ID of the content to retrieve
-     * @return a {@link ResponseEntity} containing an {@link Optional} {@link ContentDTO},
-     * which may be empty if the content is not found
+     * @return HTTP 200 with the {@link ContentDTO}, or 404 if no content has this id
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<ContentDTO>> getContent(@PathVariable Long id) {
-        Optional<ContentDTO> content = contentService.getContentById(id);
+    public ResponseEntity<ContentDTO> getContent(@PathVariable Long id) {
+        ContentDTO content = contentService.getContentById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found for id: " + id));
         return ResponseEntity.ok(content);
     }
 
@@ -105,12 +106,8 @@ public class ContentController {
      */
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadContent(@PathVariable Long id, HttpServletRequest request) throws Exception {
-        Optional<ContentDTO> contentOptional = contentService.getContentForDownload(id);
-        if (contentOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        ContentDTO content = contentOptional.get();
+        ContentDTO content = contentService.getContentForDownload(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found for id: " + id));
 
         // Load the file first, so a download is only counted if the file actually exists.
         Resource fileResource = storageService.loadFileAsResource(content.data());
@@ -163,7 +160,7 @@ public class ContentController {
      * @param thumbnail (optional) the thumbnail image file to upload
      * @return HTTP 200 with the created content as a {@link ContentDTO};
      *         HTTP 400 if {@code file} is empty or {@code thumbnail} is not a supported image;
-     *         HTTP 403 with an empty body if the user is not allowed to post (e.g. a guest when {@code guest.can-post=false})
+     *         HTTP 403 if the user is not allowed to post (e.g. a guest when {@code guest.can-post=false})
      * @throws Exception if file upload or content creation fails
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -174,10 +171,11 @@ public class ContentController {
 
         Long currentUserId = AuthHelper.getCurrentUserId();
         User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+                .orElseThrow(() -> new UnauthorizedActionException("Authenticated user no longer exists"));
 
-        if (!permissionsService.canPost(user))
-            return ResponseEntity.status(403).build(); //TODO: Construir mensaje de respuesta y analizar 403 es el status correcto
+        if (!permissionsService.canPost(user)) {
+            throw new UnauthorizedActionException("This account is not allowed to upload content");
+        }
 
         // Validate every part before anything is written, so a bad thumbnail can't leave an orphaned file.
         UploadValidator.requireNonEmpty(file, "file");

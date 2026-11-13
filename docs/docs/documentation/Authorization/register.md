@@ -18,5 +18,5 @@ Registers a new `users` in the users table.
 ## Response Status
 
 * `200 OK` – User registered successfully
-* `403 Forbidden` – Username already exists
+* `409 Conflict` – Username already exists
 * `500 Internal Server Error` – Database issue

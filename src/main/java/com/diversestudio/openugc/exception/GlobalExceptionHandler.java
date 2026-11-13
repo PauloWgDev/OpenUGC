@@ -1,5 +1,9 @@
 package com.diversestudio.openugc.exception;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +31,8 @@ import java.time.Instant;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     /** Builds a ProblemDetail with a shared {@code timestamp} property for a uniform body. */
     private ProblemDetail problem(HttpStatus status, String detail) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
@@ -36,9 +42,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ProblemDetail handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
-        // NOTE: 226 IM_USED is the pre-existing status for this case; left unchanged here.
-        // It is almost certainly meant to be 409 CONFLICT - change it in a dedicated commit.
-        return problem(HttpStatus.IM_USED, ex.getMessage());
+        return problem(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -61,8 +65,25 @@ public class GlobalExceptionHandler {
         return problem(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    /** Failed login: the caller is not authenticated, so 401 (403 means "authenticated but not allowed"). */
     @ExceptionHandler(IncorrectPasswordException.class)
     public ProblemDetail handleIncorrectPasswordException(IncorrectPasswordException ex) {
-        return problem(HttpStatus.FORBIDDEN, ex.getMessage());
+        return problem(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    /** Safety net for JPA lookups (e.g. getReferenceById) that miss. */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ProblemDetail handleEntityNotFoundException(EntityNotFoundException ex) {
+        return problem(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    /**
+     * A unique or foreign key constraint was violated, e.g. two requests racing for the same username.
+     * The database message names tables and columns, so it is logged and not returned.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        logger.debug("Data integrity violation", ex);
+        return problem(HttpStatus.CONFLICT, "The request conflicts with existing data");
     }
 }

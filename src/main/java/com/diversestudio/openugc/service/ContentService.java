@@ -275,7 +275,7 @@ public class ContentService {
         // Fetch the user from the database
         Optional<User> userOptional = userRepository.findById(creatorId);
         if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User with ID " + creatorId + " not found.");
+            throw new UnauthorizedActionException("Authenticated user no longer exists");
         }
 
         // create Set<Tag> from list of strings tag in dto
