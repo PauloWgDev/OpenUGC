@@ -53,8 +53,7 @@ public class AdminController {
      *
      * @param id       the ID of the user to update
      * @param roleName the exact role name to assign (ADMIN, USER or GUEST; case-sensitive)
-     * @return HTTP 200 with the updated {@link UserDTO}
-     * @throws IllegalArgumentException if the user or role doesn't exist (currently returns 500)
+     * @return HTTP 200 with the updated {@link UserDTO}; 404 if the user doesn't exist; 400 if the role doesn't exist
      */
     @PatchMapping("/users/{id}/role/{roleName}")
     public ResponseEntity<Object> updateRole(@PathVariable Long id, @PathVariable String roleName)

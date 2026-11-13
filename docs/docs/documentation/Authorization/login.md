@@ -30,6 +30,6 @@ Authenticates a user and returns a JSON Web Token (JWT).
 ### Response Status
 
 * `200 OK` – Returns JWT token
-* `403 Forbidden` – Invalid username or password
+* `401 Unauthorized` – Invalid username or password
 
 ---
