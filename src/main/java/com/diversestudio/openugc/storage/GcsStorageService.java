@@ -18,10 +18,14 @@ public class GcsStorageService implements StorageService
 {
     private final Storage storage;
     private final String bucketName;
+    /**
+     * Only used to read rows saved before storage keys existed, if they stored a full bucket URL.
+     * Optional: leave it empty on a new install.
+     */
     private final String fileBaseUrl;
 
     public GcsStorageService(@Value("${file.cloud.bucket}") String bucketName,
-                             @Value("${file.cloud.baseUrl}") String fileBaseUrl) {
+                             @Value("${file.cloud.baseUrl:}") String fileBaseUrl) {
         this.storage = StorageOptions.getDefaultInstance().getService();
         this.bucketName = bucketName;
         this.fileBaseUrl = fileBaseUrl;
@@ -57,13 +61,5 @@ public class GcsStorageService implements StorageService
     @Override
     public void deleteFile(String storedValue) {
         storage.delete(bucketName, StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl));
-    }
-
-    @Override
-    public String getPublicUrl(String storedValue) {
-        if (storedValue == null) {
-            return null;
-        }
-        return fileBaseUrl + StoredFileNames.keyFromStoredValue(storedValue, fileBaseUrl);
     }
 }

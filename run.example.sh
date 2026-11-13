@@ -16,11 +16,9 @@ export STORAGE_TYPE="local"
 
 # Local Storage Settings
 export STORAGE_LOCATION="/path/to/storage/"
-export STORAGE_BASEURL="http://localhost:8080/storage/"
 
 # Cloud Storage Settings
 export CLOUD_BUCKET="your-bucket"
-export CLOUD_BASEURL="https://storage.googleapis.com/example-url/"
 
 # Google Credentials
 export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials/arched-sorter-1234-56-789.json"

@@ -33,6 +33,30 @@ public enum ImageType {
     }
 
     /**
+     * Image type matching a stored file's extension ({@code .png}, {@code .jpg}/{@code .jpeg}, {@code .webp}),
+     * case-insensitive. Empty for any other extension, or no extension.
+     */
+    public static Optional<ImageType> fromFileName(String fileName) {
+        if (fileName == null) {
+            return Optional.empty();
+        }
+        int dot = fileName.lastIndexOf('.');
+        if (dot < 0 || dot == fileName.length() - 1) {
+            return Optional.empty();
+        }
+        String extension = fileName.substring(dot + 1).toLowerCase(java.util.Locale.ROOT);
+        if (extension.equals("jpeg")) {
+            return Optional.of(JPEG);
+        }
+        for (ImageType type : values()) {
+            if (type.extension.equals(extension)) {
+                return Optional.of(type);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Detects the image type from the start of a file.
      *
      * @param header the first bytes of the file (up to {@link #HEADER_LENGTH}; fewer if the file is shorter)

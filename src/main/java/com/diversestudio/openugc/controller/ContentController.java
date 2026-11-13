@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/content")
@@ -127,10 +129,46 @@ public class ContentController {
                 .body(fileResource);
     }
 
-    @Value("${file.storage.baseUrl}")
+    /**
+     * GET /api/content/thumbnail/{id} - Returns the thumbnail image of a content item.
+     * <p>
+     * Public (no token needed), so it can be used directly as an image source in a browser or game client.
+     * It is not counted as a download. Stored files never change under the same key, so the response
+     * can be cached by clients and proxies for a day.
+     *
+     * @param id the unique identifier of the content
+     * @return HTTP 200 with the image shown inline, or 404 if the content doesn't exist or has no thumbnail
+     * @throws Exception if the file cannot be read
+     */
+    @GetMapping("/thumbnail/{id}")
+    public ResponseEntity<Resource> getThumbnail(@PathVariable Long id) throws Exception {
+        ContentDTO content = contentService.getContentForDownload(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found for id: " + id));
+        if (content.thumbnail() == null || content.thumbnail().isBlank()) {
+            throw new ResourceNotFoundException("Content " + id + " has no thumbnail");
+        }
+
+        Resource image = storageService.loadFileAsResource(content.thumbnail());
+
+        // New thumbnails are always PNG, JPEG or WebP (checked on upload). Anything else can only be an
+        // unchecked legacy file, so it is sent as a plain download type and the browser won't render it.
+        MediaType contentType = ImageType.fromFileName(content.thumbnail())
+                .map(type -> MediaType.parseMediaType(type.contentType()))
+                .orElse(MediaType.APPLICATION_OCTET_STREAM);
+
+        return ResponseEntity.ok()
+                .contentType(contentType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().build().toString())
+                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic())
+                .body(image);
+    }
+
+    // 'not_using' in both base URLs skips storage entirely (metadata-only mode). An empty or unset
+    // base URL is fine: URLs in responses point to the API, not to storage.
+    @Value("${file.storage.baseUrl:}")
     private String fileBaseUrl;
 
-    @Value("${file.cloud.baseUrl}")
+    @Value("${file.cloud.baseUrl:}")
     private String fileBaseUrl_cloud;
 
     /**
