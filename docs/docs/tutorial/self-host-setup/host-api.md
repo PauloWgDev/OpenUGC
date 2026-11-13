@@ -57,11 +57,9 @@ $env:STORAGE_TYPE = "local"
 
 # Local Storage Settings
 $env:STORAGE_LOCATION = "F:/Capstone/API/unityapi/UGC_Storage"
-$env:STORAGE_BASEURL = "http://localhost:8080/storage/"
 
 # Cloud Storage Settings
 $env:CLOUD_BUCKET = "u3gc-uploads"
-$env:CLOUD_BASEURL = "https://storage.googleapis.com/open-uploads/"
 
 # Google
 $env:GOOGLE_APPLICATION_CREDENTIALS = "F:/Path/To/Credentials/arched-sorter-459106-f6-be936d47ab6a.json"

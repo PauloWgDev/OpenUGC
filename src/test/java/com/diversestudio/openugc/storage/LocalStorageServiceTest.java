@@ -85,15 +85,17 @@ class LocalStorageServiceTest {
 
         assertThat(storage.loadFileAsResource(BASE_URL + "old.zip").getContentAsByteArray())
                 .isEqualTo("legacy".getBytes());
-        assertThat(storage.getPublicUrl(BASE_URL + "old.zip")).isEqualTo(BASE_URL + "old.zip");
 
         storage.deleteFile(BASE_URL + "old.zip");
         assertThat(root.resolve("old.zip")).doesNotExist();
     }
 
     @Test
-    void publicUrlIsBaseUrlPlusKey() {
-        assertThat(storage.getPublicUrl("k1.zip")).isEqualTo(BASE_URL + "k1.zip");
-        assertThat(storage.getPublicUrl(null)).isNull();
+    void worksWithoutBaseUrl() throws Exception {
+        LocalStorageService noBaseUrl = new LocalStorageService(root.toString(), "");
+        noBaseUrl.uploadFile("k2.zip", file("no base url"), "application/octet-stream");
+
+        assertThat(noBaseUrl.loadFileAsResource("k2.zip").getContentAsByteArray())
+                .isEqualTo("no base url".getBytes());
     }
 }

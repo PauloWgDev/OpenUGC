@@ -57,9 +57,9 @@ The name of these environment variables must match those defined in [application
 | `JWT_SECRET`          | Secret key for signing JWT tokens (must be at least 32 bytes long) | `aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!`  |
 | `STORAGE_TYPE`        | Storage backend: `local` or `cloud`                     | `cloud`                                |
 | `STORAGE_LOCATION`    | (Local only) Path where files are stored, , if using cloud leave as 'not_using'   | `/data/ugc`   |
-| `STORAGE_BASEURL`     | (Local only) Base URL for serving stored files, if using cloud leave as 'not_using'         | `http://localhost:8080/files/` |
+| `STORAGE_BASEURL`     | (Optional) Only for data uploaded before storage keys existed (rows with full URLs) | `http://localhost:8080/storage/` |
 | `CLOUD_BUCKET`        | (Cloud only) Cloud storage bucket name                | `openugc-bucket`    |
-| `CLOUD_BASEURL`       | (Cloud only) Public base URL for cloud files            | `https://storage.googleapis.com/openugc-bucket/`   |
+| `CLOUD_BASEURL`       | (Optional) Same as `STORAGE_BASEURL`, for cloud storage | `https://storage.googleapis.com/openugc-bucket/`   |
 | `GOOGLE_APPLICATION_CREDENTIALS` | (Google CLoud only) path to where the google credentials are stored | `/etc/secrets/arched-sorter-459106-f6-621d3319234e.json` |
 
 

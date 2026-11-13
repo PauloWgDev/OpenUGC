@@ -36,7 +36,7 @@ During installation, you’ll also have the option to install **pgAdmin**, a gra
 3. Leave the owner as `postgres` (or assign another user if you prefer).  
 4. Click **Save**.  
 
-Your database is now created and ready for use! 🎉
+Your database is now created and ready for use!!
 
 ---
 

@@ -131,9 +131,9 @@ All settings are read from environment variables.
 | `JWT_SECRET`                     | yes             | Secret used to sign tokens. Use a random value of at least 32 bytes.        |
 | `STORAGE_TYPE`                   | yes             | `local` or `cloud`                                                          |
 | `STORAGE_LOCATION`               | local storage   | Directory where uploaded files are written                                  |
-| `STORAGE_BASEURL`                | local storage   | Base URL stored with each uploaded file                                     |
+| `STORAGE_BASEURL`                | no              | Only for data uploaded before storage keys existed (rows with full URLs)    |
 | `CLOUD_BUCKET`                   | cloud storage   | Google Cloud Storage bucket name                                            |
-| `CLOUD_BASEURL`                  | cloud storage   | Public base URL of the bucket                                               |
+| `CLOUD_BASEURL`                  | no              | Same as `STORAGE_BASEURL`, for cloud storage                                |
 | `GOOGLE_APPLICATION_CREDENTIALS` | cloud storage   | Path to the service-account JSON key                                        |
 | `PORT`                           | no              | HTTP port (default `8080`)                                                  |
 | `GUEST_ENABLED`                  | no              | Allow `POST /api/auth/guest` (default `true`)                               |
