@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.controller;
 
+import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.config.GuestProperties;
 import com.diversestudio.openugc.dto.AuthRequestDTO;
@@ -32,7 +33,7 @@ public class AuthController {
      * @return a {@link ResponseEntity} with a success message or error description
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO request, HttpServletRequest httpRequest) {
         String clientIp = httpRequest.getRemoteAddr();
         Bucket bucket = rateLimiterService.resolveBucket("register:" + clientIp);
 
@@ -50,7 +51,7 @@ public class AuthController {
      * @return a {@link ResponseEntity} containing an {@link AuthResponseDTO} with the authentication token
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequestDTO request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequestDTO request, HttpServletRequest httpRequest) {
         String clientIp = httpRequest.getRemoteAddr();
         Bucket bucket = rateLimiterService.resolveBucket("login:" + clientIp);
 

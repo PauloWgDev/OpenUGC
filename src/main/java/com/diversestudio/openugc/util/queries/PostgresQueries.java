@@ -76,6 +76,23 @@ public class PostgresQueries implements QueryProvider {
 
 
 
+    @Override
+    public String getCountContent() {
+        return "SELECT COUNT(*) " +
+                "FROM content c " +
+                "JOIN content_dates cd ON c.content_id = cd.content_id ";
+    }
+
+    @Override
+    public String getCountUsers() {
+        return "SELECT COUNT(*) FROM users u";
+    }
+
+    @Override
+    public String getCountRatingsByContent() {
+        return "SELECT COUNT(*) FROM rating r WHERE r.content_id = :contentId";
+    }
+
     // can this take a String as an argument that will be the column from which it will be filtered
     @Override
     public String getWhereFilter(String columnName) {

@@ -1,5 +1,7 @@
 package com.diversestudio.openugc.controller;
 
+import jakarta.validation.Valid;
+
 import com.diversestudio.openugc.dto.ContentCreationDTO;
 import com.diversestudio.openugc.dto.ContentDTO;
 import com.diversestudio.openugc.entity.User;
@@ -165,7 +167,7 @@ public class ContentController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ContentDTO> uploadContent(
-            @RequestPart("content") ContentCreationDTO contentCreationDTO,
+            @Valid @RequestPart("content") ContentCreationDTO contentCreationDTO,
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) throws Exception {
 

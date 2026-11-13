@@ -1,3 +1,8 @@
 package com.diversestudio.openugc.dto;
 
-public record AuthRequestDTO(String username, String credential) { }
+import jakarta.validation.constraints.NotBlank;
+
+public record AuthRequestDTO(
+        @NotBlank String username,
+        @NotBlank String credential
+) { }
