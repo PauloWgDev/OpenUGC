@@ -26,6 +26,8 @@ Uploads new user-generated content.
 
 **thumbnail and tags are optional, you don't have to include them in the body if you're not going to upload any.**
 
+Tags are saved in lowercase with surrounding spaces removed, so `"Racing"`, `" racing "` and `"RACING"` are the same tag. If a tag is repeated in one request, it is added once. Filtering with `GET /api/content?tags=...` ignores case too.
+
 ## Response
 
 ```json
