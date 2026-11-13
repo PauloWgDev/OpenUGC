@@ -134,7 +134,11 @@ public class ContentService {
         }
     }
 
-    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, List<String> tags, Pageable pageable) {
+    public Page<ContentDTO> getContentPage(String prompt, Integer creatorId, List<String> rawTags, Pageable pageable) {
+        // Tags are stored lowercase, so ?tags=Racing finds "racing".
+        List<String> normalized = normalizeTagNames(rawTags);
+        List<String> tags = normalized.isEmpty() ? null : normalized;
+
         StringBuilder sql = new StringBuilder(nativeQueryHelper.getFindAllContents());
         appendContentFilters(sql, prompt, creatorId, tags);
 
@@ -234,13 +238,42 @@ public class ContentService {
     @Autowired
     private TagRepository tagRepository;
 
-    private Set<Tag> processTags(List<String> tagNames) {
-        Set<Tag> tags = new HashSet<>();
+    /**
+     * Trims and lowercases tag names, and drops blanks and repeats (first occurrence wins).
+     * {@code ["Racing", " racing ", "PUZZLE", "racing"]} becomes {@code ["racing", "puzzle"]}.
+     *
+     * @param tagNames the names sent by the client; may be {@code null}
+     * @return the normalized names, never {@code null}
+     */
+    static List<String> normalizeTagNames(List<String> tagNames) {
+        if (tagNames == null) {
+            return List.of();
+        }
+        Set<String> names = new LinkedHashSet<>();
         for (String tagName : tagNames) {
-            Tag tag = tagRepository.findByName(tagName.trim().toLowerCase())
+            if (tagName == null) {
+                continue;
+            }
+            String name = tagName.trim().toLowerCase(Locale.ROOT);
+            if (!name.isEmpty()) {
+                names.add(name);
+            }
+        }
+        return List.copyOf(names);
+    }
+
+    /**
+     * Turns tag names into {@link Tag} entities: existing tags are reused, new ones are created.
+     * Names are normalized first (see {@link #normalizeTagNames}), so tags are always saved
+     * lowercase and a repeated tag in one request is only added once.
+     */
+    private Set<Tag> processTags(List<String> tagNames) {
+        Set<Tag> tags = new LinkedHashSet<>();
+        for (String name : normalizeTagNames(tagNames)) {
+            Tag tag = tagRepository.findByName(name)
                     .orElseGet(() -> {
                         Tag newTag = new Tag();
-                        newTag.setName(tagName);
+                        newTag.setName(name);
                         return newTag;
                     });
             tags.add(tag);
@@ -281,6 +314,7 @@ public class ContentService {
     private ContentDTO toNewContentDTO(Content content) {
         String[] tagNames = content.getTags().stream()
                 .map(Tag::getName)
+                .sorted() // same order as the list and get-by-id queries
                 .toArray(String[]::new);
 
         return new ContentDTO(
@@ -324,7 +358,8 @@ public class ContentService {
         content.setVersion(dto.version());
         content.setCreator(userOptional.get());
 
-        if (!dto.tags().isEmpty()) {
+        // Tags are optional: a missing or empty list means no tags.
+        if (dto.tags() != null && !dto.tags().isEmpty()) {
             content.setTags(processTags(dto.tags()));
         }
 

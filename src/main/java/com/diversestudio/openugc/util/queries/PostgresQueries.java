@@ -26,7 +26,7 @@ public class PostgresQueries implements QueryProvider {
                 " (SELECT AVG(rating)::float FROM rating WHERE content_id = c.content_id) AS avgRating, " +
                 " cd.created_at AS createdAt, " +
                 " cd.updated_at AS updatedAt, " +
-                " COALESCE(ARRAY_AGG(t.name), ARRAY[]::VARCHAR[]) AS tags " +
+                " COALESCE(ARRAY_AGG(t.name ORDER BY t.name) FILTER (WHERE t.name IS NOT NULL), ARRAY[]::VARCHAR[]) AS tags " +
                 "FROM content c " +
                 "JOIN content_dates cd ON c.content_id = cd.content_id " +
                 "JOIN \"users\" u ON c.creator = u.user_id " +
@@ -56,7 +56,7 @@ public class PostgresQueries implements QueryProvider {
                         " (SELECT AVG(rating)::float FROM rating WHERE content_id = c.content_id) AS avgRating, " +
                         " cd.created_at AS createdAt, " +
                         " cd.updated_at AS updatedAt, " +
-                        " COALESCE(ARRAY_AGG(t.name), ARRAY[]::VARCHAR[]) AS tags " +
+                        " COALESCE(ARRAY_AGG(t.name ORDER BY t.name) FILTER (WHERE t.name IS NOT NULL), ARRAY[]::VARCHAR[]) AS tags " +
                         "FROM content c " +
                         "JOIN content_dates cd ON c.content_id = cd.content_id " +
                         "JOIN users u ON c.creator = u.user_id " +
