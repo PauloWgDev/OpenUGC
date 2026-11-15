@@ -139,6 +139,7 @@ All settings are read from environment variables.
 | `GUEST_ENABLED`                  | no              | Allow `POST /api/auth/guest` (default `true`)                            |
 | `GUEST_CANPOST`                  | no              | Allow guests to upload content (default `false`)                         |
 | `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`              |
+| `CORS_ALLOWED_ORIGINS`           | no              | Browser origins allowed to call the API, comma-separated (default `*`). Empty turns CORS off |
 
 **Other defaults worth knowing**
 
