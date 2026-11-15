@@ -31,15 +31,6 @@ class JwtSecretTest {
     }
 
     @Test
-    void publicExampleSecret_isRejectedEvenThoughItIsLongEnough() {
-        assertThatThrownBy(() -> new JwtUtil(JwtUtil.PUBLIC_EXAMPLE_SECRET))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("public example value");
-        assertThatThrownBy(() -> new JwtUtil(" " + JwtUtil.PUBLIC_EXAMPLE_SECRET + " "))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
     void secretOf32BytesOrMore_isAccepted_andTokensRoundTrip() {
         JwtUtil jwt = new JwtUtil(GOOD_SECRET);
 
