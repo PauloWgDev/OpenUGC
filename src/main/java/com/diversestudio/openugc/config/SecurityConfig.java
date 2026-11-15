@@ -43,8 +43,7 @@ public class SecurityConfig {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                // Uses the corsConfigurationSource bean below. Preflight (OPTIONS) requests are
-                // answered here, before authentication, so they don't need a token.
+                // (OPTIONS) requests are answered here, before authentication, so they don't need a token.
                 .cors(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -57,7 +56,6 @@ public class SecurityConfig {
                                 "/error"
                             ).permitAll()
                         // Thumbnails are public so browsers and game clients can show them without a token.
-                        // Content files (/api/content/download/{id}) still require authentication.
                         .requestMatchers(HttpMethod.GET, "/api/content/thumbnail/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // restrict admin endpoints
@@ -91,13 +89,10 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        // Any request header: Authorization and Content-Type are the ones the API reads, but
-        // engines and HTTP libraries add their own, and a rejected header fails the whole request.
         config.setAllowedHeaders(List.of("*"));
-        // Lets browser clients read the file name of a download.
         config.setExposedHeaders(List.of(HttpHeaders.CONTENT_DISPOSITION));
         config.setAllowCredentials(false);
-        config.setMaxAge(Duration.ofHours(1)); // browsers cache the preflight answer
+        config.setMaxAge(Duration.ofHours(1));
 
         source.registerCorsConfiguration("/**", config);
         return source;
