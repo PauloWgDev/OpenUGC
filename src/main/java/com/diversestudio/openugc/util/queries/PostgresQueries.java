@@ -20,9 +20,8 @@ public class PostgresQueries implements QueryProvider {
                 " (SELECT COUNT(*) FROM downloads WHERE content_id = c.content_id) AS downloadsCount, " +
                 " (SELECT COUNT(*) " +
                 "    FROM downloads d " +
-                "    JOIN content_dates cd ON d.content_id = cd.content_id " +
                 "    WHERE d.content_id = c.content_id " +
-                "      AND cd.created_at >= NOW() - INTERVAL '7 days') AS latestDownloadsCount, " +
+                "      AND d.date >= NOW() - INTERVAL '7 days') AS latestDownloadsCount, " +
                 " (SELECT AVG(rating)::float FROM rating WHERE content_id = c.content_id) AS avgRating, " +
                 " cd.created_at AS createdAt, " +
                 " cd.updated_at AS updatedAt, " +
@@ -50,9 +49,8 @@ public class PostgresQueries implements QueryProvider {
                         " (SELECT COUNT(*) FROM downloads WHERE content_id = c.content_id) AS downloadsCount, " +
                         " (SELECT COUNT(*) " +
                         "    FROM downloads d " +
-                        "    JOIN content_dates cd ON d.content_id = cd.content_id " +
                         "    WHERE d.content_id = c.content_id " +
-                        "      AND cd.created_at >= NOW() - INTERVAL '7 days') AS latestDownloadsCount, " +
+                        "      AND d.date >= NOW() - INTERVAL '7 days') AS latestDownloadsCount, " +
                         " (SELECT AVG(rating)::float FROM rating WHERE content_id = c.content_id) AS avgRating, " +
                         " cd.created_at AS createdAt, " +
                         " cd.updated_at AS updatedAt, " +

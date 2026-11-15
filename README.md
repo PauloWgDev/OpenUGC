@@ -75,7 +75,7 @@ cd OpenUGC
 Open `docker-compose.yml` and check two things before starting:
 
 1. `DATABASE_USERNAME` / `DATABASE_PASSWORD` on the `open-ugc` service must match `POSTGRES_USER` / `POSTGRES_PASSWORD` on the `postgres` service.
-2. Change `JWT_SECRET` to your own random value of at least 32 bytes.
+2. Replace `JWT_SECRET: CHANGE_ME` with your own secret. The app won't start with the placeholder.
 
 Then:
 
@@ -122,23 +122,23 @@ Interactive API docs are available at **`http://localhost:8080/swagger-ui.html`*
 
 All settings are read from environment variables.
 
-| Variable                         | Required        | Description                                                                 |
-|----------------------------------|-----------------|-----------------------------------------------------------------------------|
-| `DATABASE_PROFILE`               | yes             | Database profile. Currently only `postgres` is supported.                   |
-| `DATABASE_URL`                   | yes             | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/openugc`                   |
-| `DATABASE_USERNAME`              | yes             | Database user                                                               |
-| `DATABASE_PASSWORD`              | yes             | Database password                                                           |
-| `JWT_SECRET`                     | yes             | Secret used to sign tokens. Use a random value of at least 32 bytes.        |
-| `STORAGE_TYPE`                   | yes             | `local` or `cloud`                                                          |
-| `STORAGE_LOCATION`               | local storage   | Directory where uploaded files are written                                  |
-| `STORAGE_BASEURL`                | no              | Only for data uploaded before storage keys existed (rows with full URLs)    |
-| `CLOUD_BUCKET`                   | cloud storage   | Google Cloud Storage bucket name                                            |
-| `CLOUD_BASEURL`                  | no              | Same as `STORAGE_BASEURL`, for cloud storage                                |
-| `GOOGLE_APPLICATION_CREDENTIALS` | cloud storage   | Path to the service-account JSON key                                        |
-| `PORT`                           | no              | HTTP port (default `8080`)                                                  |
-| `GUEST_ENABLED`                  | no              | Allow `POST /api/auth/guest` (default `true`)                               |
-| `GUEST_CANPOST`                  | no              | Allow guests to upload content (default `false`)                            |
-| `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`  |
+| Variable                         | Required        | Description                                                              |
+|----------------------------------|-----------------|--------------------------------------------------------------------------|
+| `DATABASE_PROFILE`               | yes             | Database profile. Currently only `postgres` is supported.                |
+| `DATABASE_URL`                   | yes             | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/openugc`                |
+| `DATABASE_USERNAME`              | yes             | Database user                                                            |
+| `DATABASE_PASSWORD`              | yes             | Database password                                                        |
+| `JWT_SECRET`                     | yes             | Secret used to sign tokens. At least 32 bytes                            |
+| `STORAGE_TYPE`                   | yes             | `local` or `cloud`                                                       |
+| `STORAGE_LOCATION`               | local storage   | Directory where uploaded files are written                               |
+| `STORAGE_BASEURL`                | no              | Only for data uploaded before storage keys existed (rows with full URLs) |
+| `CLOUD_BUCKET`                   | cloud storage   | Google Cloud Storage bucket name                                         |
+| `CLOUD_BASEURL`                  | no              | Same as `STORAGE_BASEURL`, for cloud storage                             |
+| `GOOGLE_APPLICATION_CREDENTIALS` | cloud storage   | Path to the service-account JSON key                                     |
+| `PORT`                           | no              | HTTP port (default `8080`)                                               |
+| `GUEST_ENABLED`                  | no              | Allow `POST /api/auth/guest` (default `true`)                            |
+| `GUEST_CANPOST`                  | no              | Allow guests to upload content (default `false`)                         |
+| `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`              |
 
 **Other defaults worth knowing**
 

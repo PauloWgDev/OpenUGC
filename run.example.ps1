@@ -8,8 +8,8 @@ $env:DATABASE_URL = "jdbc:postgresql://<domain>"
 $env:DATABASE_USERNAME = "user"             # change this
 $env:DATABASE_PASSWORD = "secretPassword"   # change this
 
-# JWT Secret for local auth
-$env:JWT_SECRET = "aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!"      # change this
+# JWT Secret for local auth (required, at least 32 bytes).
+$env:JWT_SECRET = "CHANGE_ME"
 
 # Storage Type
 $env:STORAGE_TYPE = "local"

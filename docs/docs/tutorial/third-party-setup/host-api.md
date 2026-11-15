@@ -54,7 +54,7 @@ The name of these environment variables must match those defined in [application
 | `DATABASE_PASSWORD`   | PostgreSQL password                                     | `mypassword`                           |
 | `DATABASE_PROFILE`    | Which database are you using (postgres, mysql, etc)     | `postgres`                             |
 | `PORT`                | Port where the API runs (Render defaults to `10000`)    | `8080`                                 |
-| `JWT_SECRET`          | Secret key for signing JWT tokens (must be at least 32 bytes long) | `aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!`  |
+| `JWT_SECRET`          | Secret key for signing JWT tokens, at least 32 bytes. Generate one with `openssl rand -base64 48`; the app refuses to start with a short or example value | `<output of openssl rand -base64 48>`  |
 | `STORAGE_TYPE`        | Storage backend: `local` or `cloud`                     | `cloud`                                |
 | `STORAGE_LOCATION`    | (Local only) Path where files are stored, , if using cloud leave as 'not_using'   | `/data/ugc`   |
 | `STORAGE_BASEURL`     | (Optional) Only for data uploaded before storage keys existed (rows with full URLs) | `http://localhost:8080/storage/` |
