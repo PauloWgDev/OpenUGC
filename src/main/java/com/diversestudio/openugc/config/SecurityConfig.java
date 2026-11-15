@@ -45,6 +45,7 @@ public class SecurityConfig {
                         // Thumbnails are public so browsers and game clients can show them without a token.
                         // Content files (/api/content/download/{id}) still require authentication.
                         .requestMatchers(HttpMethod.GET, "/api/content/thumbnail/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // restrict admin endpoints
                         .anyRequest().authenticated()
                 )
