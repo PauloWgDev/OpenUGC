@@ -13,7 +13,8 @@ services:
       DATABASE_USERNAME: username     # change this
       DATABASE_PASSWORD: password     # change this
 
-      JWT_SECRET: aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong! # change this
+      # Required. The app won't start until you replace this with your own secret
+      JWT_SECRET: CHANGE_ME
 
       STORAGE_TYPE: local
 

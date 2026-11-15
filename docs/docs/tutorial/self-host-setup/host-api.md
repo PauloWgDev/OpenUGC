@@ -49,8 +49,9 @@ $env:DATABASE_URL = "jdbc:postgresql://localhost:5433/openugc"
 $env:DATABASE_USERNAME = "postgres"
 $env:DATABASE_PASSWORD = "secretpassword"
 
-# JWT Secret for local auth
-$env:JWT_SECRET = "aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!"
+# JWT Secret for local auth (required, at least 32 bytes). Generate one with:
+#   $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); [Convert]::ToBase64String($b)
+$env:JWT_SECRET = "<your-generated-secret>"
 
 # Storage Type
 $env:STORAGE_TYPE = "local"

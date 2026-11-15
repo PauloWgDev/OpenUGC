@@ -8,8 +8,8 @@ export DATABASE_URL="jdbc:postgresql://<domain>"
 export DATABASE_USERNAME="user"       # change this
 export DATABASE_PASSWORD="password"   # change this
 
-# JWT Secret for local auth
-export JWT_SECRET="aSecureRandomGeneratedKeyThatIsAtLeast32BytesLong!"  # change this
+# JWT Secret for local auth (required, at least 32 bytes).
+export JWT_SECRET="CHANGE_ME"
 
 # Storage Type
 export STORAGE_TYPE="local"

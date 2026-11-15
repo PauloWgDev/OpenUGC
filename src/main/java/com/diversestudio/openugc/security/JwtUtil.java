@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -18,11 +19,38 @@ public class JwtUtil {
 
     private static final long EXPIRATION_TIME = 86400000; // 1 day
 
+    /** HS256 needs a key of at least 256 bits. */
+    static final int MIN_SECRET_BYTES = 32;
+
+    private static final String HOW_TO_GENERATE =
+            "Generate one with: openssl rand -base64 48";
+
     private final SecretKey key;
 
-    // Load secret key from application.properties
+    /**
+     * @param secret the {@code JWT_SECRET} value; the app refuses to start if it is blank or
+     *               shorter than {@value #MIN_SECRET_BYTES} bytes.
+     */
     public JwtUtil(@Value("${jwt.secret}") String secret) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.key = Keys.hmacShaKeyFor(checkedSecretBytes(secret));
+    }
+
+    /**
+     * Validates the configured secret and returns its UTF-8 bytes.
+     *
+     * @throws IllegalStateException with a message saying how to fix the configuration
+     */
+    static byte[] checkedSecretBytes(String secret) {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET is not set. " + HOW_TO_GENERATE);
+        }
+
+        byte[] bytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length < MIN_SECRET_BYTES) {
+            throw new IllegalStateException("JWT_SECRET must be at least " + MIN_SECRET_BYTES
+                    + " bytes long (it is " + bytes.length + "). " + HOW_TO_GENERATE);
+        }
+        return bytes;
     }
 
     // Generates a JWT token for a given username and role
