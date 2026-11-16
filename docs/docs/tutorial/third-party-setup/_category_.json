@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-     "description": "We decided to also include a tutorial on how to set-up OpenUGC with third parties so users can quickly have a working version of their UGC."
+    "description": "Set up OpenUGC with third-party services so you can quickly have a working version online: the database and the API on Render, and the files on Google Cloud Storage. Follow the pages in order."
   }
 }

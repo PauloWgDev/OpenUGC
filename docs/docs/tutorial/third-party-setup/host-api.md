@@ -4,70 +4,105 @@ sidebar_position: 3
 
 # Host OpenUGC with Render
 
-In this guide, you’ll learn how to host the **OpenUGC API** on Render, link your repository, and configure the required environment variables.  
-It’s one of the fastest ways to get OpenUGC up and running with a live URL.
+In this guide, you'll learn how to host the **OpenUGC API** on Render, link the repository, and configure the required environment variables.
+It's one of the fastest ways to get OpenUGC up and running with a public URL.
+
+Before starting, you should have:
+
+- A PostgreSQL database and its connection details ([Host Database with Render](./host-database.md)).
+- A Google Cloud Storage bucket and its JSON key ([Host with Google Cloud Storage](./host-storage.md)).
 
 ---
 
 ### 1. Create a New Web Service
 
-From the Render dashboard, click on **“New +” → “Web Service”**.
+From the Render dashboard, click on **"New +" → "Web Service"**.
 
-![alt text](host_api_1.png)
-
-
----
-
-### 2. Link your repository with Render
-
-Paste the following repo URL into the **Public Git Repository** field: `https://github.com/PauloWgDev/OpenUGC.git`
-
-![alt text](host_api_2.png)
-
+![Render "New" menu with the Web Service option](host_api_1.png)
 
 ---
 
-### 3. Configure the API values
+### 2. Link the Repository
+
+Paste the following repository URL into the **Public Git Repository** field: `https://github.com/PauloWgDev/OpenUGC.git`
+
+If you made your own fork with changes, connect your GitHub account and pick your fork instead.
+
+![Public Git Repository field on Render](host_api_2.png)
+
+---
+
+### 3. Configure the Service
 
 Fill in the fields as follows:
 
-- **Language**: Docker  
-- **Branch**: `master` (or `development` if you want the dev version)  
-- **Region**: Any (pick the closest to your users)  
+- **Language**: Docker (Render builds the image with the `Dockerfile` in the repository)
+- **Branch**: `master`
+- **Region**: the same region as your database
 - **Root Directory**: leave empty
-- **Instance Type**: Free (recommended for first-time setup)
-- **Environment Variables**: configure in the next step
+- **Instance Type**: Free (to try it out) or a paid plan
+- **Environment Variables**: configure them in the next step
 
 ---
 
-### 4. Set Up environment variables
+### 4. Set Up the Environment Variables
 
-OpenUGC requires a few environment variables to connect to your database and storage.
+OpenUGC reads its settings from environment variables. Add these in the **Environment** section:
 
-The name of these environment variables must match those defined in [application.properties](https://github.com/PauloWgDev/OpenUGC/blob/development/src/main/resources/application.properties)
+| Variable | Value |
+|----------|-------|
+| `DATABASE_PROFILE` | `postgres` (the only supported value for now) |
+| `DATABASE_URL` | JDBC URL of your database, e.g. `jdbc:postgresql://dpg-xxxxx-a:5432/openugc_db`. See [Get the Connection Details](./host-database.md#4-get-the-connection-details) |
+| `DATABASE_USERNAME` | database username |
+| `DATABASE_PASSWORD` | database password |
+| `JWT_SECRET` | secret used to sign tokens, at least 32 bytes. Generate one with `openssl rand -base64 48`. The API refuses to start with a short value or with `CHANGE_ME` |
+| `STORAGE_TYPE` | `cloud` |
+| `CLOUD_BUCKET` | your bucket name, e.g. `openugc-bucket` |
+| `GOOGLE_APPLICATION_CREDENTIALS` | `/etc/secrets/<name-of-your-key-file>.json` (see below) |
 
+You don't need to set `PORT`. Render sets it for you and OpenUGC uses it automatically.
 
-| Variable              | Description                                              | Example                                |
-|-----------------------|----------------------------------------------------------|----------------------------------------|
-| `DATABASE_URL`        | JDBC connection string for PostgreSQL                   | `jdbc:postgresql://host:5432/dbname`   |
-| `DATABASE_USERNAME`   | PostgreSQL username                                     | `postgres`                             |
-| `DATABASE_PASSWORD`   | PostgreSQL password                                     | `mypassword`                           |
-| `DATABASE_PROFILE`    | Which database are you using (postgres, mysql, etc)     | `postgres`                             |
-| `PORT`                | Port where the API runs (Render defaults to `10000`)    | `8080`                                 |
-| `CORS_ALLOWED_ORIGINS` | (Optional) Browser origins allowed to call the API, comma-separated; needed for Unity WebGL builds. Default `*` (all). Empty turns CORS off | `https://mygame.com,https://*.itch.zone` |
-| `JWT_SECRET`          | Secret key for signing JWT tokens, at least 32 bytes. Generate one with `openssl rand -base64 48`; the app refuses to start with a short or example value | `<output of openssl rand -base64 48>`  |
-| `STORAGE_TYPE`        | Storage backend: `local` or `cloud`                     | `cloud`                                |
-| `STORAGE_LOCATION`    | (Local only) Path where files are stored, , if using cloud leave as 'not_using'   | `/data/ugc`   |
-| `STORAGE_BASEURL`     | (Optional) Only for data uploaded before storage keys existed (rows with full URLs) | `http://localhost:8080/storage/` |
-| `CLOUD_BUCKET`        | (Cloud only) Cloud storage bucket name                | `openugc-bucket`    |
-| `CLOUD_BASEURL`       | (Optional) Same as `STORAGE_BASEURL`, for cloud storage | `https://storage.googleapis.com/openugc-bucket/`   |
-| `GOOGLE_APPLICATION_CREDENTIALS` | (Google CLoud only) path to where the google credentials are stored | `/etc/secrets/arched-sorter-459106-f6-621d3319234e.json` |
+**The Google key file.** In the same **Environment** section, add a **Secret File**. Use the name of your JSON key file (for example `openugc-key.json`) and paste its contents. Render makes it available at `/etc/secrets/openugc-key.json`, so that's the path to use in `GOOGLE_APPLICATION_CREDENTIALS`.
 
+There are more optional settings, such as guest access and CORS for WebGL builds. They are all on the [Configuration](../configuration.md) page.
 
-> **Important**: Make sure your database and storage are accessible from Render. If you use Render’s PostgreSQL service, it will give you a `DATABASE_URL` automatically.
+:::caution Don't use local storage on the free plan
+You could set `STORAGE_TYPE` to `local`, but the free plan's disk is temporary: every uploaded file would be lost when the service restarts, redeploys or goes to sleep. The content would still be listed, but its downloads would fail.
+:::
 
 ---
 
-After saving your settings, Render will build and deploy OpenUGC. (On the free version it may take a few minutes to deploy)
+### 5. Health Check (Optional)
 
-Once the build is finished, you’ll have a public URL where your API is live! 🎉
+In the service settings, set the **Health Check Path** to:
+
+```
+/actuator/health
+```
+
+Render then waits until the API is really ready before sending traffic to a new deploy.
+
+---
+
+### 6. Deploy
+
+After saving your settings, Render builds and deploys OpenUGC. The first build takes a few minutes.
+
+Once it's finished, you'll have a public URL like `https://openugc-xxxx.onrender.com`. Check that it works by opening:
+
+```
+https://openugc-xxxx.onrender.com/actuator/health
+```
+
+If the response contains `"status":"UP"`, the API is live. To try the endpoints, use the same requests as in [Testing the API](../self-host-setup/host-api.md#5-testing-the-api), changing `http://localhost:8080` to your Render URL.
+
+:::note
+Free web services on Render go to sleep after 15 minutes without traffic, and the next request takes around a minute to wake them up. Your game should be ready for a slow first response, or you can use a paid instance.
+:::
+
+---
+
+### Next Steps
+
+- [Create the first admin account](../first-admin.md).
+- Read [API Basics](../../documentation/api-basics.md) to start using the API from your game.

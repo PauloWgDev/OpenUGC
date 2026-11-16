@@ -1,0 +1,8 @@
+{
+  "label": "Stats",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Download and rating numbers of a content item."
+  }
+}

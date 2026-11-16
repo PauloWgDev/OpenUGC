@@ -1,0 +1,8 @@
+{
+  "label": "Admin",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "description": "Endpoints for accounts with the ADMIN role."
+  }
+}

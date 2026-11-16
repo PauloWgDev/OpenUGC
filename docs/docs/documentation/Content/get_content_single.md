@@ -1,13 +1,18 @@
-# Retrieve Specific Content
+---
+sidebar_position: 2
+---
 
-Fetches a specific content item by its ID.
+# Get Content by ID
 
-## Endpoint 
+Returns a single content item by its ID.
 
-- URL:
-  `GET http://<your-domain>/api/content/{id}`
+## Endpoint
+
+- **URL:** `GET http://<your-domain>/api/content/{id}`
 - **Headers:**
     - `Authorization: Bearer <token>`
+
+## Response Example
 
 ```json
 {
@@ -18,25 +23,29 @@ Fetches a specific content item by its ID.
   "thumbnail": "http://<your-domain>/api/content/thumbnail/1",
   "name": "My Content",
   "description": "This is a test content",
+  "tags": ["maps", "racing"],
   "version": 1,
   "downloadsCount": 4,
   "latestDownloadsCount": 0,
   "avgRating": 4.333333333333333,
-  "createdAt": "2025-02-25T19:02:10.914+00:00",
-  "updatedAt": "2025-02-25T19:02:10.914+00:00"
+  "createdAt": "2026-02-25T19:02:10.914+00:00",
+  "updatedAt": "2026-02-25T19:02:10.914+00:00"
 }
 ```
 
-`data` and `thumbnail` are API URLs, not direct links to storage:
+The fields are the same as in [Get Contents Page](./get_content_batch.md#content-fields).
 
-* `data` → `GET /api/content/download/{id}`: needs the `Authorization` header and is counted as a download.
+`data` and `thumbnail` are API URLs, not direct links to the storage:
+
+* `data` → `GET /api/content/download/{id}`: needs the `Authorization` header and is counted as a download. See [Download Content](./download_content.md).
 * `thumbnail` → `GET /api/content/thumbnail/{id}`: public, so it can be used directly as an image source. `null` if the content has no thumbnail.
 
-## Responses Status
+:::note
+Content that was [soft deleted](./delete_content.md) is hidden from the list, but it can still be fetched by ID with this endpoint (and downloaded, rated and so on). Only a hard delete removes it completely.
+:::
 
-* `200 OK` – Returns content
+## Response Status
+
+* `200 OK` – Returns the content
 * `403 Forbidden` – Invalid or missing token
-* `404 Not Found`- Content not found
-* `500 Internal Server Error` – Server issue
-
----
+* `404 Not Found` – No content with this ID

@@ -1,0 +1,8 @@
+{
+  "label": "Authorization",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Create accounts and get the tokens needed to use the rest of the API."
+  }
+}
