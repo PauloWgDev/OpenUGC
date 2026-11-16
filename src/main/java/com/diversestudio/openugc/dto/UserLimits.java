@@ -12,6 +12,6 @@ public final class UserLimits {
     public static final int PASSWORD_MAX = 72; // More characters on the password would just be ignored by the encrypter
 
     public static final int ABOUT_ME_MAX = 2_000;
-
+    
     private UserLimits() { }
 }
