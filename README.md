@@ -227,7 +227,7 @@ docs/              Docusaurus documentation site and Postman collection
 
 ## Documentation
 
-The full guide lives at **[paulowgdev.github.io/OpenUGC](https://paulowgdev.github.io/OpenUGC/)**. Its source is in [`/docs`](./docs); run it locally with:
+The full guide lives at **[paulowgdev.github.io/OpenUGC](https://paulowgdev.github.io/OpenUGC/)**. Its source is in [`/docs`](./docs), run it locally with:
 
 The documentation is still a work in progress, and feedback welcome :)
 
