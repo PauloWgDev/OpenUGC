@@ -5,8 +5,8 @@
 <h1 align="center">OpenUGC</h1>
 
 <p align="center">
-  A self-hostable, open-source backend for <b>user-generated content</b> in games.<br>
-  Players upload, browse, rate and download content — your game just talks to a REST API.
+  A self-hostable, open-source backend for <b>user-generated content</b>.<br>
+  Players upload, browse, rate and download content.
 </p>
 
 <p align="center">
@@ -35,15 +35,15 @@ And because you host it yourself, you own the data, the storage and the rules, s
 
 ## Features
 
-- **Accounts & auth** — registration, login and stateless JWT authentication (tokens last 24 h).
-- **Guest access** — optional guest tokens so players can browse without an account; you decide whether guests may upload.
-- **Roles** — `ADMIN`, `USER` and `GUEST`, created automatically on first start. Admin-only endpoints live under `/api/admin`.
-- **Content** — multipart upload of a file plus an optional thumbnail, with name, description, version and tags.
-- **Search** — paginated, sortable listing filtered by text, tags or creator.
-- **Ratings** — per-content ratings with optional comments, plus a rating distribution endpoint.
-- **Stats** — total downloads, downloads in the last 7 days, rating count and average rating per item.
-- **Download tracking** — every download is recorded with the client IP.
-- **Pluggable storage** — local disk or Google Cloud Storage, selected by one environment variable.
+- **Accounts & auth**: registration, login and stateless JWT authentication (tokens last 24 h).
+- **Guest access**: optional guest tokens so players can browse without an account; you decide whether guests may upload.
+- **Roles**: `ADMIN`, `USER` and `GUEST`, created automatically on first start. Admin-only endpoints live under `/api/admin`.
+- **Content**: multipart upload of a file plus an optional thumbnail, with name, description, version and tags.
+- **Search**: paginated, sortable listing filtered by text, tags or creator.
+- **Ratings**: per-content ratings with optional comments, plus a rating distribution endpoint.
+- **Stats**: total downloads, downloads in the last 7 days, rating count and average rating per item.
+- **Download tracking**: every download is recorded with the client IP.
+- **Pluggable storage**: local disk or Google Cloud Storage, selected by one environment variable.
 - **Soft & hard delete** for content.
 - **Rate limiting** on register, login and guest login (5 requests per minute per IP).
 - **OpenAPI / Swagger UI** generated from the code.
@@ -63,7 +63,7 @@ And because you host it yourself, you own the data, the storage and the rules, s
 
 ## Quick start
 
-### Option A — Docker Compose
+### Option A — Docker Compose (recommended)
 
 Requires Docker and Docker Compose.
 
@@ -141,22 +141,23 @@ All settings are read from environment variables.
 | `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`              |
 | `CORS_ALLOWED_ORIGINS`           | no              | Browser origins allowed to call the API, comma-separated (default `*`). Empty turns CORS off |
 
-**Other defaults worth knowing**
+**Other defaults**
 
 - Uploads are limited to **1 MB per request** (`spring.servlet.multipart.max-*` in `application.properties`). Raise it if your content is larger.
 - Security and SQL debug logging are **off** by default. To turn them on while developing, set `LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG` and/or `SPRING_JPA_SHOW_SQL=true`.
-- **Running behind a reverse proxy** (nginx, Render, etc): the client IP used for rate limits and download records comes from `X-Forwarded-For`, but only when the request arrives from a trusted proxy. By default those are private and loopback addresses. If your proxy connects from a public IP, set `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES`. Don't let clients reach the app directly from a private network while it trusts that network, because they could then set the header themselves.
+- **Running behind a reverse proxy** (nginx, Render, etc): the client IP used for rate limits and download records comes from `X-Forwarded-For`, but only when the request arrives from a trusted proxy. If your proxy connects from a public IP, set `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES`.
 - The schema is managed by Hibernate (`ddl-auto=update`), so tables are created on first start.
 
 ## Creating the first admin
 
-Roles are created automatically, but no admin account is. To get your first admin:
+Roles are created automatically, but no admin account is. To get your first admin you have to do it from the database:
 
 1. Register a normal account with `POST /api/auth/register`.
 2. Give it the `ADMIN` role directly in the database (set the user's role to the `ADMIN` row in the roles table).
-3. Log in again to get a token with the new role.
+3. Log in again to get a token with the new role. 
 
-From then on, that admin can create accounts with any role (`POST /api/admin/users`) and change roles (`PATCH /api/admin/users/{id}/role/{roleName}`). Existing tokens keep their old role until they expire.
+From then on, that admin can create accounts with any role (`POST /api/admin/users`) and change roles (`PATCH /api/admin/users/{id}/role/{roleName}`). 
+**Note:** Existing tokens keep their old role until they expire.
 
 ## API overview
 
@@ -226,13 +227,7 @@ docs/              Docusaurus documentation site and Postman collection
 
 ## Documentation
 
-The full guide — including step-by-step hosting on your own server or on third-party providers — lives at **[paulowgdev.github.io/OpenUGC](https://paulowgdev.github.io/OpenUGC/)**. Its source is in [`/docs`](./docs); run it locally with:
-
-```bash
-cd docs
-npm install
-npm start
-```
+The full guide lives at **[paulowgdev.github.io/OpenUGC](https://paulowgdev.github.io/OpenUGC/)**. Its source is in [`/docs`](./docs); run it locally with:
 
 The documentation is still a work in progress, and feedback welcome :)
 
@@ -241,8 +236,8 @@ The documentation is still a work in progress, and feedback welcome :)
 Issues and pull requests are welcome!
 
 1. Fork the repo and create a branch: `git checkout -b feature/my-change`
-2. Make your changes and run the tests: `./mvnw test`
-3. Open a pull request describing what and why
+2. Make your changes
+3. Open a pr describing what and why
 
 ## License
 
