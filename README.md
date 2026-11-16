@@ -18,7 +18,7 @@
 
 <p align="center">
   <img alt="Java 17" src="https://img.shields.io/badge/Java-17-orange">
-  <img alt="Spring Boot 3.4" src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F">
+  <img alt="Spring Boot 3.5" src="https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F">
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-17-336791">
   <img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue">
 </p>
@@ -50,16 +50,16 @@ And because you host it yourself, you own the data, the storage and the rules, s
 
 ## Built with
 
-| Layer          | Technology                                   |
-|----------------|----------------------------------------------|
-| Language       | Java 17                                      |
-| Framework      | Spring Boot 3.4 (Web, Data JPA, Security)    |
-| Database       | PostgreSQL                                   |
-| Auth           | JWT (jjwt), BCrypt password hashing          |
-| Storage        | Local filesystem or Google Cloud Storage     |
-| Rate limiting  | Bucket4j                                     |
-| API docs       | springdoc-openapi (Swagger UI)               |
-| Docs site      | Docusaurus (in [`/docs`](./docs))            |
+| Layer          | Technology                                |
+|----------------|-------------------------------------------|
+| Language       | Java 17                                   |
+| Framework      | Spring Boot 3.5 (Web, Data JPA, Security) |
+| Database       | PostgreSQL                                |
+| Auth           | JWT (jjwt), BCrypt password hashing       |
+| Storage        | Local filesystem or Google Cloud Storage  |
+| Rate limiting  | Bucket4j                                  |
+| API docs       | springdoc-openapi (Swagger UI)            |
+| Docs site      | Docusaurus (in [`/docs`](./docs))         |
 
 ## Quick start
 
