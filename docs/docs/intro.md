@@ -10,7 +10,7 @@ It isn't tied to any engine. Anything that can make HTTP requests can use it: Un
 
 ## Why OpenUGC?
 
-Unity's UGC service spent about two years in open beta without some of the basics a UGC system needs, and in 2025 Unity shut it down, leaving the games that relied on it without a solution.
+Unity's UGC service spent about two years in open beta without some of the basics a UGC system should have, and in 2025 Unity shut it down, leaving the games that relied on it without a solution.
 
 OpenUGC was built as an open-source alternative. Because you host it yourself, you own the data, the storage and the rules.
 

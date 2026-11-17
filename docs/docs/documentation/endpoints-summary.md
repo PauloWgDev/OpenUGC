@@ -13,11 +13,11 @@ All endpoints need an `Authorization: Bearer <token>` header, except the ones ma
 
 ## Authorization
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | [Register](./Authorization/register.md) a new account. Public, rate-limited |
-| POST | `/api/auth/login` | [Log in](./Authorization/login.md) and receive a JWT token. Public, rate-limited |
-| POST | `/api/auth/guest` | [Get a guest token](./Authorization/guest.md) without an account. Public, rate-limited |
+| Method | Endpoint | Description                                                                           |
+|--------|----------|---------------------------------------------------------------------------------------|
+| POST | `/api/auth/register` | [Register](./Authorization/register.md) a new account. **Public**, rate-limited       |
+| POST | `/api/auth/login` | [Log in](./Authorization/login.md) and receive a JWT token. **Public**, rate-limited      |
+| POST | `/api/auth/guest` | [Get a guest token](./Authorization/guest.md) without an account. **Public**, rate-limited |
 
 ---
 
@@ -27,7 +27,7 @@ All endpoints need an `Authorization: Bearer <token>` header, except the ones ma
 |--------|----------|-------------|
 | GET | `/api/content` | [Get a page of content](./Content/get_content_batch.md), with search, tag and creator filters, pagination and sorting |
 | GET | `/api/content/{id}` | [Get one content item](./Content/get_content_single.md) by ID |
-| GET | `/api/content/thumbnail/{id}` | [Get the thumbnail image](./Content/get_content_thumbnail.md). Public, not counted as a download |
+| GET | `/api/content/thumbnail/{id}` | [Get the thumbnail image](./Content/get_content_thumbnail.md). **Public**, not counted as a download |
 | GET | `/api/content/download/{id}` | [Download the content file](./Content/download_content.md). Counted as a download |
 | POST | `/api/content` | [Upload content](./Content/post_content.md): a file, an optional thumbnail and the metadata (multipart) |
 | DELETE | `/api/content/{id}` | [Delete content](./Content/delete_content.md). Soft delete by default, `?hardDelete=true` to remove it completely |
@@ -81,6 +81,6 @@ Requires a token with the `ADMIN` role. See [Creating the First Admin](../tutori
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/actuator/health` | Health check. Public. Returns `"status":"UP"` when the API is running |
-| GET | `/swagger-ui.html` | Interactive API docs in the browser. Public |
-| GET | `/v3/api-docs` | OpenAPI description of the API in JSON (`/v3/api-docs.yaml` for YAML). Public |
+| GET | `/actuator/health` | Health check. **Public**. Returns `"status":"UP"` when the API is running |
+| GET | `/swagger-ui.html` | Interactive API docs in the browser. **Public** |
+| GET | `/v3/api-docs` | OpenAPI description of the API in JSON (`/v3/api-docs.yaml` for YAML). **Public** |

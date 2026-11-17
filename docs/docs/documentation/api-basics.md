@@ -140,13 +140,11 @@ Each endpoint has its own limit. The 5 requests come back gradually over the min
 Too many login attempts. Please try again later.
 ```
 
-Your game should show a message and let the player try again later, instead of retrying in a loop.
-
 ---
 
 ## Errors
 
-When something goes wrong, the API returns an HTTP status code and, in most cases, a JSON body in the standard "problem details" format (`Content-Type: application/problem+json`):
+When something goes wrong, the API returns an HTTP status code and, in most cases, a JSON body in the following format:
 
 ```json
 {
@@ -159,7 +157,7 @@ When something goes wrong, the API returns an HTTP status code and, in most case
 ```
 
 - `status` is the same as the HTTP status code.
-- `detail` is a message that explains what happened. It's meant for developers and logs, not to show to players as is.
+- `detail` is a message that explains what happened. It's meant for developers and logs.
 
 When the body of a request breaks a rule (for example a username that is too short), the response is `400 Bad Request` with an `errors` object that lists each invalid field:
 
@@ -180,19 +178,19 @@ A few responses are plain text instead of JSON: the `429` rate limit messages an
 
 ### Common status codes
 
-| Code | Meaning |
-|------|---------|
-| `200 OK` | The request worked |
-| `201 Created` | An account was created by an admin |
-| `204 No Content` | The request worked and there is nothing to return (e.g. delete) |
+| Code | Meaning                                                                                                       |
+|------|---------------------------------------------------------------------------------------------------------------|
+| `200 OK` | Successful Request                                                                                            |
+| `201 Created` | An account was created by an admin                                                                            |
+| `204 No Content` | The request worked and there is nothing to return (e.g. delete)                                               |
 | `400 Bad Request` | Something in the request is wrong: a missing or invalid field, an unknown sort field, a rating out of range... |
-| `401 Unauthorized` | Wrong username or password on login |
-| `403 Forbidden` | Missing, invalid or expired token, or you're not allowed to do this (e.g. deleting someone else's content) |
-| `404 Not Found` | The content, user or file doesn't exist |
-| `409 Conflict` | The username is already taken, or the data conflicts with what's in the database |
-| `413 Payload Too Large` | The upload is bigger than the limit (1 MB by default) |
-| `429 Too Many Requests` | Rate limit reached |
-| `500 Internal Server Error` | Unexpected error on the server. Check the API logs |
+| `401 Unauthorized` | Wrong username or password on login                                                                           |
+| `403 Forbidden` | Missing, invalid or expired token, or you're not allowed to do this (e.g. deleting someone else's content)    |
+| `404 Not Found` | The content, user or file doesn't exist                                                                       |
+| `409 Conflict` | The username is already taken, or the data conflicts with what's in the database                              |
+| `413 Payload Too Large` | The upload is bigger than the limit (1 MB by default)                                                         |
+| `429 Too Many Requests` | Rate limit reached                                                                                            |
+| `500 Internal Server Error` | Unexpected error on the server. Check the API logs                                                            |
 
 ---
 
