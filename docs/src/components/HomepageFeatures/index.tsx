@@ -37,7 +37,7 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         With <b>U3GC</b>, our Unity client library, you can bring UGC into your
-        game in just a few lines of code—fast setup, smooth integration, and
+        game in just a few lines of code, fast setup, smooth integration, and
         ready to scale.
       </>
     ),
