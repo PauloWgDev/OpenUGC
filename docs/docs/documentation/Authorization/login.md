@@ -1,15 +1,17 @@
+---
+sidebar_position: 3
+---
+
 # Login
 
-Authenticates a user and returns a JSON Web Token (JWT).
+Checks a username and password and returns a JSON Web Token (JWT).
 
-## Endpoint for Login:
+## Endpoint
 
-- **URL:**
-  `POST http://<your-domain>/api/auth/login`
+- **URL:** `POST http://<your-domain>/api/auth/login`
+- **Auth:** not needed (public)
 - **Headers:**
-
-    - **Key:** `Content-Type`
-    - **Value:** `application/json`
+    - `Content-Type: application/json`
 - **Body:**
 
   ```json
@@ -19,17 +21,25 @@ Authenticates a user and returns a JSON Web Token (JWT).
   }
   ```
 
-## Sucessfull Rensponse Example:
+:::note
+The login body uses `credential` for the password, not `password`. Sending `password` here returns `400 Bad Request`.
+:::
+
+## Successful Response Example
 
 ```json
 {
-"token": "eyJhbGciOiJIUzM4NCJ9..."
+  "token": "eyJhbGciOi..."
 }
 ```
 
-### Response Status
+Use this token in the `Authorization: Bearer <token>` header of the next requests. It is valid for **24 hours**. After that, the player has to log in again.
 
-* `200 OK` – Returns JWT token
-* `401 Unauthorized` – Invalid username or password
+The token contains the user's ID, username and role. The role is saved when the token is created, so if the role changes, the player must log in again to get a token with the new role.
 
----
+## Response Status
+
+* `200 OK` – Returns the JWT token
+* `400 Bad Request` – `username` or `credential` is missing or empty
+* `401 Unauthorized` – Wrong username or password. The message is the same in both cases, so it doesn't reveal which usernames exist
+* `429 Too Many Requests` – More than 5 login requests in a minute from the same IP

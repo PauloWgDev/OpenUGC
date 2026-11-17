@@ -1,57 +1,117 @@
+---
+sidebar_position: 5
+---
+
 # Upload Content
 
-Uploads new user-generated content.
+Uploads new user-generated content: a file, an optional thumbnail, and its information (name, description, version and tags).
+
+Accounts with the `USER` or `ADMIN` role can upload. Guests can only upload if the server sets `GUEST_CANPOST=true`.
 
 ## Endpoint
 
-- URL:
-  `POST http://<your-domain>/content`
+- **URL:** `POST http://<your-domain>/api/content`
 - **Headers:**
+    - `Authorization: Bearer <token>`
+    - `Content-Type: multipart/form-data` (most HTTP clients set it for you when you send a form)
+- **Body:** a multipart form with these parts:
 
-    - **Key:** `Authorization`
-    - **Value:** `Bearer eyJhbGciOiJIUzM4NCJ..."`
--
-- **Body:**
+| Part | Required | Description |
+|------|----------|-------------|
+| `content` | yes | JSON with the content information (see below). **This part must be sent with the content type `application/json`** |
+| `file` | yes | The content file itself. Any file type (zip, json, an image, a custom format...), but it can't be empty |
+| `thumbnail` | no | A preview image. Must be a real **PNG**, **JPEG** or **WebP** image. The server checks the file itself, not just its name |
 
-  ```json
-  {
-    "name": "New Content",
-    "description": "This is just a test",
-    "version": 1,
-    "data": "This is some data",
-    "thumbnail": "base64encodedImage",
-    "tags": ["tag1", "tag2"]
-  }
-  ```
-
-**thumbnail and tags are optional, you don't have to include them in the body if you're not going to upload any.**
-
-Tags are saved in lowercase with surrounding spaces removed, so `"Racing"`, `" racing "` and `"RACING"` are the same tag. If a tag is repeated in one request, it is added once. Filtering with `GET /api/content?tags=...` ignores case too.
-
-## Response
+### The `content` part
 
 ```json
 {
-    "content_id": 10,
-    "data": "This is some data",
-    "creator": {
-        "user_id": 4,
-        "username": "player5",
-        "credential": "12345"
-    },
-    "name": "New Content",
-    "description": "This is just a test",
-    "version": 1,
-    "contentDates": {
-        "content_id": 10,
-        "created_at": "2025-03-10T05:22:40.377+00:00",
-        "updated_at": "2025-03-10T05:22:40.377+00:00"
-    }
+  "name": "Big Castle",
+  "description": "A castle map for 4 players",
+  "version": 1,
+  "tags": ["maps", "castle"]
 }
 ```
 
-## Response Status:
+| Field | Required | Rules |
+|-------|----------|-------|
+| `name` | yes | Up to 255 characters |
+| `description` | no | Up to 10,000 characters |
+| `version` | no | A whole number, 0 or more. Defaults to `0` |
+| `tags` | no | Up to 20 tags, each one up to 50 characters |
 
-* `201 Created` – Content successfully uploaded
-* `400 Bad Request` – Invalid metadata: `name` is required (max 255 characters), `description` max 10,000 characters, `version` must be 0 or more, at most 20 `tags` of up to 50 characters each. The body lists each invalid field under `errors`
-* `403 Forbidden` – Invalid or missing token / User does not exist
+Tags are saved in lowercase with the spaces around them removed, so `"Racing"`, `" racing "` and `"RACING"` are the same tag. If a tag is repeated in one request, it's added once.
+
+### Size limit
+
+By default the whole request (file + thumbnail + JSON) can be at most **1 MB**. The server owner can raise it, see [Upload Size Limit](../../tutorial/configuration.md#upload-size-limit).
+
+## Request Examples
+
+With cURL:
+
+```bash
+curl -X POST "http://<your-domain>/api/content" \
+  -H "Authorization: Bearer <token>" \
+  -F 'content={"name":"Big Castle","description":"A castle map for 4 players","version":1,"tags":["maps","castle"]};type=application/json' \
+  -F "file=@castle.zip" \
+  -F "thumbnail=@castle.png"
+```
+
+The `;type=application/json` at the end of the `content` part is important. Without it, the request fails.
+
+With Unity (`UnityWebRequest`):
+
+```csharp
+string json = JsonUtility.ToJson(new ContentInfo {
+    name = "Big Castle",
+    description = "A castle map for 4 players",
+    version = 1,
+    tags = new[] { "maps", "castle" }
+});
+
+var form = new List<IMultipartFormSection> {
+    new MultipartFormDataSection("content", Encoding.UTF8.GetBytes(json), "application/json"),
+    new MultipartFormFileSection("file", fileBytes, "castle.zip", "application/octet-stream"),
+    new MultipartFormFileSection("thumbnail", pngBytes, "castle.png", "image/png")
+};
+
+using var request = UnityWebRequest.Post("http://<your-domain>/api/content", form);
+request.SetRequestHeader("Authorization", "Bearer " + token);
+yield return request.SendWebRequest();
+```
+
+## Response Example
+
+The response is the new content, in the same format as [Get Content by ID](./get_content_single.md):
+
+```json
+{
+  "contentId": 10,
+  "creatorId": 4,
+  "creatorName": "player5",
+  "data": "http://<your-domain>/api/content/download/10",
+  "thumbnail": "http://<your-domain>/api/content/thumbnail/10",
+  "name": "Big Castle",
+  "description": "A castle map for 4 players",
+  "tags": ["castle", "maps"],
+  "version": 1,
+  "downloadsCount": 0,
+  "latestDownloadsCount": 0,
+  "avgRating": null,
+  "createdAt": "2026-03-10T05:22:40.377+00:00",
+  "updatedAt": "2026-03-10T05:22:40.377+00:00"
+}
+```
+
+`thumbnail` is `null` if no thumbnail was sent.
+
+The file is saved under a random name generated by the server. Only the extension of the original file name is kept, and it's used for the name of the file when players [download it](./download_content.md).
+
+## Response Status
+
+* `200 OK` – Content uploaded
+* `400 Bad Request` – Invalid information in the `content` part (the body lists each invalid field under `errors`), the `file` part is missing or empty, or the `thumbnail` isn't a PNG, JPEG or WebP image
+* `403 Forbidden` – Invalid or missing token, or this account isn't allowed to upload (for example a guest when `GUEST_CANPOST` is `false`)
+* `413 Payload Too Large` – The request is bigger than the upload limit
+* `415 Unsupported Media Type` – The `content` part wasn't sent as `application/json`

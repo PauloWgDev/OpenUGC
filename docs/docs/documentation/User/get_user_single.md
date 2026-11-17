@@ -1,31 +1,39 @@
-# Retrieve Specific User
+---
+sidebar_position: 2
+---
 
-Fetches a specific User by its ID.
+# Get User by ID
+
+Returns a single user by their ID.
 
 ## Endpoint
 
-- URL:
-  `GET http://<your-domain>/api/users/{id}`
+- **URL:** `GET http://<your-domain>/api/users/{id}`
 - **Headers:**
     - `Authorization: Bearer <token>`
 
+## Response Example
+
 ```json
 {
-    "userId": 13,
-    "username": "user778293",
-    "joinedAt": "2026-04-17T18:13:50.867+00:00",
-    "role": "USER",
-    "downloadsPerformed": 20,
-    "downloadReceived": 5,
-    "averageRatingsReceive": 4.1
+  "userId": 13,
+  "username": "user778293",
+  "joinedAt": "2026-04-17T18:13:50.867+00:00",
+  "role": "USER",
+  "profilePicture": "https://example.com/avatar.png",
+  "aboutMe": "I make racing tracks",
+  "downloadsPerformed": 20,
+  "downloadReceived": 5,
+  "averageRatingsReceive": 4.1
 }
 ```
 
-## Responses Status
+The fields are the same as in [Get Users Page](./get_user_batch.md#user-fields). `profilePicture` and `aboutMe` are left out if the user didn't set them.
 
-* `200 OK` – Returns User
+To get the content uploaded by this user, use `GET /api/content?creatorId={id}`.
+
+## Response Status
+
+* `200 OK` – Returns the user
 * `403 Forbidden` – Invalid or missing token
-* `404 Not Found`- User not found
-* `500 Internal Server Error` – Server issue
-
----
+* `404 Not Found` – No user with this ID
