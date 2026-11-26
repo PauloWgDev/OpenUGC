@@ -10,6 +10,11 @@
   overflow: hidden;
 }
 
+/* hero--primary uses the inverse font color, which is dark in dark mode */
+:global([data-theme='dark']) .heroBanner {
+  --ifm-hero-text-color: #fff;
+}
+
 @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
