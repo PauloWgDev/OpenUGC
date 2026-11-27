@@ -93,6 +93,27 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void patchUser_profilePictureOver255_isRejected_255IsAccepted() throws Exception {
+        String prefix = "https://example.com/";
+        String tooLong = prefix + "a".repeat(256 - prefix.length());
+        String maxLength = prefix + "a".repeat(255 - prefix.length());
+
+        mockMvc.perform(patch("/api/v1/users")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"profilePicture\":\"" + tooLong + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.profilePicture").exists());
+
+        mockMvc.perform(patch("/api/v1/users")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"profilePicture\":\"" + maxLength + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.profilePicture").value(maxLength));
+    }
+
+    @Test
     void changePassword_blankNewPassword_isRejected() throws Exception {
         mockMvc.perform(patch("/api/v1/users/password")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

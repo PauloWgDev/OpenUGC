@@ -9,18 +9,24 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * {@code POST /api/v1/rating/{id}} must reject values outside 1-5 (they would skew the average)
- * and answer 404, not 500, when the content does not exist.
+ * {@code POST /api/v1/rating/{id}} takes a JSON body {@code {"rating": 1-5, "comment": "..."}}.
+ * Out-of-range or missing ratings and too-long comments are rejected with 400 (before the content
+ * lookup), and a missing content is 404, not 500.
  */
 class RatingIntegrationTest extends AbstractIntegrationTest {
 
@@ -31,6 +37,7 @@ class RatingIntegrationTest extends AbstractIntegrationTest {
     MockMvc mockMvc;
 
     static String token;
+    static long contentId;
 
     /** Own client IP so the per-IP auth rate limit isn't shared with other test classes. */
     private static RequestPostProcessor fromOwnIp() {
@@ -45,9 +52,10 @@ class RatingIntegrationTest extends AbstractIntegrationTest {
         if (token != null) {
             return;
         }
+        String marker = UUID.randomUUID().toString().substring(0, 8);
         String credentials = """
                 {"username":"rating_%s","credential":"s3cret-pass"}
-                """.formatted(UUID.randomUUID().toString().substring(0, 8));
+                """.formatted(marker);
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(fromOwnIp())
@@ -61,24 +69,75 @@ class RatingIntegrationTest extends AbstractIntegrationTest {
                         .content(credentials))
                 .andExpect(status().isOk())
                 .andReturn();
-        token = JsonPath.read(login.getResponse().getContentAsString(), "$.token");
+        String newToken = JsonPath.read(login.getResponse().getContentAsString(), "$.token");
+
+        String json = """
+                {"name":"rating %s","description":"rating body","version":1,"tags":[]}
+                """.formatted(marker);
+        String body = mockMvc.perform(multipart("/api/v1/content")
+                        .file(new MockMultipartFile("content", "", MediaType.APPLICATION_JSON_VALUE,
+                                json.getBytes(StandardCharsets.UTF_8)))
+                        .file(new MockMultipartFile("file", "level.zip", "application/zip",
+                                "data".getBytes(StandardCharsets.UTF_8)))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + newToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        contentId = ((Number) JsonPath.read(body, "$.contentId")).longValue();
+        token = newToken;
+    }
+
+    private ResultActions rate(long id, String jsonBody) throws Exception {
+        return mockMvc.perform(post("/api/v1/rating/{id}", id)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonBody));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"0", "6", "-1", "1000"})
     void outOfRangeRating_isRejected(String rating) throws Exception {
-        // Checked before the content lookup, so a missing id still gives 400 here.
-        mockMvc.perform(post("/api/v1/rating/{id}", MISSING_CONTENT_ID)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                        .param("rating", rating))
+        // Validated before the content lookup, so a missing id still gives 400 here.
+        rate(MISSING_CONTENT_ID, "{\"rating\":" + rating + "}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.rating").exists());
+    }
+
+    @Test
+    void missingRating_isRejected() throws Exception {
+        rate(contentId, "{\"comment\":\"no score\"}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.rating").exists());
+    }
+
+    @Test
+    void nonNumericRating_isRejected() throws Exception {
+        rate(contentId, "{\"rating\":\"five\"}")
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    void tooLongComment_isRejected() throws Exception {
+        String comment = "a".repeat(2_001);
+        rate(contentId, "{\"rating\":4,\"comment\":\"" + comment + "\"}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.comment").exists());
+    }
+
+    @Test
+    void commentInBody_isSaved_andBlankCommentIsNull() throws Exception {
+        rate(contentId, "{\"rating\":4,\"comment\":\"Great map, with spaces & symbols!\"}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rating").value(4.0))
+                .andExpect(jsonPath("$.comment").value("Great map, with spaces & symbols!"));
+
+        rate(contentId, "{\"rating\":5,\"comment\":\"   \"}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.comment").doesNotExist());
+    }
+
+    @Test
     void validRatingOnMissingContent_isNotFound() throws Exception {
-        mockMvc.perform(post("/api/v1/rating/{id}", MISSING_CONTENT_ID)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                        .param("rating", "3"))
+        rate(MISSING_CONTENT_ID, "{\"rating\":3}")
                 .andExpect(status().isNotFound());
     }
 }

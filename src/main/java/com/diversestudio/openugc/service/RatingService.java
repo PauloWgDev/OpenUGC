@@ -92,7 +92,8 @@ public class RatingService {
             rating.setCreatedAt(now);
         }
         rating.setRating(ratingValue);
-        rating.setComment(comment);
+        // A blank comment is the same as no comment.
+        rating.setComment(comment == null || comment.isBlank() ? null : comment.trim());
         rating.setUpdatedAt(now);
 
         return ratingRepository.save(rating);

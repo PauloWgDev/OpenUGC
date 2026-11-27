@@ -103,12 +103,13 @@ class RatingOrderIntegrationTest extends AbstractIntegrationTest {
     }
 
     private String rate(String token, long contentId, int rating, String comment) throws Exception {
+        String body = comment == null
+                ? "{\"rating\":%d}".formatted(rating)
+                : "{\"rating\":%d,\"comment\":\"%s\"}".formatted(rating, comment);
         var request = post("/api/v1/rating/{id}", contentId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                .param("rating", String.valueOf(rating));
-        if (comment != null) {
-            request.param("comment", comment);
-        }
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body);
         return mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.createdAt", notNullValue()))

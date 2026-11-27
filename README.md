@@ -140,6 +140,7 @@ All settings are read from environment variables.
 | `GUEST_CANPOST`                  | no              | Allow guests to upload content (default `false`)                         |
 | `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`              |
 | `CORS_ALLOWED_ORIGINS`           | no              | Browser origins allowed to call the API, comma-separated (default `*`). Empty turns CORS off |
+| `MAX_PAGE_SIZE`                  | no              | Largest `size` for the paginated lists (default `100`); bigger values return `400` |
 
 **Other defaults**
 
@@ -194,7 +195,7 @@ All endpoints except `/api/v1/auth/**` and the Swagger docs require an `Authoriz
 
 | Method | Endpoint                          | Description                                                        |
 |--------|-----------------------------------|--------------------------------------------------------------------|
-| POST   | `/api/v1/rating/{contentId}`         | Rate content. Query params: `rating` (1-5), optional `comment`.    |
+| POST   | `/api/v1/rating/{contentId}`         | Rate content. JSON body: `rating` (1-5), optional `comment`.       |
 | GET    | `/api/v1/rating/{contentId}`         | Paginated ratings, newest first; filter with `rating`, `sort` by `createdAt`, `updatedAt` or `rating`. |
 | GET    | `/api/v1/rating/{contentId}/distribution` | Count of ratings per value                                    |
 | GET    | `/api/v1/stats/{contentId}`          | Downloads (total and last 7 days), rating count and average        |

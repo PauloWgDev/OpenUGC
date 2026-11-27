@@ -1,13 +1,13 @@
 package com.diversestudio.openugc.controller;
 
 import com.diversestudio.openugc.config.ApiPaths;
+import com.diversestudio.openugc.dto.RatingRequestDTO;
+import jakarta.validation.Valid;
 import com.diversestudio.openugc.entity.Rating;
 import com.diversestudio.openugc.service.RatingService;
-import com.diversestudio.openugc.util.NativeQueryHelper;
+import com.diversestudio.openugc.util.PageRequests;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,32 +19,30 @@ import java.util.Map;
 public class RatingController
 {
     private final RatingService ratingService;
-    private final NativeQueryHelper nativeQueryHelper;
+    private final PageRequests pageRequests;
 
-    public RatingController(RatingService ratingService, NativeQueryHelper nativeQueryHelper) {
+    public RatingController(RatingService ratingService, PageRequests pageRequests) {
         this.ratingService = ratingService;
-        this.nativeQueryHelper = nativeQueryHelper;
+        this.pageRequests = pageRequests;
     }
 
     /**
      * POST /api/v1/rating/{content_id} - Registers a user's rating for the specified content.
      * <p>
-     * This endpoint extracts the content ID from the URL, accepts a rating value and an optional comment as request parameters,
-     * verifies that the content exists, and then registers the rating associated with the currently authenticated user.
-     * If the content is not found, 404 is returned.
+     * The JSON body has the rating (a whole number from 1 to 5) and an optional comment
+     * (up to {@value RatingRequestDTO#COMMENT_MAX} characters); anything else returns 400.
+     * Rating again replaces the user's previous rating. If the content is not found, 404 is returned.
      * </p>
      *
      * @param id      the unique identifier of the content to rate.
-     * @param rating  the numeric rating provided by the user, from 1 to 5. Anything else returns 400.
-     * @param comment an optional comment about the content.
+     * @param request the rating and optional comment.
      * @return a {@link ResponseEntity} containing the saved {@link Rating} record.
      */
     @PostMapping("/{id}")
     public ResponseEntity<Rating> uploadRating(@PathVariable Long id,
-                                               @RequestParam int rating,
-                                               @RequestParam(required = false) String comment)
+                                               @Valid @RequestBody RatingRequestDTO request)
     {
-        Rating savedRating = ratingService.registerRating(id, rating, comment);
+        Rating savedRating = ratingService.registerRating(id, request.rating(), request.comment());
         return ResponseEntity.ok(savedRating);
     }
 
@@ -73,8 +71,7 @@ public class RatingController
                                                       @RequestParam(defaultValue = "createdAt,desc") String sort,
                                                       @RequestParam(defaultValue = "-1", required = false) Integer rating)
     {
-        Sort sortOrder = nativeQueryHelper.StringToSort(sort);
-        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Pageable pageable = pageRequests.of(page, size, sort);
         Page<Rating> ratingPage = ratingService.getRatingPage(id, rating, pageable);
         return ResponseEntity.ok(new PagedModel<>(ratingPage));
     }

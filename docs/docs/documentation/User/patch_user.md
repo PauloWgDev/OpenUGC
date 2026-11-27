@@ -58,8 +58,8 @@ The fields are the same as in [Get Users Page](./get_user_batch.md#user-fields).
 
 ## Response Status
 
-* `200 OK` – User updated. The body is the updated user
-* `400 Bad Request` – `username` is blank or not 3 to 32 characters, or `aboutMe` is over 2,000 characters. The body lists each invalid field under `errors`
-* `401 Unauthorized` – Missing, invalid or expired token
+* `200 OK` – User updated
+* `400 Bad Request` – `username` is blank or not 3 to 32 characters, `aboutMe` is over 2,000 characters, or `profilePicture` is over 255 characters. The body lists each invalid field under `errors`
+* `403 Forbidden` – Invalid or missing token
 * `404 Not Found` – The user of the token no longer exists
-* `409 Conflict` – The new username is already taken, or `profilePicture` is longer than 255 characters
+* `409 Conflict` – The new username is already taken

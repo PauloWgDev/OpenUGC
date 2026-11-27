@@ -16,7 +16,7 @@ public record UserDTO(
         @Pattern(regexp = ".*\\S.*", message = "must not be blank") String username,
         Timestamp joinedAt,
         String role, // Role name
-        @Size(max = 2048) String profilePicture,
+        @Size(max = UserLimits.PROFILE_PICTURE_MAX) String profilePicture,
         @Size(max = UserLimits.ABOUT_ME_MAX) String aboutMe,
         Integer downloadsPerformed,
         Integer downloadReceived,

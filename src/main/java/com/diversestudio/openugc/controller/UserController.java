@@ -8,11 +8,9 @@ import com.diversestudio.openugc.dto.UserDTO;
 import com.diversestudio.openugc.exception.ResourceNotFoundException;
 import com.diversestudio.openugc.security.AuthHelper;
 import com.diversestudio.openugc.service.UserService;
-import com.diversestudio.openugc.util.NativeQueryHelper;
+import com.diversestudio.openugc.util.PageRequests;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +21,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private  final UserService userService;
-    private final NativeQueryHelper nativeQueryHelper;
+    private final PageRequests pageRequests;
 
-    public UserController(UserService userService, NativeQueryHelper nativeQueryHelper)
+    public UserController(UserService userService, PageRequests pageRequests)
     {
         this.userService = userService;
-        this.nativeQueryHelper = nativeQueryHelper;
+        this.pageRequests = pageRequests;
     }
 
     /**
@@ -49,9 +47,7 @@ public class UserController {
             @RequestParam(defaultValue = "joinedAt,desc") String sort
     )
     {
-        // Convert sort string into Spring's Sort object (you can re-use similar logic as in ContentService)
-        Sort sortOrder = nativeQueryHelper.StringToSort(sort);
-        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Pageable pageable = pageRequests.of(page, size, sort);
         Page<UserDTO> userPage = userService.getUserPage(prompt, pageable);
         return ResponseEntity.ok(new PagedModel<>(userPage));
     }

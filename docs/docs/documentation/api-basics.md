@@ -80,11 +80,11 @@ The endpoints that return lists (`GET /api/v1/content`, `GET /api/v1/users`, `GE
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `page` | `0` | Page number. **The first page is `0`** |
-| `size` | `10` | Number of items per page |
+| `size` | `10` | Number of items per page, from `1` to `100` |
 
 Example: `GET /api/v1/content?page=2&size=20` returns items 41 to 60.
 
-`page` must be `0` or more and `size` must be `1` or more. Keep `size` reasonable (up to 50 or 100), because big pages are slow.
+`page` must be `0` or more, and `size` must be from `1` to `100`. Anything else returns `400 Bad Request`. The server owner can change the largest `size` with the `MAX_PAGE_SIZE` setting (see [Configuration](../tutorial/configuration.md)).
 
 The response is a page object. The items are in `content`, and `page` tells you where you are:
 
