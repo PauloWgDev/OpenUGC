@@ -7,10 +7,12 @@ import com.diversestudio.openugc.config.GuestProperties;
 import com.diversestudio.openugc.dto.AuthRequestDTO;
 import com.diversestudio.openugc.dto.AuthResponseDTO;
 import com.diversestudio.openugc.dto.RegisterRequestDTO;
+import com.diversestudio.openugc.dto.UserDTO;
+import com.diversestudio.openugc.exception.UnauthorizedActionException;
 import com.diversestudio.openugc.service.AuthService;
 import com.diversestudio.openugc.service.RateLimiterService;
-import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,58 +30,43 @@ public class AuthController {
     }
     
     /**
-     * POST /api/v1/auth/register - Registers a new user in the system.
+     * POST /api/v1/auth/register - Registers a new user in the system, always with the USER role.
      *
      * @param request the {@link RegisterRequestDTO} with the new username and password
-     * @return a {@link ResponseEntity} with a success message or error description
+     * @return 201 with the created user; 429 (ProblemDetail, Retry-After) if the IP is over the limit
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO request, HttpServletRequest httpRequest) {
-        String clientIp = httpRequest.getRemoteAddr();
-        Bucket bucket = rateLimiterService.resolveBucket("register:" + clientIp);
-
-        if (bucket.tryConsume(1)) {
-            return ResponseEntity.ok(authService.register(request));
-        } else {
-            return ResponseEntity.status(429).body("Too many registration attempts. Please try again later.");
-        }
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterRequestDTO request, HttpServletRequest httpRequest) {
+        rateLimiterService.consume("register:" + httpRequest.getRemoteAddr(),
+                "Too many registration attempts. Please try again later.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
     /**
      * POST /api/v1/auth/login - Authenticates a user and returns an authentication token if valid.
      *
      * @param request the {@link AuthRequestDTO} containing login credentials (e.g., username and password)
-     * @return a {@link ResponseEntity} containing an {@link AuthResponseDTO} with the authentication token
+     * @return 200 with an {@link AuthResponseDTO}; 401 for wrong credentials; 429 if the IP is over the limit
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthRequestDTO request, HttpServletRequest httpRequest) {
-        String clientIp = httpRequest.getRemoteAddr();
-        Bucket bucket = rateLimiterService.resolveBucket("login:" + clientIp);
-
-        if (bucket.tryConsume(1)) {
-            return ResponseEntity.ok(authService.login(request));
-        } else {
-            return ResponseEntity.status(429).body("Too many login attempts. Please try again later.");
-        }
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO request, HttpServletRequest httpRequest) {
+        rateLimiterService.consume("login:" + httpRequest.getRemoteAddr(),
+                "Too many login attempts. Please try again later.");
+        return ResponseEntity.ok(authService.login(request));
     }
 
-
+    /**
+     * POST /api/v1/auth/guest - Creates a guest account and returns its token.
+     *
+     * @return 200 with an {@link AuthResponseDTO}; 403 if guests are disabled; 429 if the IP is over the limit
+     */
     @PostMapping("/guest")
-    public ResponseEntity<?> guestLogin(HttpServletRequest httpRequest) {
-
+    public ResponseEntity<AuthResponseDTO> guestLogin(HttpServletRequest httpRequest) {
         if (!guestProperties.isEnabled()) {
-            return ResponseEntity.status(403)
-                    .body("Guest users are disabled.");
+            throw new UnauthorizedActionException("Guest users are disabled.");
         }
-
-        String clientIp = httpRequest.getRemoteAddr();
-        Bucket bucket = rateLimiterService.resolveBucket("guest:" + clientIp);
-
-        if (!bucket.tryConsume(1)) {
-            return ResponseEntity.status(429)
-                    .body("Too many guest login attempts.");
-        }
-
+        rateLimiterService.consume("guest:" + httpRequest.getRemoteAddr(),
+                "Too many guest login attempts. Please try again later.");
         return ResponseEntity.ok(authService.guestLogin());
     }
 }

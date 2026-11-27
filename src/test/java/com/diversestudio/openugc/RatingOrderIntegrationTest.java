@@ -66,7 +66,7 @@ class RatingOrderIntegrationTest extends AbstractIntegrationTest {
                     """.formatted(marker, i);
             mockMvc.perform(post("/api/v1/auth/register").with(fromIp(i))
                             .contentType(MediaType.APPLICATION_JSON).content(credentials))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isCreated());
             String login = mockMvc.perform(post("/api/v1/auth/login").with(fromIp(i))
                             .contentType(MediaType.APPLICATION_JSON).content(credentials))
                     .andExpect(status().isOk())
@@ -174,7 +174,7 @@ class RatingOrderIntegrationTest extends AbstractIntegrationTest {
                 """.formatted(marker);
         mockMvc.perform(post("/api/v1/auth/register").with(ip)
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         String login = mockMvc.perform(post("/api/v1/auth/login").with(ip)
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk())

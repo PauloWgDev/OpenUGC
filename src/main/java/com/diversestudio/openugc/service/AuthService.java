@@ -3,6 +3,7 @@ package com.diversestudio.openugc.service;
 import com.diversestudio.openugc.dto.AuthRequestDTO;
 import com.diversestudio.openugc.dto.AuthResponseDTO;
 import com.diversestudio.openugc.dto.RegisterRequestDTO;
+import com.diversestudio.openugc.dto.UserDTO;
 import com.diversestudio.openugc.entity.Role;
 import com.diversestudio.openugc.entity.User;
 import com.diversestudio.openugc.exception.IncorrectPasswordException;
@@ -45,10 +46,9 @@ public class AuthService {
         return new AuthResponseDTO(token);
     }
 
-    public String register(RegisterRequestDTO request) {
+    public UserDTO register(RegisterRequestDTO request) {
         // Self-registration always gets the USER role; validation and entity building live in UserService.
-        userService.createUser(request.username(), request.credential(), "USER");
-        return "User registered successfully!";
+        return userService.createUser(request.username(), request.credential(), "USER");
     }
 
 

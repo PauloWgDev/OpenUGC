@@ -51,5 +51,6 @@ Nothing stops you from removing the `ADMIN` role from the last admin. If that ha
 
 * `200 OK` – Role changed
 * `400 Bad Request` – The role doesn't exist (remember it's uppercase)
-* `403 Forbidden` – Invalid or missing token, or the token doesn't have the `ADMIN` role
+* `401 Unauthorized` – Missing, invalid or expired token
+* `403 Forbidden` – the token doesn't have the `ADMIN` role
 * `404 Not Found` – No user with this ID

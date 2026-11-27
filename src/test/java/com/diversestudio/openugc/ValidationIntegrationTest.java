@@ -50,7 +50,7 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(post("/api/v1/auth/register").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         String login = mockMvc.perform(post("/api/v1/auth/login").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk())

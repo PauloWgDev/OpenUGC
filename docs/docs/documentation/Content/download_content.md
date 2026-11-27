@@ -41,5 +41,5 @@ A download is only recorded if the file was found, so failed downloads don't cou
 ## Response Status
 
 * `200 OK` – Returns the file
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – No content with this ID, or the file is missing from the storage

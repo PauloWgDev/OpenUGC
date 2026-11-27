@@ -58,7 +58,7 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(username, "s3cret-pass")))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
                         .with(fromOwnIp())

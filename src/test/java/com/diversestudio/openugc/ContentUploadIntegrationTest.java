@@ -66,7 +66,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -226,7 +226,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         Integer id = JsonPath.read(body, "$.contentId");
 
         MvcResult result = mockMvc.perform(get("/api/v1/content/download/" + id)).andReturn();
-        assertThat(result.getResponse().getStatus()).isIn(401, 403);
+        assertThat(result.getResponse().getStatus()).isEqualTo(401);
     }
 
     @Test

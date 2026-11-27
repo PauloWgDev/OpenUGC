@@ -34,4 +34,4 @@ To get the average and the total number of ratings, use [Get Content Stats](../S
 ## Response Status
 
 * `200 OK` – Returns the distribution. If the content has no ratings, or doesn't exist, all values are `0`
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
