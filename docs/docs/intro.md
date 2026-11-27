@@ -50,4 +50,4 @@ The [Documentation](/docs/category/documentation) section describes every endpoi
 - [Endpoints Summary](./documentation/endpoints-summary.md): all endpoints on one page.
 - [API Basics](./documentation/api-basics.md): tokens, pagination, sorting and error responses, which work the same way on every endpoint.
 
-While the API is running, you can also open `http://<your-domain>/swagger-ui.html` to see and try every endpoint from the browser.
+While the API is running, you can also open `http://<your-domain>/swagger-ui.html` to see and try every endpoint from the browser. To try the endpoints that need a token, first call `POST /api/v1/auth/login` (or `/api/v1/auth/guest`), copy the `token`, click **Authorize** at the top of the page and paste it.

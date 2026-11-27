@@ -1,6 +1,7 @@
 package com.diversestudio.openugc.controller;
 
 import com.diversestudio.openugc.config.ApiPaths;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.dto.ContentCreationDTO;
@@ -139,6 +140,7 @@ public class ContentController {
      * @throws Exception if the file cannot be read
      */
     @GetMapping("/thumbnail/{id}")
+    @SecurityRequirements // Public: works in <img> tags without a token
     public ResponseEntity<Resource> getThumbnail(@PathVariable Long id) throws Exception {
         ContentDTO content = contentService.getContentForDownload(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found for id: " + id));

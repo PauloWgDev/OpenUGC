@@ -122,7 +122,7 @@ curl http://localhost:8080/api/v1/content \
   -H "Authorization: Bearer <token>"
 ```
 
-Interactive API docs are available at **`http://localhost:8080/swagger-ui.html`** while the API is running. To use Postman instead, import `http://localhost:8080/v3/api-docs` (**Import → Link**) and Postman builds the collection from the server, so it always matches the code.
+Interactive API docs are available at **`http://localhost:8080/swagger-ui.html`** while the API is running. To try protected endpoints, log in with `POST /api/v1/auth/login`, click **Authorize** and paste the token. To use Postman instead, import `http://localhost:8080/v3/api-docs` (**Import → Link**) and Postman builds the collection from the server, so it always matches the code.
 
 ## Configuration
 
