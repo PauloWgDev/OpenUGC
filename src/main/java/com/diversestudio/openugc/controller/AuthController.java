@@ -1,6 +1,7 @@
 package com.diversestudio.openugc.controller;
 
 import com.diversestudio.openugc.config.ApiPaths;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.config.GuestProperties;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(ApiPaths.V1 + "/auth")
+@SecurityRequirements // Public: no token needed (shown without a lock in Swagger UI)
 public class AuthController {
     private final AuthService authService;
     private final RateLimiterService rateLimiterService;
