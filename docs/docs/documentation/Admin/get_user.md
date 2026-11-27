@@ -31,5 +31,6 @@ The fields are explained in [Get Users Page](../User/get_user_batch.md#user-fiel
 ## Response Status
 
 * `200 OK` – Returns the user
-* `403 Forbidden` – Invalid or missing token, or the token doesn't have the `ADMIN` role
+* `401 Unauthorized` – Missing, invalid or expired token
+* `403 Forbidden` – the token doesn't have the `ADMIN` role
 * `404 Not Found` – No user with this ID

@@ -31,15 +31,25 @@ Any other field in the body (like `role` or `userId`) is ignored, so players can
 
 ## Response Example
 
-`200 OK` with a plain text message:
+`201 Created` with the new user:
 
+```json
+{
+  "userId": 13,
+  "username": "player1",
+  "joinedAt": "2026-11-27T14:05:12.345+00:00",
+  "role": "USER",
+  "downloadsPerformed": 0,
+  "downloadReceived": 0,
+  "averageRatingsReceive": 0.0
+}
 ```
-User registered successfully!
-```
+
+The fields are the same as in [Get Users Page](../User/get_user_batch.md#user-fields). Registering doesn't log the player in: call [Login](./login.md) next to get a token.
 
 ## Response Status
 
-* `200 OK` – User registered successfully
+* `201 Created` – User registered. The body is the new user
 * `400 Bad Request` – A field breaks the rules above. The body lists each invalid field under `errors`, e.g. `{"errors": {"username": "size must be between 3 and 32"}}`
 * `409 Conflict` – The username is already taken
-* `429 Too Many Requests` – More than 5 register requests in a minute from the same IP
+* `429 Too Many Requests` – More than 5 register requests in a minute from the same IP. The `Retry-After` header says how many seconds to wait. See [Rate Limits](../api-basics.md#rate-limits)

@@ -38,16 +38,28 @@ Other fields (like `role` or `userId`) are ignored. To change the password, use 
 
 ## Response Example
 
-`200 OK` with a plain text message:
+`200 OK` with the updated user, so the game can refresh the profile without another request:
 
+```json
+{
+  "userId": 13,
+  "username": "player1",
+  "joinedAt": "2026-11-27T14:05:12.345+00:00",
+  "role": "USER",
+  "profilePicture": "https://example.com/avatar.png",
+  "aboutMe": "I make racing tracks",
+  "downloadsPerformed": 20,
+  "downloadReceived": 5,
+  "averageRatingsReceive": 4.1
+}
 ```
-User Patched Successfully
-```
+
+The fields are the same as in [Get Users Page](./get_user_batch.md#user-fields).
 
 ## Response Status
 
-* `200 OK` – User updated
+* `200 OK` – User updated. The body is the updated user
 * `400 Bad Request` – `username` is blank or not 3 to 32 characters, or `aboutMe` is over 2,000 characters. The body lists each invalid field under `errors`
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – The user of the token no longer exists
 * `409 Conflict` – The new username is already taken, or `profilePicture` is longer than 255 characters

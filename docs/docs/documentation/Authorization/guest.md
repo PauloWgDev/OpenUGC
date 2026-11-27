@@ -43,5 +43,5 @@ Guests **can't upload content** unless the server sets `GUEST_CANPOST=true`. Whe
 ## Response Status
 
 * `200 OK` – Returns the guest token
-* `403 Forbidden` – Guests are disabled on this server. The body is the plain text `Guest users are disabled.`
-* `429 Too Many Requests` – More than 5 guest login requests in a minute from the same IP
+* `403 Forbidden` – Guests are disabled on this server (`"detail": "Guest users are disabled."`)
+* `429 Too Many Requests` – More than 5 guest login requests in a minute from the same IP. The `Retry-After` header says how many seconds to wait. See [Rate Limits](../api-basics.md#rate-limits)

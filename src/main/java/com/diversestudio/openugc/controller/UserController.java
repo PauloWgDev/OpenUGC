@@ -74,21 +74,32 @@ public class UserController {
     // Account creation is not exposed here: players use POST /api/v1/auth/register,
     // and admins use POST /api/v1/admin/users.
 
+    /**
+     * PATCH /api/v1/users - Updates the current user's username, profile picture and/or about me.
+     * Fields left out (null) are not changed.
+     *
+     * @return 200 with the updated {@link UserDTO}, so clients don't need another GET
+     */
     @PatchMapping()
-    public ResponseEntity<Object> updateUserData(@Valid @RequestBody UserDTO user)
+    public ResponseEntity<UserDTO> updateUserData(@Valid @RequestBody UserDTO user)
     {
         Long userId = AuthHelper.getCurrentUserId();
         userService.patchUser(userId, user);
-        return ResponseEntity.status(200).body("User Patched Successfully");
+        UserDTO updated = userService.getUserById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return ResponseEntity.ok(updated);
     }
 
+    /**
+     * PATCH /api/v1/users/password - Changes the current user's password.
+     *
+     * @return 204 with no body; 400 if the current password is wrong or the new one breaks the rules
+     */
     @PatchMapping("/password")
-    public ResponseEntity<Object> updatePassword(@Valid @RequestBody ChangePasswordDTO changePasswordObject)
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody ChangePasswordDTO changePasswordObject)
     {
         Long userId = AuthHelper.getCurrentUserId();
-
         userService.changePassword(userId, changePasswordObject);
-
-        return ResponseEntity.status(200).body("Password changed successfully");
+        return ResponseEntity.noContent().build();
     }
 }

@@ -28,17 +28,13 @@ Changes the password of the user who sends the request. The current password is 
 
 ## Response Example
 
-`200 OK` with a plain text message:
-
-```
-Password changed successfully
-```
+`204 No Content`, with an empty body.
 
 Tokens that were issued before the change keep working until they expire (up to 24 hours). The next login must use the new password.
 
 ## Response Status
 
-* `200 OK` – Password changed
+* `204 No Content` – Password changed
 * `400 Bad Request` – `currentPassword` is wrong, or a field breaks the rules above
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – The user of the token no longer exists

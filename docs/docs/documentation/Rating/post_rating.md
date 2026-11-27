@@ -53,5 +53,5 @@ The saved rating:
 
 * `200 OK` – Rating saved
 * `400 Bad Request` – `rating` is missing, isn't a whole number, or isn't between 1 and 5
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – No content with this ID

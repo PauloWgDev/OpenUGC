@@ -42,4 +42,4 @@ The token contains the user's ID, username and role. The role is saved when the 
 * `200 OK` – Returns the JWT token
 * `400 Bad Request` – `username` or `credential` is missing or empty
 * `401 Unauthorized` – Wrong username or password. The message is the same in both cases, so it doesn't reveal which usernames exist
-* `429 Too Many Requests` – More than 5 login requests in a minute from the same IP
+* `429 Too Many Requests` – More than 5 login requests in a minute from the same IP. The `Retry-After` header says how many seconds to wait. See [Rate Limits](../api-basics.md#rate-limits)

@@ -41,7 +41,8 @@ Things to know about tokens:
 
 - A token is valid for **24 hours**. After that, log in again to get a new one. There is no refresh endpoint.
 - There is no logout endpoint either. To "log out", the client just deletes the token.
-- A missing, invalid or expired token gets `403 Forbidden`.
+- A missing, invalid or expired token gets `401 Unauthorized`. When your game gets a `401`, it should log in again (or get a new guest token) and retry.
+- A valid token that isn't allowed to do something (for example a `USER` calling an admin endpoint) gets `403 Forbidden`. Logging in again won't help.
 
 ### Public endpoints
 
@@ -134,17 +135,29 @@ To stop spam and password guessing, these endpoints accept at most **5 requests 
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/guest`
 
-Each endpoint has its own limit. The 5 requests come back gradually over the minute. When the limit is reached, the API returns `429 Too Many Requests` with a plain text message, for example:
+Each endpoint has its own limit. The 5 requests come back gradually over the minute. When the limit is reached, the API returns `429 Too Many Requests` with the usual [error body](#errors). The `Retry-After` header, and the `retryAfterSeconds` field, say how many seconds to wait before trying again:
 
 ```
-Too many login attempts. Please try again later.
+HTTP/1.1 429 Too Many Requests
+Retry-After: 12
+Content-Type: application/problem+json
+
+{
+  "type": "about:blank",
+  "title": "Too Many Requests",
+  "status": 429,
+  "detail": "Too many login attempts. Please try again later.",
+  "instance": "/api/v1/auth/login",
+  "retryAfterSeconds": 12,
+  "timestamp": "2026-11-27T14:05:12.345Z"
+}
 ```
 
 ---
 
 ## Errors
 
-When something goes wrong, the API returns an HTTP status code and, in most cases, a JSON body in the following format:
+When something goes wrong, the API returns an HTTP status code and a JSON body (`Content-Type: application/problem+json`, the [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) format) like this one:
 
 ```json
 {
@@ -174,22 +187,24 @@ When the body of a request breaks a rule (for example a username that is too sho
 }
 ```
 
-A few responses are plain text instead of JSON: the `429` rate limit messages and the `403` "Guest users are disabled." message.
+Every error uses this format, so your game only needs one way to read errors: check the status code, and show or log `detail` if you need a message.
+
+Successful responses are always JSON, except for file downloads and thumbnails (the file itself) and `204 No Content` (no body at all).
 
 ### Common status codes
 
 | Code | Meaning                                                                                                       |
 |------|---------------------------------------------------------------------------------------------------------------|
 | `200 OK` | Successful Request                                                                                            |
-| `201 Created` | An account was created by an admin                                                                            |
-| `204 No Content` | The request worked and there is nothing to return (e.g. delete)                                               |
+| `201 Created` | An account was created (register, or an admin creating a user) |
+| `204 No Content` | The request worked and there is nothing to return (delete, password change) |
 | `400 Bad Request` | Something in the request is wrong: a missing or invalid field, an unknown sort field, a rating out of range... |
-| `401 Unauthorized` | Wrong username or password on login                                                                           |
-| `403 Forbidden` | Missing, invalid or expired token, or you're not allowed to do this (e.g. deleting someone else's content)    |
+| `401 Unauthorized` | Missing, invalid or expired token: log in again. Also a wrong username or password on login |
+| `403 Forbidden` | The token is valid but not allowed to do this (admin endpoints, deleting someone else's content, guests disabled...) |
 | `404 Not Found` | The content, user or file doesn't exist                                                                       |
 | `409 Conflict` | The username is already taken, or the data conflicts with what's in the database                              |
 | `413 Payload Too Large` | The upload is bigger than the limit (1 MB by default)                                                         |
-| `429 Too Many Requests` | Rate limit reached                                                                                            |
+| `429 Too Many Requests` | Rate limit reached. Wait the seconds in `Retry-After` |
 | `500 Internal Server Error` | Unexpected error on the server. Check the API logs                                                            |
 
 ---
