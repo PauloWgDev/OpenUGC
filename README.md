@@ -122,7 +122,7 @@ curl http://localhost:8080/api/v1/content \
   -H "Authorization: Bearer <token>"
 ```
 
-Interactive API docs are available at **`http://localhost:8080/swagger-ui.html`**, and a ready-made Postman collection is in [`docs/openugc.postman_collection.json`](./docs/openugc.postman_collection.json).
+Interactive API docs are available at **`http://localhost:8080/swagger-ui.html`** while the API is running. To use Postman instead, import `http://localhost:8080/v3/api-docs` (**Import → Link**) and Postman builds the collection from the server, so it always matches the code.
 
 ## Configuration
 
