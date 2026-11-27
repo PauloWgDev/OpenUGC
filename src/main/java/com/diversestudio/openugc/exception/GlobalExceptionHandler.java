@@ -40,6 +40,9 @@ import java.util.Map;
  * <p>
  * A failed {@code @Valid} check returns 400 with an {@code errors} map of field to message, e.g.
  * {@code "errors": {"username": "size must be between 3 and 32"}}.
+ * <p>
+ * Errors raised by Spring Security before a controller runs (401 missing/invalid token,
+ * 403 missing role) use the same body; see {@code ProblemDetailSecurityHandler}.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -82,6 +85,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IncorrectPasswordException.class)
     public ProblemDetail handleIncorrectPasswordException(IncorrectPasswordException ex) {
         return problem(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    /** Rate limit reached: 429, with {@code Retry-After} telling the client how many seconds to wait. */
+    @ExceptionHandler(RateLimitedException.class)
+    public ResponseEntity<ProblemDetail> handleRateLimitedException(RateLimitedException ex) {
+        ProblemDetail body = problem(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        body.setProperty("retryAfterSeconds", ex.getRetryAfterSeconds());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+                .body(body);
     }
 
     /** Safety net for JPA lookups (e.g. getReferenceById) that miss. */

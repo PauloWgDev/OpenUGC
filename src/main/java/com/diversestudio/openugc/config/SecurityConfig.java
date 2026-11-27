@@ -2,6 +2,7 @@ package com.diversestudio.openugc.config;
 
 import com.diversestudio.openugc.security.JwtAuthenticationFilter;
 import com.diversestudio.openugc.security.JwtUtil;
+import com.diversestudio.openugc.security.ProblemDetailSecurityHandler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +32,13 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final CorsProperties corsProperties;
+    private final ProblemDetailSecurityHandler problemDetailSecurityHandler;
 
-    public SecurityConfig(JwtUtil jwtUtil, CorsProperties corsProperties) {
+    public SecurityConfig(JwtUtil jwtUtil, CorsProperties corsProperties,
+                          ProblemDetailSecurityHandler problemDetailSecurityHandler) {
         this.jwtUtil = jwtUtil;
         this.corsProperties = corsProperties;
+        this.problemDetailSecurityHandler = problemDetailSecurityHandler;
     }
 
     @Bean
@@ -61,6 +65,10 @@ public class SecurityConfig {
                         .requestMatchers(ApiPaths.V1 + "/admin/**").hasRole("ADMIN") // restrict admin endpoints
                         .anyRequest().authenticated()
                 )
+                // 401 (no/invalid/expired token) and 403 (role not allowed) as ProblemDetail JSON.
+                .exceptionHandling(errors -> errors
+                        .authenticationEntryPoint(problemDetailSecurityHandler)
+                        .accessDeniedHandler(problemDetailSecurityHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

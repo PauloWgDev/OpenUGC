@@ -40,5 +40,6 @@ Soft deleting content that is already soft deleted works too, and just updates t
 ## Response Status
 
 * `204 No Content` – Content deleted
-* `403 Forbidden` – Invalid or missing token, or the content belongs to another user and you're not an `ADMIN`
+* `401 Unauthorized` – Missing, invalid or expired token
+* `403 Forbidden` – the content belongs to another user and you're not an `ADMIN`
 * `404 Not Found` – No content with this ID

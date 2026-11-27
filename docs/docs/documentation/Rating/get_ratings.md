@@ -86,4 +86,4 @@ The page fields are explained in [Pagination](../api-basics.md#pagination).
 
 * `200 OK` – Returns a page of ratings. If the content has no ratings, or doesn't exist, `content` is an empty list
 * `400 Bad Request` – A parameter has the wrong type (e.g. `rating=abc`), or `sort` uses a field that isn't in the list above
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token

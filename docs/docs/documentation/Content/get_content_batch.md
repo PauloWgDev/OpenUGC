@@ -113,4 +113,4 @@ The `page` fields are explained in [Pagination](../api-basics.md#pagination).
 
 * `200 OK` – Returns a page of content. If nothing matches, `content` is an empty list
 * `400 Bad Request` – Invalid `sort` field, or a parameter with the wrong type (e.g. `creatorId=abc`)
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token

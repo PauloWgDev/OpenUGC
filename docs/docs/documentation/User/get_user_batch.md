@@ -93,4 +93,4 @@ Guest accounts (`guest_...`) are included in this list.
 
 * `200 OK` – Returns a page of users
 * `400 Bad Request` – Invalid `sort` field or parameter
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token

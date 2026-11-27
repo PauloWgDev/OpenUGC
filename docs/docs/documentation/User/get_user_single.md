@@ -35,5 +35,5 @@ To get the content uploaded by this user, use `GET /api/v1/content?creatorId={id
 ## Response Status
 
 * `200 OK` – Returns the user
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – No user with this ID

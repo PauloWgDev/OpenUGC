@@ -50,5 +50,6 @@ The new user can log in right away with [Login](../Authorization/login.md).
 
 * `201 Created` – Account created
 * `400 Bad Request` – A field breaks the rules above (listed under `errors`), or the role doesn't exist
-* `403 Forbidden` – Invalid or missing token, or the token doesn't have the `ADMIN` role
+* `401 Unauthorized` – Missing, invalid or expired token
+* `403 Forbidden` – the token doesn't have the `ADMIN` role
 * `409 Conflict` – The username is already taken

@@ -36,5 +36,5 @@ Returns the download and rating numbers of a content item.
 ## Response Status
 
 * `200 OK` – Returns the stats
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – No content with this ID

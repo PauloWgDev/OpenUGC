@@ -47,5 +47,5 @@ Content that was [soft deleted](./delete_content.md) is hidden from the list, bu
 ## Response Status
 
 * `200 OK` – Returns the content
-* `403 Forbidden` – Invalid or missing token
+* `401 Unauthorized` – Missing, invalid or expired token
 * `404 Not Found` – No content with this ID
