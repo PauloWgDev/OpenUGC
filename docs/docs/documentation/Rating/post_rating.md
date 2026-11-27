@@ -6,7 +6,7 @@ sidebar_position: 1
 
 Saves the rating of the current user for a content item, from 1 to 5, with an optional comment.
 
-Each user has **one rating per content**. If the user rates the same content again, the new rating replaces the old one (comment included).
+Each user has **one rating per content**. If the user rates the same content again, the new rating replaces the old one (comment included). The rating keeps its `createdAt` date and gets a new `updatedAt`, so it doesn't move to the top of the [ratings list](./get_ratings.md).
 
 ## Endpoint
 
@@ -43,7 +43,9 @@ The saved rating:
   "userId": 4,
   "contentId": 10,
   "rating": 5.0,
-  "comment": "Great map"
+  "comment": "Great map",
+  "createdAt": "2026-03-12T18:20:05.512+00:00",
+  "updatedAt": "2026-03-12T18:20:05.512+00:00"
 }
 ```
 

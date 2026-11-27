@@ -126,7 +126,9 @@ public class PostgresQueries implements QueryProvider {
                 " r.content_id AS content_id, " +
                 " r.user_id AS user_id, " +
                 " r.rating, " +
-                " r.comment " +
+                " r.comment, " +
+                " r.created_at, " +
+                " r.updated_at " +
                 "FROM rating r " +
                 "WHERE r.content_id = :contentId";
     }
