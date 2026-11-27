@@ -29,7 +29,7 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(name = "profile_picture")
+    @Column(name = "profile_picture", length = 255)
     private String profilePicture;
 
     @Column(name = "about_me", columnDefinition = "TEXT")

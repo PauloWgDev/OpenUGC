@@ -17,7 +17,7 @@ Returns a page of users, with search, pagination and sorting.
 |-----------|---------|-------------|
 | `prompt` | `""` | Text to search for in the **username**. It matches any part of the name and ignores upper and lower case |
 | `page` | `0` | Page number, starting at 0 |
-| `size` | `10` | Number of users per page |
+| `size` | `10` | Number of users per page, from `1` to `100` (see [Pagination](../api-basics.md#pagination)) |
 | `sort` | `joinedAt,desc` | Sort order, as `field,direction`. See the allowed fields below |
 
 ### Sort fields

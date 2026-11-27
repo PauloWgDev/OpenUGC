@@ -17,14 +17,12 @@ import com.diversestudio.openugc.storage.ImageType;
 import com.diversestudio.openugc.storage.StorageService;
 import com.diversestudio.openugc.storage.StoredFileNames;
 import com.diversestudio.openugc.storage.UploadValidator;
-import com.diversestudio.openugc.util.NativeQueryHelper;
+import com.diversestudio.openugc.util.PageRequests;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
@@ -45,18 +43,18 @@ public class ContentController {
     private final ContentService contentService;
     private final StorageService storageService;
     private final DownloadService downloadService;
-    private final NativeQueryHelper nativeQueryHelper;
+    private final PageRequests pageRequests;
     private final PermissionsService permissionsService;
     private final UserRepository userRepository;
 
     @Value("${file.storage.type}")
     private String storageType;
 
-    public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,NativeQueryHelper nativeQueryHelper, PermissionsService permissionsService, UserRepository userRepository) {
+    public ContentController(ContentService contentService, StorageService storageService, DownloadService downloadService,PageRequests pageRequests, PermissionsService permissionsService, UserRepository userRepository) {
         this.contentService = contentService;
         this.storageService = storageService;
         this.downloadService = downloadService;
-        this.nativeQueryHelper = nativeQueryHelper;
+        this.pageRequests = pageRequests;
         this.permissionsService = permissionsService;
         this.userRepository = userRepository;
     }
@@ -81,8 +79,7 @@ public class ContentController {
             @RequestParam(required = false) Integer creatorId,
             @RequestParam(required = false) List<String> tags)
     {
-        Sort sortOrder = nativeQueryHelper.StringToSort(sort);
-        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Pageable pageable = pageRequests.of(page, size, sort);
         Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId, tags, pageable);
         return ResponseEntity.ok(new PagedModel<>(contentList));
     }

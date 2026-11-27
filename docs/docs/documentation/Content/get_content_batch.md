@@ -21,7 +21,7 @@ Content that was [soft deleted](./delete_content.md) doesn't appear in this list
 | `tags` | none | Only return content that has **at least one** of these tags. Ignores upper and lower case. Send several as `tags=racing&tags=night` or `tags=racing,night` |
 | `creatorId` | none | Only return content uploaded by this user ID |
 | `page` | `0` | Page number, starting at 0 |
-| `size` | `10` | Number of items per page |
+| `size` | `10` | Number of items per page, from `1` to `100` (see [Pagination](../api-basics.md#pagination)) |
 | `sort` | `createdAt,desc` | Sort order, as `field,direction`. See the allowed fields below |
 
 You can combine the filters. For example, the newest maps from user 5 with "castle" in the name:

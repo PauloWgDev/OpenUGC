@@ -63,6 +63,7 @@ See [Host with Google Cloud Storage](./third-party-setup/host-storage.md) to cre
 | `GUEST_ENABLED` | `true` | Allows `POST /api/v1/auth/guest`, which gives guest tokens. See [Guest Login](../documentation/Authorization/guest.md) |
 | `GUEST_CANPOST` | `false` | Allows guests to upload content. Only works if `GUEST_ENABLED` is `true` |
 | `CORS_ALLOWED_ORIGINS` | `*` | Which websites can call the API from a browser. See [CORS](#cors-for-webgl-and-browser-clients) |
+| `MAX_PAGE_SIZE` | `100` | Largest `size` a client can ask for in the content, user and rating lists. Bigger values return `400`. See [Pagination](../documentation/api-basics.md#pagination) |
 | `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | private IP ranges | Which reverse proxies are trusted to tell the real client IP. See [Running behind a reverse proxy](#running-behind-a-reverse-proxy) |
 | `SPRING_SERVLET_MULTIPART_MAXFILESIZE` | `1MB` | Maximum size of each uploaded file |
 | `SPRING_SERVLET_MULTIPART_MAXREQUESTSIZE` | `1MB` | Maximum size of a whole upload request (file + thumbnail + metadata) |

@@ -92,7 +92,8 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
         for (int i = 0; i < USERS; i++) {
             mockMvc.perform(post("/api/v1/rating/{id}", firstContentId)
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + newTokens[i])
-                            .param("rating", String.valueOf(i + 3)))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"rating\":" + (i + 3) + "}"))
                     .andExpect(status().isOk());
         }
 
@@ -179,5 +180,36 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
                         .param("rating", "4"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements").value(1));
+    }
+
+    @Test
+    void sizeAtTheLimit_isAccepted() throws Exception {
+        mockMvc.perform(get("/api/v1/content")
+                        .header(HttpHeaders.AUTHORIZATION, auth())
+                        .param("size", "100"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.size").value(100));
+    }
+
+    @Test
+    void badPageParameters_areRejected_onEveryList() throws Exception {
+        String[][] badParams = {
+                {"size", "0"},
+                {"size", "101"},
+                {"size", "1000000"},
+                {"page", "-1"},
+                // An empty sort= falls back to the default sort, so only a missing field is tested here.
+                {"sort", ",desc"},
+        };
+        String[] lists = {"/api/v1/content", "/api/v1/users", "/api/v1/rating/" + ratedContentId};
+        for (String list : lists) {
+            for (String[] param : badParams) {
+                mockMvc.perform(get(list)
+                                .header(HttpHeaders.AUTHORIZATION, auth())
+                                .param(param[0], param[1]))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.status").value(400));
+            }
+        }
     }
 }

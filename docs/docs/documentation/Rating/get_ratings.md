@@ -19,7 +19,7 @@ Returns a page of the ratings that a content item received.
 | `rating` | `-1` | Only return ratings with this value (`1` to `5`). Any other value, like the default `-1`, returns all ratings |
 | `sort` | `createdAt,desc` | Order of the ratings, as `field,direction` (see below) |
 | `page` | `0` | Page number, starting at 0 |
-| `size` | `10` | Number of ratings per page |
+| `size` | `10` | Number of ratings per page, from `1` to `100` (see [Pagination](../api-basics.md#pagination)) |
 
 For example, to show only the 5-star reviews:
 
