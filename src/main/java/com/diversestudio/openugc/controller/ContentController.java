@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.controller;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.dto.ContentCreationDTO;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/api/content")
+@RequestMapping(ApiPaths.V1 + "/content")
 public class ContentController {
     private final ContentService contentService;
     private final StorageService storageService;
@@ -61,7 +62,7 @@ public class ContentController {
     }
 
     /**
-     * GET /api/content - Retrieves a paginated list of content entries, optionally filtered by prompt
+     * GET /api/v1/content - Retrieves a paginated list of content entries, optionally filtered by prompt
      * and sorted according to a specified property and direction.
      *
      * @param prompt optional keyword to filter content by prompt (default: empty string, meaning no filter)
@@ -87,7 +88,7 @@ public class ContentController {
     }
 
     /**
-     * GET /api/content/{id} - Retrieves a specific content item by its ID.
+     * GET /api/v1/content/{id} - Retrieves a specific content item by its ID.
      *
      * @param id the ID of the content to retrieve
      * @return HTTP 200 with the {@link ContentDTO}, or 404 if no content has this id
@@ -100,7 +101,7 @@ public class ContentController {
     }
 
     /**
-     * GET /api/content/download/{id} - Handles the download request for a content item by its unique identifier.
+     * GET /api/v1/content/download/{id} - Handles the download request for a content item by its unique identifier.
      *
      * @param id the unique identifier of the content to be downloaded
      * @param request the HTTP request; {@code getRemoteAddr()} gives the client IP
@@ -130,7 +131,7 @@ public class ContentController {
     }
 
     /**
-     * GET /api/content/thumbnail/{id} - Returns the thumbnail image of a content item.
+     * GET /api/v1/content/thumbnail/{id} - Returns the thumbnail image of a content item.
      * <p>
      * Public (no token needed), so it can be used directly as an image source in a browser or game client.
      * It is not counted as a download. Stored files never change under the same key, so the response
@@ -172,7 +173,7 @@ public class ContentController {
     private String fileBaseUrl_cloud;
 
     /**
-     * POST /api/content - Uploads a content file and an optional thumbnail, then creates a Content record.
+     * POST /api/v1/content - Uploads a content file and an optional thumbnail, then creates a Content record.
      * <p>
      * Expects a multipart/form-data request with the following parts:
      * <ul>
@@ -191,7 +192,7 @@ public class ContentController {
      * If both storage base URLs are set to {@code not_using}, no files are uploaded and {@code data} is set
      * to a placeholder.
      * <p>
-     * The response is a {@link ContentDTO}, the same shape returned by {@code GET /api/content/{id}}.
+     * The response is a {@link ContentDTO}, the same shape returned by {@code GET /api/v1/content/{id}}.
      * It exposes only the creator's id and username, never the full user entity. Because the content
      * is new, {@code downloadsCount} and {@code latestDownloadsCount} are 0 and {@code avgRating} is null.
      *
@@ -276,7 +277,7 @@ public class ContentController {
 
     //TODO: There should be a soft Delete and Hard Delete endpoints
     /**
-     * DELETE /api/content/{id} - Deletes a content record and its associated files.
+     * DELETE /api/v1/content/{id} - Deletes a content record and its associated files.
      * <p>
      * This endpoint deletes the content record identified by the provided ID.
      * It also removes the main file (stored in the data field) and the optional thumbnail

@@ -1,12 +1,13 @@
 package com.diversestudio.openugc.controller;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import com.diversestudio.openugc.dto.StatsDTO;
 import com.diversestudio.openugc.service.StatsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/stats")
+@RequestMapping(ApiPaths.V1 + "/stats")
 public class StatsController {
     private final StatsService statsService;
 
@@ -16,7 +17,7 @@ public class StatsController {
     }
 
 
-    // GET /api/stats/{id}
+    // GET /api/v1/stats/{id}
     @GetMapping("/{id}")
     public ResponseEntity<StatsDTO> getStats(@PathVariable("id") Long contentId)
     {

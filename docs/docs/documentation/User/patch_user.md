@@ -10,7 +10,7 @@ Only the fields you send are changed. Fields that are missing (or `null`) keep t
 
 ## Endpoint
 
-- **URL:** `PATCH http://<your-domain>/api/users`
+- **URL:** `PATCH http://<your-domain>/api/v1/users`
 - **Headers:**
     - `Authorization: Bearer <token>`
     - `Content-Type: application/json`

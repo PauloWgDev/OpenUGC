@@ -50,7 +50,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
     String storageLocation;
 
     /** MockMvc requests go to http://localhost, so that's the base of the URLs in responses. */
-    private static final String API_BASE = "http://localhost/api/content/";
+    private static final String API_BASE = "http://localhost/api/v1/content/";
 
     static String token;
 
@@ -63,12 +63,12 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
                 {"username":"upload_%s","credential":"s3cret-pass"}
                 """.formatted(UUID.randomUUID().toString().substring(0, 8));
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
                 .andExpect(status().isOk());
 
-        MvcResult login = mockMvc.perform(post("/api/auth/login")
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
                 .andExpect(status().isOk())
@@ -80,7 +80,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         String json = """
                 {"name":"My Level","description":"test","version":1,"tags":[]}
                 """;
-        MockMultipartHttpServletRequestBuilder request = multipart("/api/content")
+        MockMultipartHttpServletRequestBuilder request = multipart("/api/v1/content")
                 .file(new MockMultipartFile("content", "", MediaType.APPLICATION_JSON_VALUE,
                         json.getBytes(StandardCharsets.UTF_8)))
                 .file(file);
@@ -136,7 +136,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         assertThat((String) JsonPath.read(first, "$.data")).isEqualTo(API_BASE + "download/" + firstId);
         assertThat((String) JsonPath.read(second, "$.data")).isEqualTo(API_BASE + "download/" + secondId);
 
-        MvcResult download = mockMvc.perform(get("/api/content/download/" + firstId)
+        MvcResult download = mockMvc.perform(get("/api/v1/content/download/" + firstId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -146,7 +146,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         assertThat(disposition.isAttachment()).isTrue();
         assertThat(disposition.getFilename()).isEqualTo("My Level.zip");
 
-        String secondContent = mockMvc.perform(get("/api/content/download/" + secondId)
+        String secondContent = mockMvc.perform(get("/api/v1/content/download/" + secondId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -188,7 +188,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         Integer id = JsonPath.read(body, "$.contentId");
 
         // No Authorization header.
-        MvcResult result = mockMvc.perform(get("/api/content/thumbnail/" + id))
+        MvcResult result = mockMvc.perform(get("/api/v1/content/thumbnail/" + id))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "image/png"))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline"))
@@ -198,7 +198,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
                 .contains("max-age=86400").contains("public");
 
         // Fetching the thumbnail is not a download.
-        mockMvc.perform(get("/api/content/" + id)
+        mockMvc.perform(get("/api/v1/content/" + id)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.downloadsCount").value(0));
@@ -210,13 +210,13 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         Integer id = JsonPath.read(body, "$.contentId");
 
         assertThat((String) JsonPath.read(body, "$.thumbnail")).isNull();
-        mockMvc.perform(get("/api/content/thumbnail/" + id))
+        mockMvc.perform(get("/api/v1/content/thumbnail/" + id))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void thumbnail_missingContent_isNotFound() throws Exception {
-        mockMvc.perform(get("/api/content/thumbnail/999999999"))
+        mockMvc.perform(get("/api/v1/content/thumbnail/999999999"))
                 .andExpect(status().isNotFound());
     }
 
@@ -225,7 +225,7 @@ class ContentUploadIntegrationTest extends AbstractIntegrationTest {
         String body = uploadAndGetBody(mainFile("level.zip", "data"), null);
         Integer id = JsonPath.read(body, "$.contentId");
 
-        MvcResult result = mockMvc.perform(get("/api/content/download/" + id)).andReturn();
+        MvcResult result = mockMvc.perform(get("/api/v1/content/download/" + id)).andReturn();
         assertThat(result.getResponse().getStatus()).isIn(401, 403);
     }
 

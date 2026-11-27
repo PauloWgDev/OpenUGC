@@ -8,7 +8,7 @@ Checks a username and password and returns a JSON Web Token (JWT).
 
 ## Endpoint
 
-- **URL:** `POST http://<your-domain>/api/auth/login`
+- **URL:** `POST http://<your-domain>/api/v1/auth/login`
 - **Auth:** not needed (public)
 - **Headers:**
     - `Content-Type: application/json`

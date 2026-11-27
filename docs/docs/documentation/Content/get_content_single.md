@@ -8,7 +8,7 @@ Returns a single content item by its ID.
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/content/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/content/{id}`
 - **Headers:**
     - `Authorization: Bearer <token>`
 
@@ -19,8 +19,8 @@ Returns a single content item by its ID.
   "contentId": 1,
   "creatorId": 1,
   "creatorName": "Pepe",
-  "data": "http://<your-domain>/api/content/download/1",
-  "thumbnail": "http://<your-domain>/api/content/thumbnail/1",
+  "data": "http://<your-domain>/api/v1/content/download/1",
+  "thumbnail": "http://<your-domain>/api/v1/content/thumbnail/1",
   "name": "My Content",
   "description": "This is a test content",
   "tags": ["maps", "racing"],
@@ -37,8 +37,8 @@ The fields are the same as in [Get Contents Page](./get_content_batch.md#content
 
 `data` and `thumbnail` are API URLs, not direct links to the storage:
 
-* `data` → `GET /api/content/download/{id}`: needs the `Authorization` header and is counted as a download. See [Download Content](./download_content.md).
-* `thumbnail` → `GET /api/content/thumbnail/{id}`: public, so it can be used directly as an image source. `null` if the content has no thumbnail.
+* `data` → `GET /api/v1/content/download/{id}`: needs the `Authorization` header and is counted as a download. See [Download Content](./download_content.md).
+* `thumbnail` → `GET /api/v1/content/thumbnail/{id}`: public, so it can be used directly as an image source. `null` if the content has no thumbnail.
 
 :::note
 Content that was [soft deleted](./delete_content.md) is hidden from the list, but it can still be fetched by ID with this endpoint (and downloaded, rated and so on). Only a hard delete removes it completely.

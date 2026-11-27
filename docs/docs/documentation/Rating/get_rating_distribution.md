@@ -8,7 +8,7 @@ Returns how many ratings of each value (1 to 5) a content item has. It's useful 
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/rating/{id}/distribution`
+- **URL:** `GET http://<your-domain>/api/v1/rating/{id}/distribution`
   - `{id}` is the **content** ID.
 - **Headers:**
   - `Authorization: Bearer <token>`

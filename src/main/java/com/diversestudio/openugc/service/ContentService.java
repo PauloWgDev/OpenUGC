@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.service;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import com.diversestudio.openugc.dto.ContentCreationDTO;
 import com.diversestudio.openugc.dto.ContentDTO;
 import com.diversestudio.openugc.entity.Content;
@@ -212,8 +213,8 @@ public class ContentService {
     /** Replaces the stored keys in {@code data} and {@code thumbnail} with their public URLs. */
     /**
      * Replaces the storage keys in {@code data} and {@code thumbnail} with the API URLs that serve them:
-     * {@code data} → {@code GET /api/content/download/{id}} (needs a token, counted as a download),
-     * {@code thumbnail} → {@code GET /api/content/thumbnail/{id}} (public), or {@code null} if there is none.
+     * {@code data} → {@code GET /api/v1/content/download/{id}} (needs a token, counted as a download),
+     * {@code thumbnail} → {@code GET /api/v1/content/thumbnail/{id}} (public), or {@code null} if there is none.
      * Files are never linked directly, so local storage and GCS behave the same.
      */
     private ContentDTO withApiUrls(ContentDTO c) {
@@ -282,24 +283,24 @@ public class ContentService {
     }
 
     /**
-     * Absolute URL of {@code GET /api/content/download/{id}}, built from the current request.
+     * Absolute URL of {@code GET /api/v1/content/download/{id}}, built from the current request.
      * Behind a reverse proxy the host and scheme come from the forwarded headers
      * ({@code server.forward-headers-strategy=native}).
      */
     private static String downloadUrl(Long contentId) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/content/download/{id}")
+                .path(ApiPaths.V1 + "/content/download/{id}")
                 .buildAndExpand(contentId)
                 .toUriString();
     }
 
-    /** Absolute URL of {@code GET /api/content/thumbnail/{id}}, or {@code null} if the content has no thumbnail. */
+    /** Absolute URL of {@code GET /api/v1/content/thumbnail/{id}}, or {@code null} if the content has no thumbnail. */
     private static String thumbnailUrl(Long contentId, String thumbnailKey) {
         if (thumbnailKey == null || thumbnailKey.isBlank()) {
             return null;
         }
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/content/thumbnail/{id}")
+                .path(ApiPaths.V1 + "/content/thumbnail/{id}")
                 .buildAndExpand(contentId)
                 .toUriString();
     }

@@ -17,7 +17,7 @@ class CorsConfigTest {
         properties.setAllowedOrigins(origins);
         // JwtUtil isn't used to build the CORS rules.
         CorsConfigurationSource source = new SecurityConfig(null, properties).corsConfigurationSource();
-        return source.getCorsConfiguration(new MockHttpServletRequest("GET", "/api/content"));
+        return source.getCorsConfiguration(new MockHttpServletRequest("GET", "/api/v1/content"));
     }
 
     @Test

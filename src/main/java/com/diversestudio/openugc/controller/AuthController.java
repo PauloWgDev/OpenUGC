@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.controller;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.config.GuestProperties;
@@ -14,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(ApiPaths.V1 + "/auth")
 public class AuthController {
     private final AuthService authService;
     private final RateLimiterService rateLimiterService;
@@ -27,7 +28,7 @@ public class AuthController {
     }
     
     /**
-     * POST /api/auth/register - Registers a new user in the system.
+     * POST /api/v1/auth/register - Registers a new user in the system.
      *
      * @param request the {@link RegisterRequestDTO} with the new username and password
      * @return a {@link ResponseEntity} with a success message or error description
@@ -45,7 +46,7 @@ public class AuthController {
     }
 
     /**
-     * POST /api/auth/login - Authenticates a user and returns an authentication token if valid.
+     * POST /api/v1/auth/login - Authenticates a user and returns an authentication token if valid.
      *
      * @param request the {@link AuthRequestDTO} containing login credentials (e.g., username and password)
      * @return a {@link ResponseEntity} containing an {@link AuthResponseDTO} with the authentication token

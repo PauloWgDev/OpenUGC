@@ -37,7 +37,7 @@ And because you host it yourself, you own the data, the storage and the rules, s
 
 - **Accounts & auth**: registration, login and stateless JWT authentication (tokens last 24 h).
 - **Guest access**: optional guest tokens so players can browse without an account; you decide whether guests may upload.
-- **Roles**: `ADMIN`, `USER` and `GUEST`, created automatically on first start. Admin-only endpoints live under `/api/admin`.
+- **Roles**: `ADMIN`, `USER` and `GUEST`, created automatically on first start. Admin-only endpoints live under `/api/v1/admin`.
 - **Content**: multipart upload of a file plus an optional thumbnail, with name, description, version and tags.
 - **Search**: paginated, sortable listing filtered by text, tags or creator.
 - **Ratings**: per-content ratings with optional comments, plus a rating distribution endpoint.
@@ -101,18 +101,18 @@ sh run.sh
 
 ```bash
 # Register
-curl -X POST http://localhost:8080/api/auth/register \
+curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"player1","password":"secret123"}'
 
 # Log in and grab the token
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"player1","credential":"secret123"}'
 # -> {"token":"eyJhbGciOi..."}
 
 # List content
-curl http://localhost:8080/api/content \
+curl http://localhost:8080/api/v1/content \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -136,7 +136,7 @@ All settings are read from environment variables.
 | `CLOUD_BASEURL`                  | no              | Same as `STORAGE_BASEURL`, for cloud storage                             |
 | `GOOGLE_APPLICATION_CREDENTIALS` | cloud storage   | Path to the service-account JSON key                                     |
 | `PORT`                           | no              | HTTP port (default `8080`)                                               |
-| `GUEST_ENABLED`                  | no              | Allow `POST /api/auth/guest` (default `true`)                            |
+| `GUEST_ENABLED`                  | no              | Allow `POST /api/v1/auth/guest` (default `true`)                            |
 | `GUEST_CANPOST`                  | no              | Allow guests to upload content (default `false`)                         |
 | `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | no    | Regex of reverse-proxy IPs allowed to set `X-Forwarded-For`              |
 | `CORS_ALLOWED_ORIGINS`           | no              | Browser origins allowed to call the API, comma-separated (default `*`). Empty turns CORS off |
@@ -152,60 +152,60 @@ All settings are read from environment variables.
 
 Roles are created automatically, but no admin account is. To get your first admin you have to do it from the database:
 
-1. Register a normal account with `POST /api/auth/register`.
+1. Register a normal account with `POST /api/v1/auth/register`.
 2. Give it the `ADMIN` role directly in the database (set the user's role to the `ADMIN` row in the roles table).
 3. Log in again to get a token with the new role. 
 
-From then on, that admin can create accounts with any role (`POST /api/admin/users`) and change roles (`PATCH /api/admin/users/{id}/role/{roleName}`). 
+From then on, that admin can create accounts with any role (`POST /api/v1/admin/users`) and change roles (`PATCH /api/v1/admin/users/{id}/role/{roleName}`). 
 **Note:** Existing tokens keep their old role until they expire.
 
 ## API overview
 
-All endpoints except `/api/auth/**` and the Swagger docs require an `Authorization: Bearer <token>` header.
+All endpoints except `/api/v1/auth/**` and the Swagger docs require an `Authorization: Bearer <token>` header.
 
 ### Auth
 
 | Method | Endpoint              | Description                                                   |
 |--------|-----------------------|---------------------------------------------------------------|
-| POST   | `/api/auth/register`  | Create an account (`username`, `password`). Rate-limited.     |
-| POST   | `/api/auth/login`     | Log in (`username`, `credential`) and receive a JWT. Rate-limited. |
-| POST   | `/api/auth/guest`     | Get a guest token, if guests are enabled. Rate-limited.       |
+| POST   | `/api/v1/auth/register`  | Create an account (`username`, `password`). Rate-limited.     |
+| POST   | `/api/v1/auth/login`     | Log in (`username`, `credential`) and receive a JWT. Rate-limited. |
+| POST   | `/api/v1/auth/guest`     | Get a guest token, if guests are enabled. Rate-limited.       |
 
 ### Content
 
 | Method | Endpoint                       | Description                                                                 |
 |--------|--------------------------------|-----------------------------------------------------------------------------|
-| GET    | `/api/content`                 | Paginated list. Query params: `prompt`, `tags`, `creatorId`, `page`, `size`, `sort` (e.g. `createdAt,desc`). |
-| GET    | `/api/content/{id}`            | Get one content item                                                        |
-| GET    | `/api/content/download/{id}`   | Download the file and record the download                                   |
-| POST   | `/api/content`                 | Upload (multipart): `content` (JSON: name, description, version, tags), `file`, optional `thumbnail` |
-| DELETE | `/api/content/{id}`            | Soft delete; add `?hardDelete=true` to remove the record and its files      |
+| GET    | `/api/v1/content`                 | Paginated list. Query params: `prompt`, `tags`, `creatorId`, `page`, `size`, `sort` (e.g. `createdAt,desc`). |
+| GET    | `/api/v1/content/{id}`            | Get one content item                                                        |
+| GET    | `/api/v1/content/download/{id}`   | Download the file and record the download                                   |
+| POST   | `/api/v1/content`                 | Upload (multipart): `content` (JSON: name, description, version, tags), `file`, optional `thumbnail` |
+| DELETE | `/api/v1/content/{id}`            | Soft delete; add `?hardDelete=true` to remove the record and its files      |
 
 ### Users
 
 | Method | Endpoint               | Description                                                       |
 |--------|------------------------|-------------------------------------------------------------------|
-| GET    | `/api/users`           | Paginated list. Query params: `prompt`, `page`, `size`, `sort`.   |
-| GET    | `/api/users/{id}`      | Get one user                                                      |
-| PATCH  | `/api/users`           | Update the current user's profile                                 |
-| PATCH  | `/api/users/password`  | Change the current user's password (`currentPassword`, `newPassword`) |
+| GET    | `/api/v1/users`           | Paginated list. Query params: `prompt`, `page`, `size`, `sort`.   |
+| GET    | `/api/v1/users/{id}`      | Get one user                                                      |
+| PATCH  | `/api/v1/users`           | Update the current user's profile                                 |
+| PATCH  | `/api/v1/users/password`  | Change the current user's password (`currentPassword`, `newPassword`) |
 
 ### Ratings & stats
 
 | Method | Endpoint                          | Description                                                        |
 |--------|-----------------------------------|--------------------------------------------------------------------|
-| POST   | `/api/rating/{contentId}`         | Rate content. Query params: `rating` (1-5), optional `comment`.    |
-| GET    | `/api/rating/{contentId}`         | Paginated ratings; filter by a single value with `rating`.         |
-| GET    | `/api/rating/{contentId}/distribution` | Count of ratings per value                                    |
-| GET    | `/api/stats/{contentId}`          | Downloads (total and last 7 days), rating count and average        |
+| POST   | `/api/v1/rating/{contentId}`         | Rate content. Query params: `rating` (1-5), optional `comment`.    |
+| GET    | `/api/v1/rating/{contentId}`         | Paginated ratings; filter by a single value with `rating`.         |
+| GET    | `/api/v1/rating/{contentId}/distribution` | Count of ratings per value                                    |
+| GET    | `/api/v1/stats/{contentId}`          | Downloads (total and last 7 days), rating count and average        |
 
 ### Admin (`ADMIN` role only)
 
 | Method | Endpoint                                   | Description                                       |
 |--------|--------------------------------------------|---------------------------------------------------|
-| GET    | `/api/admin/{id}`                          | Get any user                                      |
-| POST   | `/api/admin/users`                         | Create an account with a chosen role (default `USER`) |
-| PATCH  | `/api/admin/users/{id}/role/{roleName}`    | Change a user's role (`ADMIN`, `USER`, `GUEST`)   |
+| GET    | `/api/v1/admin/{id}`                          | Get any user                                      |
+| POST   | `/api/v1/admin/users`                         | Create an account with a chosen role (default `USER`) |
+| PATCH  | `/api/v1/admin/users/{id}/role/{roleName}`    | Change a user's role (`ADMIN`, `USER`, `GUEST`)   |
 
 Full request and response examples are in the [documentation](https://paulowgdev.github.io/OpenUGC/).
 

@@ -48,10 +48,10 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
                 {"username":"valid_%s","credential":"s3cret-pass"}
                 """.formatted(UUID.randomUUID().toString().substring(0, 8));
 
-        mockMvc.perform(post("/api/auth/register").with(fromOwnIp())
+        mockMvc.perform(post("/api/v1/auth/register").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk());
-        String login = mockMvc.perform(post("/api/auth/login").with(fromOwnIp())
+        String login = mockMvc.perform(post("/api/v1/auth/login").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -60,7 +60,7 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void register_blankUsername_isRejected() throws Exception {
-        mockMvc.perform(post("/api/auth/register").with(fromOwnIp())
+        mockMvc.perform(post("/api/v1/auth/register").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"username":"   ","credential":"s3cret-pass"}
@@ -71,7 +71,7 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void register_shortPassword_isRejected() throws Exception {
-        mockMvc.perform(post("/api/auth/register").with(fromOwnIp())
+        mockMvc.perform(post("/api/v1/auth/register").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"username":"short_pw_user","credential":"abc"}
@@ -82,7 +82,7 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void patchUser_blankUsername_isRejected() throws Exception {
-        mockMvc.perform(patch("/api/users")
+        mockMvc.perform(patch("/api/v1/users")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -94,7 +94,7 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void changePassword_blankNewPassword_isRejected() throws Exception {
-        mockMvc.perform(patch("/api/users/password")
+        mockMvc.perform(patch("/api/v1/users/password")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -109,7 +109,7 @@ class ValidationIntegrationTest extends AbstractIntegrationTest {
         String json = """
                 {"description":"no name","version":1,"tags":[]}
                 """;
-        mockMvc.perform(multipart("/api/content")
+        mockMvc.perform(multipart("/api/v1/content")
                         .file(new MockMultipartFile("content", "", MediaType.APPLICATION_JSON_VALUE,
                                 json.getBytes(StandardCharsets.UTF_8)))
                         .file(new MockMultipartFile("file", "level.zip", "application/zip",

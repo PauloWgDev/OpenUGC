@@ -57,10 +57,10 @@ class TagsIntegrationTest extends AbstractIntegrationTest {
                 {"username":"tags_%s","credential":"s3cret-pass"}
                 """.formatted(marker);
 
-        mockMvc.perform(post("/api/auth/register").with(fromOwnIp())
+        mockMvc.perform(post("/api/v1/auth/register").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk());
-        String login = mockMvc.perform(post("/api/auth/login").with(fromOwnIp())
+        String login = mockMvc.perform(post("/api/v1/auth/login").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -69,7 +69,7 @@ class TagsIntegrationTest extends AbstractIntegrationTest {
 
     /** Uploads content with the given metadata JSON and returns the response body. */
     private String upload(String contentJson) throws Exception {
-        return mockMvc.perform(multipart("/api/content")
+        return mockMvc.perform(multipart("/api/v1/content")
                         .file(new MockMultipartFile("content", "", MediaType.APPLICATION_JSON_VALUE,
                                 contentJson.getBytes(StandardCharsets.UTF_8)))
                         .file(new MockMultipartFile("file", "level.zip", "application/zip",
@@ -80,7 +80,7 @@ class TagsIntegrationTest extends AbstractIntegrationTest {
     }
 
     private void expectTagsOnGet(Integer id, Matcher<?> matcher) throws Exception {
-        mockMvc.perform(get("/api/content/{id}", id)
+        mockMvc.perform(get("/api/v1/content/{id}", id)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tags", matcher));
@@ -133,7 +133,7 @@ class TagsIntegrationTest extends AbstractIntegrationTest {
                 """.formatted(marker, marker));
 
         // Both items carry the same lowercase tag, and the filter finds them whatever the case.
-        mockMvc.perform(get("/api/content")
+        mockMvc.perform(get("/api/v1/content")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .param("tags", "Shared-" + marker))
                 .andExpect(status().isOk())

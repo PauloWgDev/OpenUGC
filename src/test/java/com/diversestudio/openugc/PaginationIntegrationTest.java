@@ -61,10 +61,10 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
             String credentials = """
                     {"username":"%s_u%d","credential":"s3cret-pass"}
                     """.formatted(marker, i);
-            mockMvc.perform(post("/api/auth/register").with(fromIp(i))
+            mockMvc.perform(post("/api/v1/auth/register").with(fromIp(i))
                             .contentType(MediaType.APPLICATION_JSON).content(credentials))
                     .andExpect(status().isOk());
-            String login = mockMvc.perform(post("/api/auth/login").with(fromIp(i))
+            String login = mockMvc.perform(post("/api/v1/auth/login").with(fromIp(i))
                             .contentType(MediaType.APPLICATION_JSON).content(credentials))
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
@@ -76,7 +76,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
             String json = """
                     {"name":"%s level %d","description":"pagination","version":1,"tags":[]}
                     """.formatted(marker, i);
-            String body = mockMvc.perform(multipart("/api/content")
+            String body = mockMvc.perform(multipart("/api/v1/content")
                             .file(new MockMultipartFile("content", "", MediaType.APPLICATION_JSON_VALUE,
                                     json.getBytes(StandardCharsets.UTF_8)))
                             .file(new MockMultipartFile("file", "level.zip", "application/zip",
@@ -90,7 +90,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
         }
 
         for (int i = 0; i < USERS; i++) {
-            mockMvc.perform(post("/api/rating/{id}", firstContentId)
+            mockMvc.perform(post("/api/v1/rating/{id}", firstContentId)
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + newTokens[i])
                             .param("rating", String.valueOf(i + 3)))
                     .andExpect(status().isOk());
@@ -106,7 +106,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void contentPage_totalCountsAllMatchingContent() throws Exception {
-        mockMvc.perform(get("/api/content")
+        mockMvc.perform(get("/api/v1/content")
                         .header(HttpHeaders.AUTHORIZATION, auth())
                         .param("prompt", marker)
                         .param("size", "2"))
@@ -120,7 +120,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
     void pageJson_hasStableShape() throws Exception {
         // Clients (e.g. the Unity package) depend on this shape: items in "content",
         // metadata in "page", and none of PageImpl's internal fields.
-        mockMvc.perform(get("/api/content")
+        mockMvc.perform(get("/api/v1/content")
                         .header(HttpHeaders.AUTHORIZATION, auth())
                         .param("prompt", marker)
                         .param("size", "2")
@@ -138,7 +138,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void contentPage_lastPage_keepsTheSameTotal() throws Exception {
-        mockMvc.perform(get("/api/content")
+        mockMvc.perform(get("/api/v1/content")
                         .header(HttpHeaders.AUTHORIZATION, auth())
                         .param("prompt", marker)
                         .param("size", "2")
@@ -150,7 +150,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void userPage_totalCountsAllMatchingUsers() throws Exception {
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .header(HttpHeaders.AUTHORIZATION, auth())
                         .param("prompt", marker)
                         .param("size", "1"))
@@ -162,7 +162,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void ratingPage_totalCountsAllRatings() throws Exception {
-        mockMvc.perform(get("/api/rating/{id}", ratedContentId)
+        mockMvc.perform(get("/api/v1/rating/{id}", ratedContentId)
                         .header(HttpHeaders.AUTHORIZATION, auth())
                         .param("size", "1"))
                 .andExpect(status().isOk())
@@ -173,7 +173,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
     @Test
     void ratingPage_withRatingFilter_countsOnlyThatValue() throws Exception {
         // Ratings are 3, 4 and 5, one each.
-        mockMvc.perform(get("/api/rating/{id}", ratedContentId)
+        mockMvc.perform(get("/api/v1/rating/{id}", ratedContentId)
                         .header(HttpHeaders.AUTHORIZATION, auth())
                         .param("size", "1")
                         .param("rating", "4"))

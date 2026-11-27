@@ -13,7 +13,7 @@ OpenUGC creates the `ADMIN`, `USER` and `GUEST` roles the first time it starts, 
 Register the account that will become admin, like any other user:
 
 ```bash
-curl -X POST http://<your-domain>/api/auth/register \
+curl -X POST http://<your-domain>/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "a-long-and-safe-password"}'
 ```
@@ -39,7 +39,7 @@ Change `'admin'` to the username you registered. The query should report `UPDATE
 The role is saved inside the token when you log in, so a token you got before the change still says `USER`. Log in again to get a token with the `ADMIN` role:
 
 ```bash
-curl -X POST http://<your-domain>/api/auth/login \
+curl -X POST http://<your-domain>/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "credential": "a-long-and-safe-password"}'
 ```
@@ -55,5 +55,5 @@ With an admin token you can:
 - Soft delete or hard delete any content, not only their own: [Delete Content](../documentation/Content/delete_content.md).
 
 **Note**:
-When an admin changes someone's role, the user's existing tokens still carry the old role for the admin endpoints until they expire (up to 24 hours). For example, a demoted admin can keep calling `/api/admin/...` until their token expires.
+When an admin changes someone's role, the user's existing tokens still carry the old role for the admin endpoints until they expire (up to 24 hours). For example, a demoted admin can keep calling `/api/v1/admin/...` until their token expires.
 

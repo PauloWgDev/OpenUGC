@@ -13,7 +13,7 @@ Only the user who uploaded the content, or an `ADMIN`, can delete it.
 
 ## Endpoint
 
-- **URL:** `DELETE http://<your-domain>/api/content/{id}`
+- **URL:** `DELETE http://<your-domain>/api/v1/content/{id}`
 - **Headers:**
   - `Authorization: Bearer <token>`
 - **Query Parameters:**
@@ -23,11 +23,11 @@ Examples:
 
 ```bash
 # Soft delete (hide it from the list)
-curl -X DELETE "http://<your-domain>/api/content/10" \
+curl -X DELETE "http://<your-domain>/api/v1/content/10" \
   -H "Authorization: Bearer <token>"
 
 # Hard delete (remove it completely)
-curl -X DELETE "http://<your-domain>/api/content/10?hardDelete=true" \
+curl -X DELETE "http://<your-domain>/api/v1/content/10?hardDelete=true" \
   -H "Authorization: Bearer <token>"
 ```
 

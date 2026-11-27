@@ -8,7 +8,7 @@ Returns any user by their ID. It returns the same information as [Get User by ID
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/admin/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/admin/{id}`
 - **Headers:**
   - `Authorization: Bearer <token>` (the token must have the `ADMIN` role)
 

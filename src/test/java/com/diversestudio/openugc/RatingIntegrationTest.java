@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * {@code POST /api/rating/{id}} must reject values outside 1-5 (they would skew the average)
+ * {@code POST /api/v1/rating/{id}} must reject values outside 1-5 (they would skew the average)
  * and answer 404, not 500, when the content does not exist.
  */
 class RatingIntegrationTest extends AbstractIntegrationTest {
@@ -49,13 +49,13 @@ class RatingIntegrationTest extends AbstractIntegrationTest {
                 {"username":"rating_%s","credential":"s3cret-pass"}
                 """.formatted(UUID.randomUUID().toString().substring(0, 8));
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
                 .andExpect(status().isOk());
 
-        MvcResult login = mockMvc.perform(post("/api/auth/login")
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
@@ -68,7 +68,7 @@ class RatingIntegrationTest extends AbstractIntegrationTest {
     @ValueSource(strings = {"0", "6", "-1", "1000"})
     void outOfRangeRating_isRejected(String rating) throws Exception {
         // Checked before the content lookup, so a missing id still gives 400 here.
-        mockMvc.perform(post("/api/rating/{id}", MISSING_CONTENT_ID)
+        mockMvc.perform(post("/api/v1/rating/{id}", MISSING_CONTENT_ID)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .param("rating", rating))
                 .andExpect(status().isBadRequest());
@@ -76,7 +76,7 @@ class RatingIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void validRatingOnMissingContent_isNotFound() throws Exception {
-        mockMvc.perform(post("/api/rating/{id}", MISSING_CONTENT_ID)
+        mockMvc.perform(post("/api/v1/rating/{id}", MISSING_CONTENT_ID)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .param("rating", "3"))
                 .andExpect(status().isNotFound());

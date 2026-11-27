@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
+                                ApiPaths.V1 + "/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -56,9 +56,9 @@ public class SecurityConfig {
                                 "/error"
                             ).permitAll()
                         // Thumbnails are public so browsers and game clients can show them without a token.
-                        .requestMatchers(HttpMethod.GET, "/api/content/thumbnail/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, ApiPaths.V1 + "/content/thumbnail/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // restrict admin endpoints
+                        .requestMatchers(ApiPaths.V1 + "/admin/**").hasRole("ADMIN") // restrict admin endpoints
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

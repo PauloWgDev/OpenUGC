@@ -152,7 +152,7 @@ Before connecting your game, it's a good idea to test the main flow. The example
 ### Register a User
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/register \
+curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username": "testuser", "password": "mypassword"}'
 ```
@@ -168,7 +168,7 @@ User registered successfully!
 The login body uses `credential` for the password:
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "testuser", "credential": "mypassword"}'
 ```
@@ -186,7 +186,7 @@ The response includes a JWT token:
 Send the token in the `Authorization` header:
 
 ```bash
-curl "http://localhost:8080/api/content?page=0&size=5" \
+curl "http://localhost:8080/api/v1/content?page=0&size=5" \
   -H "Authorization: Bearer <your-jwt-token>"
 ```
 

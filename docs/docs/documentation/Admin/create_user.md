@@ -8,7 +8,7 @@ Creates an account. Unlike [Register](../Authorization/register.md), the admin c
 
 ## Endpoint
 
-- **URL:** `POST http://<your-domain>/api/admin/users`
+- **URL:** `POST http://<your-domain>/api/v1/admin/users`
 - **Headers:**
   - `Authorization: Bearer <token>` (the token must have the `ADMIN` role)
   - `Content-Type: application/json`

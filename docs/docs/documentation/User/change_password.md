@@ -8,7 +8,7 @@ Changes the password of the user who sends the request. The current password is 
 
 ## Endpoint
 
-- **URL:** `PATCH http://<your-domain>/api/users/password`
+- **URL:** `PATCH http://<your-domain>/api/v1/users/password`
 - **Headers:**
     - `Authorization: Bearer <token>`
     - `Content-Type: application/json`

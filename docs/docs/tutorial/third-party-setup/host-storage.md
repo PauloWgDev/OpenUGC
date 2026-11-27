@@ -11,7 +11,7 @@ In this guide, we'll create a bucket, generate credentials, and prepare them for
 Free Render web services have a temporary disk: anything saved there is lost every time the service restarts, redeploys or goes to sleep. If you host the API on Render, store the files in a bucket like this one.
 :::
 
-The files are never served straight from the bucket. Players always download them through the API (`/api/content/download/{id}` and `/api/content/thumbnail/{id}`), so the bucket can stay **private**.
+The files are never served straight from the bucket. Players always download them through the API (`/api/v1/content/download/{id}` and `/api/v1/content/thumbnail/{id}`), so the bucket can stay **private**.
 
 ---
 

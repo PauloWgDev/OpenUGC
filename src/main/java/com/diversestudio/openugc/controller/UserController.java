@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.controller;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.dto.ChangePasswordDTO;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(ApiPaths.V1 + "/users")
 public class UserController {
 
     private  final UserService userService;
@@ -31,7 +32,7 @@ public class UserController {
     }
 
     /**
-     * GET /api/users - Retrieves a paginated list of users, optionally filtered by a prompt
+     * GET /api/v1/users - Retrieves a paginated list of users, optionally filtered by a prompt
      * and sorted by a specified field and direction.
      *
      * @param prompt optional filter string to match against user data (default: empty string)
@@ -57,7 +58,7 @@ public class UserController {
 
 
     /**
-     * GET /api/users/{id} - Retrieves a specific user by their ID.
+     * GET /api/v1/users/{id} - Retrieves a specific user by their ID.
      *
      * @param id the ID of the user to retrieve
      * @return a {@link ResponseEntity} containing the {@link UserDTO}
@@ -70,8 +71,8 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
-    // Account creation is not exposed here: players use POST /api/auth/register,
-    // and admins use POST /api/admin/users.
+    // Account creation is not exposed here: players use POST /api/v1/auth/register,
+    // and admins use POST /api/v1/admin/users.
 
     @PatchMapping()
     public ResponseEntity<Object> updateUserData(@Valid @RequestBody UserDTO user)

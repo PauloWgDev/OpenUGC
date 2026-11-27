@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.security;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Skip token checking for auth endpoints
         String path = request.getRequestURI();
-        if (path.startsWith("/api/auth/")) {
+        if (path.startsWith(ApiPaths.V1 + "/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
