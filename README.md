@@ -72,10 +72,16 @@ git clone https://github.com/PauloWgDev/OpenUGC.git
 cd OpenUGC
 ```
 
-Open `docker-compose.yml` and check two things before starting:
+Create your own compose file from the example. `docker-compose.yml` is git-ignored, so your passwords and secret stay out of the repo:
 
-1. `DATABASE_USERNAME` / `DATABASE_PASSWORD` on the `open-ugc` service must match `POSTGRES_USER` / `POSTGRES_PASSWORD` on the `postgres` service.
-2. Replace `JWT_SECRET: CHANGE_ME` with your own secret. The app won't start with the placeholder.
+```bash
+cp docker-compose-example.yml docker-compose.yml
+```
+
+Open `docker-compose.yml` and check these before starting:
+
+1. Change the database username and password. `DATABASE_USERNAME` / `DATABASE_PASSWORD` on the `open-ugc` service must match `POSTGRES_USER` / `POSTGRES_PASSWORD` on the `postgres` service.
+2. Replace `JWT_SECRET: CHANGE_ME` with your own secret, at least 32 characters. The app won't start with the placeholder.
 
 Then:
 
