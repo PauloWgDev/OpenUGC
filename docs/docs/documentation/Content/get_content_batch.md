@@ -1,18 +1,48 @@
+---
+sidebar_position: 1
+---
+
 # Get Contents Page
 
-Returns a page of contents with support for advanced search, pagination options, and sorting.
+Returns a page of content, with search, filters, pagination and sorting.
+
+Content that was [soft deleted](./delete_content.md) doesn't appear in this list.
 
 ## Endpoint
 
-- URL:
-  `GET http://<your-domain>/api/content`
+- **URL:** `GET http://<your-domain>/api/content`
 - **Headers:**
   - `Authorization: Bearer <token>`
-- **Parameters:**
-  - `prompt` (optional, default: ""): Filter content by a search prompt.
-  - `page` (optional, default: 0): Page number for pagination.
-  - `size` (optional, default: 10): Number of items per page.
-  - `sort` (optional, default: "createdAt,desc"): Sort order (e.g., `avgRating,desc` to sort by average rating in descending order).
+- **Query Parameters (all optional):**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `prompt` | `""` | Text to search for in the content **name**. It matches any part of the name and ignores upper and lower case: `castle` finds "Big Castle" and "castle_v2" |
+| `tags` | none | Only return content that has **at least one** of these tags. Ignores upper and lower case. Send several as `tags=racing&tags=night` or `tags=racing,night` |
+| `creatorId` | none | Only return content uploaded by this user ID |
+| `page` | `0` | Page number, starting at 0 |
+| `size` | `10` | Number of items per page |
+| `sort` | `createdAt,desc` | Sort order, as `field,direction`. See the allowed fields below |
+
+You can combine the filters. For example, the newest maps from user 5 with "castle" in the name:
+
+```
+GET /api/content?prompt=castle&tags=maps&creatorId=5&sort=createdAt,desc
+```
+
+### Sort fields
+
+| Field | Sorts by |
+|-------|----------|
+| `createdAt` | Upload date (default, newest first) |
+| `updatedAt` | Last update date |
+| `name` | Name, alphabetically |
+| `version` | Version number |
+| `avgRating` | Average rating. Content without ratings always goes last |
+| `downloadsCount` | Total downloads |
+| `latestDownloadsCount` | Downloads in the last 7 days. Useful for a "trending" list |
+
+Any other field returns `400 Bad Request`. See [Sorting](../api-basics.md#sorting) for the format.
 
 ## Response Example
 
@@ -20,65 +50,78 @@ Returns a page of contents with support for advanced search, pagination options,
 {
   "content": [
     {
-      "contentId": 1,
-      "creatorId": 1,
-      "creatorName": "Alice",
-      "data": "some data",
-      "name": "My Content",
-      "description": "This is a test content",
-      "version": 1,
-      "downloadsCount": 4,
-      "latestDownloadsCount": 0,
-      "avgRating": 4.333333333333333,
-      "createdAt": "2025-02-25T19:02:10.914+00:00",
-      "updatedAt": "2025-02-25T19:02:10.914+00:00"
-    },
-    {
       "contentId": 2,
       "creatorId": 1,
       "creatorName": "Alice",
-      "data": "Example content data",
-      "name": "Sample Content",
-      "description": "This is a sample description",
+      "data": "http://<your-domain>/api/content/download/2",
+      "thumbnail": "http://<your-domain>/api/content/thumbnail/2",
+      "name": "Big Castle",
+      "description": "A castle map for 4 players",
+      "tags": ["castle", "maps"],
       "version": 1,
       "downloadsCount": 5,
+      "latestDownloadsCount": 2,
+      "avgRating": 4.5,
+      "createdAt": "2026-03-10T00:50:57.150+00:00",
+      "updatedAt": "2026-03-10T00:50:57.150+00:00"
+    },
+    {
+      "contentId": 1,
+      "creatorId": 1,
+      "creatorName": "Alice",
+      "data": "http://<your-domain>/api/content/download/1",
+      "thumbnail": null,
+      "name": "Desert Track",
+      "description": "My first track",
+      "tags": [],
+      "version": 1,
+      "downloadsCount": 0,
       "latestDownloadsCount": 0,
-      "avgRating": 3.5,
-      "createdAt": "2025-03-10T00:50:57.150+00:00",
-      "updatedAt": "2025-03-10T00:50:57.150+00:00"
+      "avgRating": null,
+      "createdAt": "2026-02-25T19:02:10.914+00:00",
+      "updatedAt": "2026-02-25T19:02:10.914+00:00"
     }
-    // ... more content objects
   ],
   "pageable": {
     "pageNumber": 0,
     "pageSize": 10,
-    "sort": {
-      "empty": false,
-      "sorted": true,
-      "unsorted": false
-    },
+    "sort": { "empty": false, "sorted": true, "unsorted": false },
     "offset": 0,
     "paged": true,
     "unpaged": false
   },
   "last": true,
-  "totalElements": 7,
+  "totalElements": 2,
   "totalPages": 1,
   "size": 10,
   "number": 0,
-  "sort": {
-    "empty": false,
-    "sorted": true,
-    "unsorted": false
-  },
+  "sort": { "empty": false, "sorted": true, "unsorted": false },
   "first": true,
-  "numberOfElements": 7,
+  "numberOfElements": 2,
   "empty": false
 }
 ```
 
-## Responses Status
+The page fields (`totalElements`, `totalPages`, `last`...) are explained in [Pagination](../api-basics.md#pagination).
 
-* `200 OK` – Returns page of contents 
+### Content fields
+
+| Field | Description |
+|-------|-------------|
+| `contentId` | ID of the content |
+| `creatorId`, `creatorName` | ID and username of the user who uploaded it |
+| `data` | URL to [download the file](./download_content.md). Needs a token, and each call counts as a download |
+| `thumbnail` | URL of the [thumbnail image](./get_content_thumbnail.md), public. `null` if the content has no thumbnail |
+| `name`, `description` | Name and description given on upload |
+| `tags` | Tags of the content, lowercase and in alphabetical order. Empty list if it has none |
+| `version` | Version number given on upload |
+| `downloadsCount` | Number of different users who downloaded it. The same user downloading it twice counts once. See [How Downloads Are Counted](./download_content.md#how-downloads-are-counted) |
+| `latestDownloadsCount` | How many of those users downloaded it in the last 7 days |
+| `avgRating` | Average rating from 1 to 5. `null` if nobody rated it yet |
+| `createdAt`, `updatedAt` | Upload date. Since content can't be edited yet, both are the same |
+
+## Response Status
+
+* `200 OK` – Returns a page of content. If nothing matches, `content` is an empty list
+* `400 Bad Request` – Invalid `sort` field, or a parameter with the wrong type (e.g. `creatorId=abc`)
 * `403 Forbidden` – Invalid or missing token
-* `500 Internal Server Error` – Server issue

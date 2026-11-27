@@ -1,0 +1,8 @@
+{
+  "label": "Content",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Upload, browse, download and delete user-generated content."
+  }
+}

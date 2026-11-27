@@ -12,7 +12,9 @@ permissions:
   contents: read
 
 jobs:
+  # PRs only: validate the build (fails on broken links)
   build:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,27 +29,38 @@ jobs:
           cache-dependency-path: docs/package-lock.json
 
       - run: npm ci
-      # Fails on broken links
       - run: npm run build
 
-      - uses: actions/upload-pages-artifact@v3
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-        with:
-          path: docs/build
-
+  # master: build + push to gh-pages via docusaurus deploy
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    needs: build
     runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      contents: write # needed to push to gh-pages
     concurrency:
       group: pages
       cancel-in-progress: false # do not cut a deployment in half
+    defaults:
+      run:
+        working-directory: docs
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - run: npm ci
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy
+        env:
+          GIT_USER: ${{ github.actor }}
+          GIT_PASS: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run deploy

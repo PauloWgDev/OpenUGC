@@ -1,0 +1,8 @@
+{
+  "label": "Users",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "See users and update your own account."
+  }
+}

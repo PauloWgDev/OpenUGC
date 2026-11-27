@@ -1,11 +1,41 @@
 .features {
   display: flex;
   align-items: center;
-  padding: 2rem 0;
+  padding: 3rem 0;
   width: 100%;
 }
 
+.row {
+  align-items: center;
+}
+
+.logoCol {
+  display: flex;
+  justify-content: center;
+}
+
 .featureSvg {
-  height: 200px;
-  width: 200px;
+  height: 220px;
+  width: 220px;
+}
+
+.intro p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.intro p:last-child {
+  margin-bottom: 0;
+}
+
+/* Infima stacks columns below 996px: add space between logo and text */
+@media screen and (max-width: 996px) {
+  .logoCol {
+    margin-bottom: 1.5rem;
+  }
+
+  .featureSvg {
+    height: 160px;
+    width: 160px;
+  }
 }
