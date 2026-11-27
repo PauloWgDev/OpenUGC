@@ -62,13 +62,12 @@ GET /api/users?sort=averageRatingsReceive,desc
       "averageRatingsReceive": 0.0
     }
   ],
-  "totalElements": 2,
-  "totalPages": 1,
-  "number": 0,
-  "size": 10,
-  "first": true,
-  "last": true,
-  ...
+  "page": {
+    "size": 10,
+    "number": 0,
+    "totalElements": 2,
+    "totalPages": 1
+  }
 }
 ```
 

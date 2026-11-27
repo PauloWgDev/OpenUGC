@@ -195,9 +195,12 @@ It returns a page of content. On a new install the list is empty:
 ```json
 {
   "content": [],
-  "totalElements": 0,
-  "totalPages": 0,
-  ...
+  "page": {
+    "size": 5,
+    "number": 0,
+    "totalElements": 0,
+    "totalPages": 0
+  }
 }
 ```
 

@@ -82,27 +82,16 @@ Any other field returns `400 Bad Request`. See [Sorting](../api-basics.md#sortin
       "updatedAt": "2026-02-25T19:02:10.914+00:00"
     }
   ],
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 10,
-    "sort": { "empty": false, "sorted": true, "unsorted": false },
-    "offset": 0,
-    "paged": true,
-    "unpaged": false
-  },
-  "last": true,
-  "totalElements": 2,
-  "totalPages": 1,
-  "size": 10,
-  "number": 0,
-  "sort": { "empty": false, "sorted": true, "unsorted": false },
-  "first": true,
-  "numberOfElements": 2,
-  "empty": false
+  "page": {
+    "size": 10,
+    "number": 0,
+    "totalElements": 2,
+    "totalPages": 1
+  }
 }
 ```
 
-The page fields (`totalElements`, `totalPages`, `last`...) are explained in [Pagination](../api-basics.md#pagination).
+The `page` fields are explained in [Pagination](../api-basics.md#pagination).
 
 ### Content fields
 

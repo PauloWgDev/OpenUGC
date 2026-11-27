@@ -137,7 +137,7 @@ class TagsIntegrationTest extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .param("tags", "Shared-" + marker))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.page.totalElements").value(2))
                 .andExpect(jsonPath("$.content[0].tags", contains(shared)))
                 .andExpect(jsonPath("$.content[1].tags", contains(shared)));
     }

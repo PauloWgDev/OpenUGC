@@ -81,34 +81,29 @@ Example: `GET /api/content?page=2&size=20` returns items 41 to 60.
 
 `page` must be `0` or more and `size` must be `1` or more. Keep `size` reasonable (up to 50 or 100), because big pages are slow.
 
-The response is a page object. The items are in `content`, and these fields tell you where you are:
+The response is a page object. The items are in `content`, and `page` tells you where you are:
 
 ```json
 {
   "content": [ ... ],
-  "number": 0,
-  "size": 10,
-  "numberOfElements": 10,
-  "totalElements": 42,
-  "totalPages": 5,
-  "first": true,
-  "last": false,
-  "empty": false,
-  "pageable": { ... },
-  "sort": { ... }
+  "page": {
+    "size": 10,
+    "number": 0,
+    "totalElements": 42,
+    "totalPages": 5
+  }
 }
 ```
 
 | Field | Meaning |
 |-------|---------|
 | `content` | The items on this page |
-| `number` | Current page number (starting at 0) |
-| `size` | Requested page size |
-| `numberOfElements` | How many items this page actually has |
-| `totalElements` | Total number of items, across all pages |
-| `totalPages` | Total number of pages |
-| `first` / `last` | Whether this is the first or the last page |
-| `empty` | Whether this page has no items |
+| `page.size` | Requested page size |
+| `page.number` | Current page number (starting at 0) |
+| `page.totalElements` | Total number of items, across all pages |
+| `page.totalPages` | Total number of pages |
+
+To know if you're on the last page, check `page.number + 1 >= page.totalPages`. The number of items on this page is the length of `content`.
 
 ---
 

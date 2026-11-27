@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -59,7 +60,6 @@ public class ContentController {
         this.userRepository = userRepository;
     }
 
-
     /**
      * GET /api/content - Retrieves a paginated list of content entries, optionally filtered by prompt
      * and sorted according to a specified property and direction.
@@ -72,7 +72,7 @@ public class ContentController {
      * @return a {@link ResponseEntity} containing a page of {@link ContentDTO} objects
      */
     @GetMapping()
-    public ResponseEntity<Page<ContentDTO>> getContentPage(
+    public ResponseEntity<PagedModel<ContentDTO>> getContentPage(
             @RequestParam(defaultValue = "") String prompt,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -83,7 +83,7 @@ public class ContentController {
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
         Page<ContentDTO> contentList = contentService.getContentPage(prompt, creatorId, tags, pageable);
-        return ResponseEntity.ok(contentList);
+        return ResponseEntity.ok(new PagedModel<>(contentList));
     }
 
     /**

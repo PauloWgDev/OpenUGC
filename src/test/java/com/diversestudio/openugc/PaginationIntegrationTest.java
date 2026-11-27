@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * {@code totalElements} and {@code totalPages} must count every matching row,
+ * {@code page.totalElements} and {@code page.totalPages} must count every matching row,
  * not just the rows on the current page.
  * <p>
  * Setup: three users (each registering and logging in from its own IP, to stay under the
@@ -112,8 +112,28 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
                         .param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.totalElements").value(CONTENTS))
-                .andExpect(jsonPath("$.totalPages").value(2));
+                .andExpect(jsonPath("$.page.totalElements").value(CONTENTS))
+                .andExpect(jsonPath("$.page.totalPages").value(2));
+    }
+
+    @Test
+    void pageJson_hasStableShape() throws Exception {
+        // Clients (e.g. the Unity package) depend on this shape: items in "content",
+        // metadata in "page", and none of PageImpl's internal fields.
+        mockMvc.perform(get("/api/content")
+                        .header(HttpHeaders.AUTHORIZATION, auth())
+                        .param("prompt", marker)
+                        .param("size", "2")
+                        .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.page.size").value(2))
+                .andExpect(jsonPath("$.page.number").value(1))
+                .andExpect(jsonPath("$.page.totalElements").value(CONTENTS))
+                .andExpect(jsonPath("$.page.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").doesNotExist())
+                .andExpect(jsonPath("$.pageable").doesNotExist())
+                .andExpect(jsonPath("$.sort").doesNotExist());
     }
 
     @Test
@@ -125,7 +145,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
                         .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements").value(CONTENTS));
+                .andExpect(jsonPath("$.page.totalElements").value(CONTENTS));
     }
 
     @Test
@@ -136,8 +156,8 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
                         .param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements").value(USERS))
-                .andExpect(jsonPath("$.totalPages").value(USERS));
+                .andExpect(jsonPath("$.page.totalElements").value(USERS))
+                .andExpect(jsonPath("$.page.totalPages").value(USERS));
     }
 
     @Test
@@ -147,7 +167,7 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
                         .param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements").value(USERS));
+                .andExpect(jsonPath("$.page.totalElements").value(USERS));
     }
 
     @Test
@@ -158,6 +178,6 @@ class PaginationIntegrationTest extends AbstractIntegrationTest {
                         .param("size", "1")
                         .param("rating", "4"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.page.totalElements").value(1));
     }
 }
