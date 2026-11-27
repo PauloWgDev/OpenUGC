@@ -78,12 +78,11 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "raw": "{{baseUrl}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "auth",
                 "login"
               ]
@@ -92,14 +91,94 @@
           "response": []
         },
         {
-          "name": "register",
+          "name": "login manual",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login response status\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401, 429]);\r",
+                  "});\r",
+                  "\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    let jsonData;\r",
+                  "\r",
+                  "    try {\r",
+                  "        jsonData = pm.response.json();\r",
+                  "    } catch (e) {\r",
+                  "        console.error(\"Response is not JSON:\", pm.response.text());\r",
+                  "        return;\r",
+                  "    }\r",
+                  "\r",
+                  "    // Adjust this depending on your AuthResponse structure\r",
+                  "    const token = jsonData.token || jsonData.jwt || jsonData.accessToken;\r",
+                  "\r",
+                  "    if (token) {\r",
+                  "        pm.environment.set(\"token\", token);\r",
+                  "        console.log(\"Token saved:\", token);\r",
+                  "    } else {\r",
+                  "        console.warn(\"⚠️ Token not found in response:\", jsonData);\r",
+                  "    }\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"user123\",\r\n  \"credential\": \"user1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "register auto",
           "event": [
             {
               "listen": "prerequest",
               "script": {
                 "exec": [
                   "// Generate random user data (only if not already set)\r",
-                  "if (true) {\r",
+                  "if (false) {\r",
                   "    const randomId = Math.floor(Math.random() * 1000000);\r",
                   "\r",
                   "    const password = \"Test1234!\";\r",
@@ -136,14 +215,77 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "raw": "{{baseUrl}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "auth",
                 "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "register manual",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"credential\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "guest",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/guest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "guest"
               ]
             }
           },
@@ -163,18 +305,21 @@
                 "key": "Content-Type",
                 "value": "application/json",
                 "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/content/{i",
+              "raw": "{{baseUrl}}/content/4",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "content",
-                "{i"
+                "4"
               ]
             }
           },
@@ -187,40 +332,22 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer token",
-                "type": "text"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/content?prompt=random name&page=10&size=15&sort=avgRating,desc",
+              "raw": "{{baseUrl}}/content",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "content"
               ],
               "query": [
                 {
-                  "key": "prompt",
-                  "value": "random name",
-                  "type": "text"
-                },
-                {
-                  "key": "page",
-                  "value": "10",
-                  "type": "text"
-                },
-                {
-                  "key": "size",
-                  "value": "15",
-                  "type": "text"
-                },
-                {
                   "key": "sort",
-                  "value": "avgRating,desc",
-                  "type": "text"
+                  "value": "(CASE WHEN (SELECT substring(credential from 1 for 1) FROM users WHERE user_id=1)='$' THEN content_id ELSE name END),desc",
+                  "disabled": true
                 }
               ]
             }
@@ -234,19 +361,18 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
-                "type": "text"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/download{id}",
+              "raw": "{{baseUrl}}/content/download/4",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
-                "download{id}"
+                "content",
+                "download",
+                "4"
               ]
             }
           },
@@ -307,18 +433,16 @@
                   "key": "file",
                   "type": "file",
                   "uuid": "4bd16602-e181-4875-a339-2af2fbd5e3a5",
-                  "src": "/C:/Users/pnwp/Documents/Proyectos/ws_bcp_proxy.postman_collection.json"
+                  "src": "/C:/Users/pnwp/Downloads/Apikey de Banfamiliar.md"
                 }
               ]
             },
             "url": {
-              "raw": "localhost:8080/api/v1/content",
+              "raw": "{{baseUrl}}/content",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "content"
               ]
             }
@@ -332,20 +456,18 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/content/{id}",
+              "raw": "{{baseUrl}}/content/1",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "content",
-                "{id}"
+                "1"
               ]
             }
           },
@@ -358,24 +480,95 @@
       "item": [
         {
           "name": "retrieve users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Response status code is 200\", function () {\r",
+                  "    pm.expect(pm.response.code).to.equal(200);\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Response time is less than 200ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Validate the structure of the 'content' array\", function () {\r",
+                  "    const responseData = pm.response.json();\r",
+                  "    \r",
+                  "    pm.expect(responseData).to.be.an('object');\r",
+                  "    pm.expect(responseData.content).to.be.an('array');\r",
+                  "\r",
+                  "    responseData.content.forEach(user => {\r",
+                  "        pm.expect(user).to.be.an('object');\r",
+                  "        pm.expect(user).to.have.all.keys('userId', 'username', 'joinedAt', 'role', 'downloadsPerformed', 'downloadReceived', 'averageRatingsReceive');\r",
+                  "        pm.expect(user.userId).to.be.a('number');\r",
+                  "        pm.expect(user.username).to.be.a('string').that.is.not.empty;\r",
+                  "        pm.expect(user.joinedAt).to.be.a('string').that.is.not.empty;\r",
+                  "        pm.expect(user.role).to.be.a('string').that.is.not.empty;\r",
+                  "        pm.expect(user.downloadsPerformed).to.be.a('number');\r",
+                  "        pm.expect(user.downloadReceived).to.be.a('number');\r",
+                  "        pm.expect(user.averageRatingsReceive).to.be.a('number');\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"All user objects in 'content' have required fields\", function () {\r",
+                  "    const responseData = pm.response.json();\r",
+                  "    \r",
+                  "    pm.expect(responseData).to.be.an('object');\r",
+                  "    pm.expect(responseData.content).to.be.an('array');\r",
+                  "    \r",
+                  "    responseData.content.forEach(function(user) {\r",
+                  "        pm.expect(user).to.have.all.keys('userId', 'username', 'joinedAt', 'role', 'downloadsPerformed', 'downloadReceived', 'averageRatingsReceive');\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Validate that 'joinedAt' is in a valid date format\", function () {\r",
+                  "    const responseData = pm.response.json();\r",
+                  "    \r",
+                  "    pm.expect(responseData).to.be.an('object');\r",
+                  "    \r",
+                  "    responseData.content.forEach(user => {\r",
+                  "        pm.expect(user.joinedAt).to.exist.and.to.satisfy(date => {\r",
+                  "            return !isNaN(Date.parse(date));\r",
+                  "        });\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/users",
+              "raw": "{{baseUrl}}/users",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "users"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "userId,asc",
+                  "disabled": true
+                }
               ]
             }
           },
@@ -388,20 +581,18 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/users/{id}",
+              "raw": "{{baseUrl}}/users/3",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "users",
-                "{id}"
+                "3"
               ]
             }
           },
@@ -411,10 +602,16 @@
           "name": "patch user",
           "request": {
             "method": "PATCH",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"pochoclo\",\r\n    \"aboutMe\": \"just another test user\" \r\n}",
+              "raw": "{\r\n    \"username\": \"potato\",\r\n    \"aboutMe\": \"just another test user\" \r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -422,15 +619,48 @@
               }
             },
             "url": {
-              "raw": "localhost:8080/api/v1/users/{id}",
+              "raw": "{{baseUrl}}/users",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "change password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currentPassword\": \"sopapo123\",\n    \"newPassword\": \"sopapo1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
                 "users",
-                "{id}"
+                "password"
               ]
             }
           },
@@ -448,18 +678,16 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/rating/{id}",
+              "raw": "{{baseUrl}}/rating/{id}",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "rating",
                 "{id}"
               ]
@@ -474,22 +702,18 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/content/api/v1/rating/{id}/distribution",
+              "raw": "{{baseUrl}}/rating/5/distribution",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
-                "content",
-                "api",
                 "rating",
-                "{id}",
+                "5",
                 "distribution"
               ]
             }
@@ -503,18 +727,16 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer Token",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/v1/content/api/v1/rating/{id}",
+              "raw": "{{baseUrl}}/content/api/rating/{id}",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "api",
                 "content",
                 "api",
                 "rating",
