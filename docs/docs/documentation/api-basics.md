@@ -10,11 +10,15 @@ This page explains the things that work the same way on every endpoint: tokens, 
 
 ## Base URL
 
-All endpoints start with `/api`, for example:
+All endpoints start with `/api/v1`, for example:
 
 ```
-http://<your-domain>/api/content
+http://<your-domain>/api/v1/content
 ```
+
+The `v1` is the API version. Changes that would break existing clients (renamed fields, removed endpoints) go to a new version, like `/api/v2`, instead of changing `v1`. In your game, keep the base URL (`http://<your-domain>/api/v1`) in one setting, so moving to a new version is a config change.
+
+The health check (`/actuator/health`) and the Swagger docs (`/swagger-ui.html`, `/v3/api-docs`) are not part of the versioned API, so they don't have the prefix.
 
 Request and response bodies are JSON (`Content-Type: application/json`), except for the content upload, which is a multipart request (see [Upload Content](./Content/post_content.md)).
 
@@ -45,8 +49,8 @@ These don't need a token:
 
 | Endpoint | Why |
 |----------|-----|
-| `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/guest` | You use them to get a token |
-| `GET /api/content/thumbnail/{id}` | So thumbnails can be used directly as an image URL |
+| `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `POST /api/v1/auth/guest` | You use them to get a token |
+| `GET /api/v1/content/thumbnail/{id}` | So thumbnails can be used directly as an image URL |
 | `GET /actuator/health` | Health check for Docker and hosting services |
 | `/swagger-ui.html`, `/v3/api-docs` | Interactive API docs |
 
@@ -70,14 +74,14 @@ The role is stored inside the token when it's created. If an admin changes someo
 
 ## Pagination
 
-The endpoints that return lists (`GET /api/content`, `GET /api/users`, `GET /api/rating/{id}`) return one page at a time. Use these query parameters:
+The endpoints that return lists (`GET /api/v1/content`, `GET /api/v1/users`, `GET /api/v1/rating/{id}`) return one page at a time. Use these query parameters:
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `page` | `0` | Page number. **The first page is `0`** |
 | `size` | `10` | Number of items per page |
 
-Example: `GET /api/content?page=2&size=20` returns items 41 to 60.
+Example: `GET /api/v1/content?page=2&size=20` returns items 41 to 60.
 
 `page` must be `0` or more and `size` must be `1` or more. Keep `size` reasonable (up to 50 or 100), because big pages are slow.
 
@@ -112,8 +116,8 @@ To know if you're on the last page, check `page.number + 1 >= page.totalPages`. 
 The content and user lists accept a `sort` parameter in the format `field,direction`:
 
 ```
-GET /api/content?sort=avgRating,desc
-GET /api/users?sort=username,asc
+GET /api/v1/content?sort=avgRating,desc
+GET /api/v1/users?sort=username,asc
 ```
 
 - `direction` is `asc` (lowest first) or `desc` (highest first). If you leave it out, it's `asc`.
@@ -125,9 +129,9 @@ GET /api/users?sort=username,asc
 
 To stop spam and password guessing, these endpoints accept at most **5 requests per minute from the same IP**:
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/guest`
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/guest`
 
 Each endpoint has its own limit. The 5 requests come back gradually over the minute. When the limit is reached, the API returns `429 Too Many Requests` with a plain text message, for example:
 

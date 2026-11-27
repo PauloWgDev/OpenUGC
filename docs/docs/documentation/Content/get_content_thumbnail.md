@@ -10,10 +10,10 @@ This endpoint is public: no token is needed, so the URL can be used directly as 
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/content/thumbnail/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/content/thumbnail/{id}`
 - **Auth:** not needed (public)
 
-The `thumbnail` field returned by `GET /api/content` and `GET /api/content/{id}` already holds this URL, so you don't need to build it yourself.
+The `thumbnail` field returned by `GET /api/v1/content` and `GET /api/v1/content/{id}` already holds this URL, so you don't need to build it yourself.
 
 ## Response
 

@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Checks how the client IP is resolved, using the per-IP rate limit on
- * {@code POST /api/auth/guest} (5 requests per minute) as the observable effect.
+ * {@code POST /api/v1/auth/guest} (5 requests per minute) as the observable effect.
  * <p>
  * This needs a real Tomcat ({@code RANDOM_PORT}): {@code X-Forwarded-For} is handled by Tomcat's
  * {@code RemoteIpValve} ({@code server.forward-headers-strategy=native}), which MockMvc bypasses.
@@ -36,7 +36,7 @@ class ClientIpIntegrationTest extends AbstractIntegrationTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Forwarded-For", forwardedFor);
         ResponseEntity<String> response = rest.exchange(
-                "/api/auth/guest", HttpMethod.POST, new HttpEntity<>(headers), String.class);
+                "/api/v1/auth/guest", HttpMethod.POST, new HttpEntity<>(headers), String.class);
         return HttpStatus.valueOf(response.getStatusCode().value());
     }
 

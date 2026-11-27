@@ -78,7 +78,7 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
+              "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -136,7 +136,7 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/v1/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -166,7 +166,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/content/{i",
+              "raw": "localhost:8080/api/v1/content/{i",
               "host": [
                 "localhost"
               ],
@@ -192,7 +192,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/content?prompt=random name&page=10&size=15&sort=avgRating,desc",
+              "raw": "localhost:8080/api/v1/content?prompt=random name&page=10&size=15&sort=avgRating,desc",
               "host": [
                 "localhost"
               ],
@@ -239,7 +239,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/download{id}",
+              "raw": "localhost:8080/api/v1/download{id}",
               "host": [
                 "localhost"
               ],
@@ -312,7 +312,7 @@
               ]
             },
             "url": {
-              "raw": "localhost:8080/api/content",
+              "raw": "localhost:8080/api/v1/content",
               "host": [
                 "localhost"
               ],
@@ -337,7 +337,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/content/{id}",
+              "raw": "localhost:8080/api/v1/content/{id}",
               "host": [
                 "localhost"
               ],
@@ -368,7 +368,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/users",
+              "raw": "localhost:8080/api/v1/users",
               "host": [
                 "localhost"
               ],
@@ -393,7 +393,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/users/{id}",
+              "raw": "localhost:8080/api/v1/users/{id}",
               "host": [
                 "localhost"
               ],
@@ -422,7 +422,7 @@
               }
             },
             "url": {
-              "raw": "localhost:8080/api/users/{id}",
+              "raw": "localhost:8080/api/v1/users/{id}",
               "host": [
                 "localhost"
               ],
@@ -453,7 +453,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/rating/{id}",
+              "raw": "localhost:8080/api/v1/rating/{id}",
               "host": [
                 "localhost"
               ],
@@ -479,7 +479,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/content/api/rating/{id}/distribution",
+              "raw": "localhost:8080/api/v1/content/api/v1/rating/{id}/distribution",
               "host": [
                 "localhost"
               ],
@@ -508,7 +508,7 @@
               }
             ],
             "url": {
-              "raw": "localhost:8080/api/content/api/rating/{id}",
+              "raw": "localhost:8080/api/v1/content/api/v1/rating/{id}",
               "host": [
                 "localhost"
               ],

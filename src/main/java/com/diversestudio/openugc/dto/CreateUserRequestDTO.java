@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 /**
- * Body of POST /api/admin/users.
+ * Body of POST /api/v1/admin/users.
  * <p>
  * Lets an admin create an account directly. Only these fields are accepted, so a request
  * can't set userId (which would overwrite an existing account) or joinedAt.

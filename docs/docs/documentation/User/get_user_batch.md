@@ -8,7 +8,7 @@ Returns a page of users, with search, pagination and sorting.
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/users`
+- **URL:** `GET http://<your-domain>/api/v1/users`
 - **Headers:**
     - `Authorization: Bearer <token>`
 - **Query Parameters (all optional):**
@@ -33,7 +33,7 @@ Returns a page of users, with search, pagination and sorting.
 Any other field returns `400 Bad Request`. For example, to get the best-rated creators:
 
 ```
-GET /api/users?sort=averageRatingsReceive,desc
+GET /api/v1/users?sort=averageRatingsReceive,desc
 ```
 
 ## Response Example

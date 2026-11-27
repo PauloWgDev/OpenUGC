@@ -8,7 +8,7 @@ Returns a page of the ratings that a content item received.
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/rating/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/rating/{id}`
   - `{id}` is the **content** ID.
 - **Headers:**
   - `Authorization: Bearer <token>`
@@ -23,7 +23,7 @@ Returns a page of the ratings that a content item received.
 For example, to show only the 5-star reviews:
 
 ```
-GET /api/rating/10?rating=5
+GET /api/v1/rating/10?rating=5
 ```
 
 :::note

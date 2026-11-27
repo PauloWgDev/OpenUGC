@@ -10,7 +10,7 @@ Registering doesn't log the player in. Call [Login](./login.md) afterwards to ge
 
 ## Endpoint
 
-* **URL:** `POST http://<your-domain>/api/auth/register`
+* **URL:** `POST http://<your-domain>/api/v1/auth/register`
 * **Auth:** not needed (public)
 * **Headers:**
     * `Content-Type: application/json`

@@ -8,7 +8,7 @@ Returns a single user by their ID.
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/users/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/users/{id}`
 - **Headers:**
     - `Authorization: Bearer <token>`
 
@@ -30,7 +30,7 @@ Returns a single user by their ID.
 
 The fields are the same as in [Get Users Page](./get_user_batch.md#user-fields). `profilePicture` and `aboutMe` are left out if the user didn't set them.
 
-To get the content uploaded by this user, use `GET /api/content?creatorId={id}`.
+To get the content uploaded by this user, use `GET /api/v1/content?creatorId={id}`.
 
 ## Response Status
 

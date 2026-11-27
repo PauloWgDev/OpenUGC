@@ -25,7 +25,7 @@ class CorsIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void preflight_toAuthenticatedEndpoint_succeedsWithoutToken() throws Exception {
-        mockMvc.perform(options("/api/content")
+        mockMvc.perform(options("/api/v1/content")
                         .header(HttpHeaders.ORIGIN, ORIGIN)
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "authorization, content-type"))
@@ -38,7 +38,7 @@ class CorsIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void errorResponses_carryCorsHeaders_soTheClientCanReadThem() throws Exception {
-        mockMvc.perform(get("/api/content/thumbnail/999999999")
+        mockMvc.perform(get("/api/v1/content/thumbnail/999999999")
                         .header(HttpHeaders.ORIGIN, ORIGIN))
                 .andExpect(status().isNotFound())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ORIGIN));

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 /**
- * Body of POST /api/auth/register.
+ * Body of POST /api/v1/auth/register.
  * <p>
  * Only these two fields are accepted. Anything else in the request (userId, role, joinedAt, ...)
  * is ignored, so a client can't overwrite an existing account or pick its own role.

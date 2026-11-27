@@ -10,7 +10,7 @@ This endpoint only works if guests are enabled on the server (`GUEST_ENABLED`, `
 
 ## Endpoint
 
-- **URL:** `POST http://<your-domain>/api/auth/guest`
+- **URL:** `POST http://<your-domain>/api/v1/auth/guest`
 - **Auth:** not needed (public)
 - **Body:** none
 

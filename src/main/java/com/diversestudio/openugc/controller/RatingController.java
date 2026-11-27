@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.controller;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import com.diversestudio.openugc.entity.Rating;
 import com.diversestudio.openugc.service.RatingService;
 import com.diversestudio.openugc.util.NativeQueryHelper;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/rating")
+@RequestMapping(ApiPaths.V1 + "/rating")
 public class RatingController
 {
     private final RatingService ratingService;
@@ -26,7 +27,7 @@ public class RatingController
     }
 
     /**
-     * POST /api/rating/{content_id} - Registers a user's rating for the specified content.
+     * POST /api/v1/rating/{content_id} - Registers a user's rating for the specified content.
      * <p>
      * This endpoint extracts the content ID from the URL, accepts a rating value and an optional comment as request parameters,
      * verifies that the content exists, and then registers the rating associated with the currently authenticated user.
@@ -48,7 +49,7 @@ public class RatingController
     }
 
     /**
-     * GET /api/rating/{id} - Retrieves a paginated list of ratings for the specified content.
+     * GET /api/v1/rating/{id} - Retrieves a paginated list of ratings for the specified content.
      * <p>
      * This endpoint allows clients to fetch a page of rating entries associated with a specific content ID.
      * Pagination and sorting parameters can be specified through query parameters.
@@ -80,7 +81,7 @@ public class RatingController
 
 
     /**
-    * GET /api/rating/{id}/distribution - Retrieves the distribution of ratings for the specified content.
+    * GET /api/v1/rating/{id}/distribution - Retrieves the distribution of ratings for the specified content.
     * <p>
     * This endpoint returns a map where the keys represent rating values (typically from 1 to 5),
     * and the values indicate how many users gave each rating. This allows clients to visualize or analyze

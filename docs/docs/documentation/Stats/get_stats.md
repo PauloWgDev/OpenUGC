@@ -8,7 +8,7 @@ Returns the download and rating numbers of a content item.
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/stats/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/stats/{id}`
   - `{id}` is the **content** ID.
 - **Headers:**
   - `Authorization: Bearer <token>`

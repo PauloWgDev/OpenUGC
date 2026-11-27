@@ -138,7 +138,7 @@ public class UserService {
 
     /**
      * Creates a new account. This is the only place users are created from a username and password:
-     * both /api/auth/register (always role USER) and the admin endpoint go through here.
+     * both /api/v1/auth/register (always role USER) and the admin endpoint go through here.
      * <p>
      * The entity is always built on the server, so userId stays null (save() can only INSERT)
      * and role/joinedAt never come from the client.

@@ -10,7 +10,7 @@ Each user has **one rating per content**. If the user rates the same content aga
 
 ## Endpoint
 
-- **URL:** `POST http://<your-domain>/api/rating/{id}`
+- **URL:** `POST http://<your-domain>/api/v1/rating/{id}`
   - `{id}` is the **content** ID.
 - **Headers:**
   - `Authorization: Bearer <token>`
@@ -28,7 +28,7 @@ The rating and the comment are sent as **query parameters** in the URL, not as a
 Example:
 
 ```bash
-curl -X POST "http://<your-domain>/api/rating/10?rating=5&comment=Great%20map" \
+curl -X POST "http://<your-domain>/api/v1/rating/10?rating=5&comment=Great%20map" \
   -H "Authorization: Bearer <token>"
 ```
 

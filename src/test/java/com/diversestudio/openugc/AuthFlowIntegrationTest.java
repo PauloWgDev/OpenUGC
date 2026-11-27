@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Smoke test proving the harness works end to end: a user can register and then log in
  * and receive a JWT. Exercises context boot, the DB insert, BCrypt encoding, role seeding
- * (StartupInitializer), the security permit-list for /api/auth/**, and token issuance.
+ * (StartupInitializer), the security permit-list for /api/v1/auth/**, and token issuance.
  */
 class AuthFlowIntegrationTest extends AbstractIntegrationTest {
 
@@ -28,12 +28,12 @@ class AuthFlowIntegrationTest extends AbstractIntegrationTest {
                 {"username":"harness_user","credential":"s3cret-pass"}
                 """;
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials))
                 .andExpect(status().isOk())

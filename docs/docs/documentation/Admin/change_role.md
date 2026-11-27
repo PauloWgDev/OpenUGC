@@ -8,7 +8,7 @@ Changes the role of a user.
 
 ## Endpoint
 
-- **URL:** `PATCH http://<your-domain>/api/admin/users/{id}/role/{roleName}`
+- **URL:** `PATCH http://<your-domain>/api/v1/admin/users/{id}/role/{roleName}`
   - `{id}` is the user ID.
   - `{roleName}` is the new role: `ADMIN`, `USER` or `GUEST`. **It must be in uppercase**; `admin` returns `400 Bad Request`.
 - **Headers:**
@@ -18,7 +18,7 @@ Changes the role of a user.
 Example, to make user 13 an admin:
 
 ```bash
-curl -X PATCH "http://<your-domain>/api/admin/users/13/role/ADMIN" \
+curl -X PATCH "http://<your-domain>/api/v1/admin/users/13/role/ADMIN" \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -41,7 +41,7 @@ The updated user:
 ## When the New Role Applies
 
 * **Uploading and deleting content** use the role saved in the database, so they follow the new role right away.
-* **Admin endpoints** (`/api/admin/...`) use the role saved in the token. The user keeps their old role there until they log in again or their token expires (up to 24 hours). For example, a user who was just demoted from `ADMIN` can still call the admin endpoints with their current token.
+* **Admin endpoints** (`/api/v1/admin/...`) use the role saved in the token. The user keeps their old role there until they log in again or their token expires (up to 24 hours). For example, a user who was just demoted from `ADMIN` can still call the admin endpoints with their current token.
 
 :::caution
 Nothing stops you from removing the `ADMIN` role from the last admin. If that happens, you'll have to give it back from the database, as explained in [Creating the First Admin](../../tutorial/first-admin.md).

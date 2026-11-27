@@ -10,7 +10,7 @@ Accounts with the `USER` or `ADMIN` role can upload. Guests can only upload if t
 
 ## Endpoint
 
-- **URL:** `POST http://<your-domain>/api/content`
+- **URL:** `POST http://<your-domain>/api/v1/content`
 - **Headers:**
     - `Authorization: Bearer <token>`
     - `Content-Type: multipart/form-data` (most HTTP clients set it for you when you send a form)
@@ -51,7 +51,7 @@ By default the whole request (file + thumbnail + JSON) can be at most **1 MB**. 
 With cURL:
 
 ```bash
-curl -X POST "http://<your-domain>/api/content" \
+curl -X POST "http://<your-domain>/api/v1/content" \
   -H "Authorization: Bearer <token>" \
   -F 'content={"name":"Big Castle","description":"A castle map for 4 players","version":1,"tags":["maps","castle"]};type=application/json' \
   -F "file=@castle.zip" \
@@ -76,7 +76,7 @@ var form = new List<IMultipartFormSection> {
     new MultipartFormFileSection("thumbnail", pngBytes, "castle.png", "image/png")
 };
 
-using var request = UnityWebRequest.Post("http://<your-domain>/api/content", form);
+using var request = UnityWebRequest.Post("http://<your-domain>/api/v1/content", form);
 request.SetRequestHeader("Authorization", "Bearer " + token);
 yield return request.SendWebRequest();
 ```
@@ -90,8 +90,8 @@ The response is the new content, in the same format as [Get Content by ID](./get
   "contentId": 10,
   "creatorId": 4,
   "creatorName": "player5",
-  "data": "http://<your-domain>/api/content/download/10",
-  "thumbnail": "http://<your-domain>/api/content/thumbnail/10",
+  "data": "http://<your-domain>/api/v1/content/download/10",
+  "thumbnail": "http://<your-domain>/api/v1/content/thumbnail/10",
   "name": "Big Castle",
   "description": "A castle map for 4 players",
   "tags": ["castle", "maps"],

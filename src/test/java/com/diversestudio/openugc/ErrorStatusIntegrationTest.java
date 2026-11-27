@@ -54,13 +54,13 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
         }
         username = "errors_" + UUID.randomUUID().toString().substring(0, 8);
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(username, "s3cret-pass")))
                 .andExpect(status().isOk());
 
-        MvcResult login = mockMvc.perform(post("/api/auth/login")
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(username, "s3cret-pass")))
@@ -71,7 +71,7 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void loginWithWrongPassword_isUnauthorized() throws Exception {
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(username, "wrong-pass")))
@@ -81,7 +81,7 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void registerTakenUsername_isConflict() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(username, "another-pass")))
@@ -91,7 +91,7 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void getMissingContent_isNotFound() throws Exception {
-        mockMvc.perform(get("/api/content/{id}", MISSING_CONTENT_ID)
+        mockMvc.perform(get("/api/v1/content/{id}", MISSING_CONTENT_ID)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
@@ -99,7 +99,7 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void downloadMissingContent_isNotFound() throws Exception {
-        mockMvc.perform(get("/api/content/download/{id}", MISSING_CONTENT_ID)
+        mockMvc.perform(get("/api/v1/content/download/{id}", MISSING_CONTENT_ID)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
@@ -107,9 +107,17 @@ class ErrorStatusIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void getStatsOfMissingContent_isNotFound() throws Exception {
-        mockMvc.perform(get("/api/stats/{id}", MISSING_CONTENT_ID)
+        mockMvc.perform(get("/api/v1/stats/{id}", MISSING_CONTENT_ID)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void unversionedPath_isNotFound() throws Exception {
+        // The API only lives under /api/v1; the old unversioned paths must not answer.
+        mockMvc.perform(get("/api/content")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isNotFound());
     }
 }

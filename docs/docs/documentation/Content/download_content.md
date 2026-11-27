@@ -8,11 +8,11 @@ Returns the content file and records the download.
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/content/download/{id}`
+- **URL:** `GET http://<your-domain>/api/v1/content/download/{id}`
 - **Headers:**
   - `Authorization: Bearer <token>`
 
-The `data` field returned by `GET /api/content` and `GET /api/content/{id}` already holds this URL.
+The `data` field returned by `GET /api/v1/content` and `GET /api/v1/content/{id}` already holds this URL.
 
 ## Response
 
@@ -26,7 +26,7 @@ The suggested file name is the content's name plus the extension of the file tha
 Example with cURL, saving the file with the suggested name:
 
 ```bash
-curl -OJ "http://<your-domain>/api/content/download/2" \
+curl -OJ "http://<your-domain>/api/v1/content/download/2" \
   -H "Authorization: Bearer <token>"
 ```
 

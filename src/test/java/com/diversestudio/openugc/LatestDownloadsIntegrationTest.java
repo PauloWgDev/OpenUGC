@@ -56,10 +56,10 @@ class LatestDownloadsIntegrationTest extends AbstractIntegrationTest {
                 {"username":"latest_%s","credential":"s3cret-pass"}
                 """.formatted(marker);
 
-        mockMvc.perform(post("/api/auth/register").with(fromOwnIp())
+        mockMvc.perform(post("/api/v1/auth/register").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk());
-        String login = mockMvc.perform(post("/api/auth/login").with(fromOwnIp())
+        String login = mockMvc.perform(post("/api/v1/auth/login").with(fromOwnIp())
                         .contentType(MediaType.APPLICATION_JSON).content(credentials))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -71,7 +71,7 @@ class LatestDownloadsIntegrationTest extends AbstractIntegrationTest {
         String json = """
                 {"name":"%s","version":1}
                 """.formatted(name);
-        String body = mockMvc.perform(multipart("/api/content")
+        String body = mockMvc.perform(multipart("/api/v1/content")
                         .file(new MockMultipartFile("content", "", MediaType.APPLICATION_JSON_VALUE,
                                 json.getBytes(StandardCharsets.UTF_8)))
                         .file(new MockMultipartFile("file", "level.zip", "application/zip",
@@ -81,7 +81,7 @@ class LatestDownloadsIntegrationTest extends AbstractIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
         long id = ((Number) JsonPath.read(body, "$.contentId")).longValue();
 
-        mockMvc.perform(get("/api/content/download/{id}", id)
+        mockMvc.perform(get("/api/v1/content/download/{id}", id)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk());
         return id;
@@ -91,18 +91,18 @@ class LatestDownloadsIntegrationTest extends AbstractIntegrationTest {
     private void expectCounts(long id, String name, int total, int latest) throws Exception {
         String auth = "Bearer " + token;
 
-        mockMvc.perform(get("/api/content/{id}", id).header(HttpHeaders.AUTHORIZATION, auth))
+        mockMvc.perform(get("/api/v1/content/{id}", id).header(HttpHeaders.AUTHORIZATION, auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.downloadsCount").value(total))
                 .andExpect(jsonPath("$.latestDownloadsCount").value(latest));
 
-        mockMvc.perform(get("/api/content").header(HttpHeaders.AUTHORIZATION, auth).param("prompt", name))
+        mockMvc.perform(get("/api/v1/content").header(HttpHeaders.AUTHORIZATION, auth).param("prompt", name))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].contentId").value(id))
                 .andExpect(jsonPath("$.content[0].downloadsCount").value(total))
                 .andExpect(jsonPath("$.content[0].latestDownloadsCount").value(latest));
 
-        mockMvc.perform(get("/api/stats/{id}", id).header(HttpHeaders.AUTHORIZATION, auth))
+        mockMvc.perform(get("/api/v1/stats/{id}", id).header(HttpHeaders.AUTHORIZATION, auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.downloadsCount").value(total))
                 .andExpect(jsonPath("$.latestDownloadsCount").value(latest));

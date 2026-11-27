@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserDTO(
         Long userId,
-        // Also the body of PATCH /api/users, where null means "leave unchanged".
+        // Also the body of PATCH /api/v1/users, where null means "leave unchanged".
         // @Pattern rejects a username made only of whitespace; null still passes.
         @Size(min = UserLimits.USERNAME_MIN, max = UserLimits.USERNAME_MAX)
         @Pattern(regexp = ".*\\S.*", message = "must not be blank") String username,

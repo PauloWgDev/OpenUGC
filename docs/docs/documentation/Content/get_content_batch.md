@@ -10,7 +10,7 @@ Content that was [soft deleted](./delete_content.md) doesn't appear in this list
 
 ## Endpoint
 
-- **URL:** `GET http://<your-domain>/api/content`
+- **URL:** `GET http://<your-domain>/api/v1/content`
 - **Headers:**
   - `Authorization: Bearer <token>`
 - **Query Parameters (all optional):**
@@ -27,7 +27,7 @@ Content that was [soft deleted](./delete_content.md) doesn't appear in this list
 You can combine the filters. For example, the newest maps from user 5 with "castle" in the name:
 
 ```
-GET /api/content?prompt=castle&tags=maps&creatorId=5&sort=createdAt,desc
+GET /api/v1/content?prompt=castle&tags=maps&creatorId=5&sort=createdAt,desc
 ```
 
 ### Sort fields
@@ -53,8 +53,8 @@ Any other field returns `400 Bad Request`. See [Sorting](../api-basics.md#sortin
       "contentId": 2,
       "creatorId": 1,
       "creatorName": "Alice",
-      "data": "http://<your-domain>/api/content/download/2",
-      "thumbnail": "http://<your-domain>/api/content/thumbnail/2",
+      "data": "http://<your-domain>/api/v1/content/download/2",
+      "thumbnail": "http://<your-domain>/api/v1/content/thumbnail/2",
       "name": "Big Castle",
       "description": "A castle map for 4 players",
       "tags": ["castle", "maps"],
@@ -69,7 +69,7 @@ Any other field returns `400 Bad Request`. See [Sorting](../api-basics.md#sortin
       "contentId": 1,
       "creatorId": 1,
       "creatorName": "Alice",
-      "data": "http://<your-domain>/api/content/download/1",
+      "data": "http://<your-domain>/api/v1/content/download/1",
       "thumbnail": null,
       "name": "Desert Track",
       "description": "My first track",

@@ -1,5 +1,6 @@
 package com.diversestudio.openugc.controller;
 
+import com.diversestudio.openugc.config.ApiPaths;
 import jakarta.validation.Valid;
 
 import com.diversestudio.openugc.dto.CreateUserRequestDTO;
@@ -10,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/admin")
+@RequestMapping(ApiPaths.V1 + "/admin")
 public class AdminController {
     private  final UserService userService;
 
@@ -20,7 +21,7 @@ public class AdminController {
     }
 
     /**
-     * GET /api/admin/{id} - Retrieves any user by their ID. ADMIN only (enforced in SecurityConfig for /api/admin/**).
+     * GET /api/v1/admin/{id} - Retrieves any user by their ID. ADMIN only (enforced in SecurityConfig for /api/v1/admin/**).
      *
      * @param id the ID of the user to retrieve
      * @return HTTP 200 with the {@link UserDTO}
@@ -34,9 +35,9 @@ public class AdminController {
     }
 
     /**
-     * POST /api/admin/users - Creates a user account. ADMIN only (enforced in SecurityConfig for /api/admin/**).
+     * POST /api/v1/admin/users - Creates a user account. ADMIN only (enforced in SecurityConfig for /api/v1/admin/**).
      * <p>
-     * Unlike /api/auth/register, the admin can choose the role. Omitting "role" creates a USER.
+     * Unlike /api/v1/auth/register, the admin can choose the role. Omitting "role" creates a USER.
      *
      * @return HTTP 201 with the created {@link UserDTO}; 400 for missing fields or an unknown role
      */
@@ -48,7 +49,7 @@ public class AdminController {
     }
 
     /**
-     * PATCH /api/admin/users/{id}/role/{roleName} - Changes a user's role. ADMIN only (enforced in SecurityConfig for /api/admin/**).
+     * PATCH /api/v1/admin/users/{id}/role/{roleName} - Changes a user's role. ADMIN only (enforced in SecurityConfig for /api/v1/admin/**).
      * <p>
      * The new role applies to permission checks that read the role from the database right away.
      * Tokens the user already holds keep their old role until they expire (up to 1 day).
