@@ -2,6 +2,7 @@ package com.diversestudio.openugc.service;
 
 import com.diversestudio.openugc.dto.ContentDTO;
 import com.diversestudio.openugc.entity.Rating;
+import com.diversestudio.openugc.entity.RatingId;
 import com.diversestudio.openugc.exception.InvalidRequestException;
 import com.diversestudio.openugc.exception.ResourceNotFoundException;
 import com.diversestudio.openugc.repository.RatingRepository;
@@ -10,10 +11,15 @@ import com.diversestudio.openugc.util.NativeQueryHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +29,13 @@ import java.util.Optional;
 public class RatingService {
     public static final int MIN_RATING = 1;
     public static final int MAX_RATING = 5;
+
+    /** Accepted {@code sort} fields for the ratings list, mapped to their columns. */
+    private static final Map<String, String> RATING_SORT = Map.of(
+            "createdAt", "r.created_at",
+            "updatedAt", "r.updated_at",
+            "rating",    "r.rating"
+    );
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -66,18 +79,42 @@ public class RatingService {
 
         Long currentUserId = AuthHelper.getCurrentUserId();
 
-        // Create and populate the new Rating entity.
-        Rating newRating = new Rating();
-        newRating.setContentId(contentId);
-        newRating.setUserId(currentUserId);
-        newRating.setRating(ratingValue);
-        newRating.setComment(comment);
+        Timestamp now = Timestamp.from(Instant.now().truncatedTo(ChronoUnit.MILLIS));
 
-        // Save and return the new rating.
-        return ratingRepository.save(newRating);
+        Rating rating = ratingRepository.findById(new RatingId(currentUserId, contentId))
+                .orElseGet(() -> {
+                    Rating created = new Rating();
+                    created.setUserId(currentUserId);
+                    created.setContentId(contentId);
+                    return created;
+                });
+        if (rating.getCreatedAt() == null) {
+            rating.setCreatedAt(now);
+        }
+        rating.setRating(ratingValue);
+        rating.setComment(comment);
+        rating.setUpdatedAt(now);
+
+        return ratingRepository.save(rating);
     }
 
-    //TODO: implement the sorting
+    /**
+     * Builds the ORDER BY of the ratings list from the requested sort. Fields are checked
+     * against {@link #RATING_SORT} (400 otherwise). Ratings saved before ratings had dates
+     * have null dates, so they go last. {@code user_id} is added as a tie-breaker, so the
+     * order is the same on every request and pages never repeat or skip a rating.
+     */
+    private String ratingOrderBy(Sort sort) {
+        List<String> order = new ArrayList<>();
+        if (sort.isSorted()) {
+            sort.forEach(o -> order.add(nativeQueryHelper.resolveSortColumn(RATING_SORT, o.getProperty())
+                    + " " + o.getDirection() + " NULLS LAST"));
+        } else {
+            order.add("r.created_at DESC NULLS LAST");
+        }
+        order.add("r.user_id ASC");
+        return " ORDER BY " + String.join(", ", order);
+    }
 
     // rating default value could be -1, and when rating is -1 it will not filter by rating value
     // if rating has a valid value (1 to 5) it will filter and only show ratings with that value.
@@ -89,6 +126,7 @@ public class RatingService {
             sqlBuilder.append(" AND r.rating = :ratingFilter");
         }
 
+        sqlBuilder.append(ratingOrderBy(pageable.getSort()));
         sqlBuilder.append(" LIMIT :limit OFFSET :offset");
 
         var query = entityManager.createNativeQuery(sqlBuilder.toString(), Rating.class);

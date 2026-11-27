@@ -113,11 +113,12 @@ To know if you're on the last page, check `page.number + 1 >= page.totalPages`. 
 
 ## Sorting
 
-The content and user lists accept a `sort` parameter in the format `field,direction`:
+The content, user and rating lists accept a `sort` parameter in the format `field,direction`:
 
 ```
 GET /api/v1/content?sort=avgRating,desc
 GET /api/v1/users?sort=username,asc
+GET /api/v1/rating/10?sort=createdAt,desc
 ```
 
 - `direction` is `asc` (lowest first) or `desc` (highest first). If you leave it out, it's `asc`.

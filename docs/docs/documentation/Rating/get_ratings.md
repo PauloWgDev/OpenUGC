@@ -17,6 +17,7 @@ Returns a page of the ratings that a content item received.
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `rating` | `-1` | Only return ratings with this value (`1` to `5`). Any other value, like the default `-1`, returns all ratings |
+| `sort` | `createdAt,desc` | Order of the ratings, as `field,direction` (see below) |
 | `page` | `0` | Page number, starting at 0 |
 | `size` | `10` | Number of ratings per page |
 
@@ -26,9 +27,23 @@ For example, to show only the 5-star reviews:
 GET /api/v1/rating/10?rating=5
 ```
 
-:::note
-This endpoint also accepts a `sort` parameter, but it has no effect yet: ratings come in no particular order. Ratings don't have a date either.
-:::
+### Sorting
+
+By default the newest ratings come first. The `sort` parameter accepts these fields, with `asc` or `desc` (see [Sorting](../api-basics.md#sorting)):
+
+| Field | Sorts by |
+|-------|----------|
+| `createdAt` | When the user first rated the content |
+| `updatedAt` | When the user last changed their rating or comment |
+| `rating` | The rating value |
+
+For example, the lowest ratings first:
+
+```
+GET /api/v1/rating/10?sort=rating,asc
+```
+
+Ratings with the same value come in the same order on every request, so pages never repeat or skip a rating.
 
 ## Response Example
 
@@ -39,13 +54,17 @@ This endpoint also accepts a `sort` parameter, but it has no effect yet: ratings
       "userId": 4,
       "contentId": 10,
       "rating": 5.0,
-      "comment": "Great map"
+      "comment": "Great map",
+      "createdAt": "2026-03-12T18:20:05.512+00:00",
+      "updatedAt": "2026-03-14T09:02:41.003+00:00"
     },
     {
       "userId": 7,
       "contentId": 10,
       "rating": 3.0,
-      "comment": null
+      "comment": null,
+      "createdAt": "2026-03-11T22:47:13.880+00:00",
+      "updatedAt": "2026-03-11T22:47:13.880+00:00"
     }
   ],
   "page": {
@@ -57,6 +76,8 @@ This endpoint also accepts a `sort` parameter, but it has no effect yet: ratings
 }
 ```
 
+`createdAt` is when the user first rated the content, and `updatedAt` is when they last changed it. They're the same until the user rates again. Ratings saved by a server older than 0.0.1 have `null` dates, and come last when sorting by a date.
+
 Each rating has the `userId` of the user who wrote it, not the username. To show the username, get it with [Get User by ID](../User/get_user_single.md).
 
 The page fields are explained in [Pagination](../api-basics.md#pagination).
@@ -64,5 +85,5 @@ The page fields are explained in [Pagination](../api-basics.md#pagination).
 ## Response Status
 
 * `200 OK` – Returns a page of ratings. If the content has no ratings, or doesn't exist, `content` is an empty list
-* `400 Bad Request` – A parameter has the wrong type (e.g. `rating=abc`)
+* `400 Bad Request` – A parameter has the wrong type (e.g. `rating=abc`), or `sort` uses a field that isn't in the list above
 * `403 Forbidden` – Invalid or missing token

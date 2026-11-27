@@ -60,7 +60,8 @@ public class RatingController
      * @param page    the page number to retrieve (0-based index). Defaults to 0 if not specified.
      * @param size    the number of items per page. Defaults to 10 if not specified.
      * @param sort    the sorting criteria, in the format "field,direction" (e.g., "createdAt,desc").
-     *                Defaults to "createdAt,desc".
+     *                Fields: createdAt, updatedAt, rating; anything else returns 400. Defaults to
+     *                "createdAt,desc" (newest first).
      * @param rating  an optional rating filter; if set to a value from 1 to 5, only ratings with that score will be returned.
      *                Use -1 to fetch all ratings. Defaults to -1.
      * @return a {@link ResponseEntity} containing a {@link PagedModel} of {@link Rating} entities matching the criteria.

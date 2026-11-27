@@ -195,7 +195,7 @@ All endpoints except `/api/v1/auth/**` and the Swagger docs require an `Authoriz
 | Method | Endpoint                          | Description                                                        |
 |--------|-----------------------------------|--------------------------------------------------------------------|
 | POST   | `/api/v1/rating/{contentId}`         | Rate content. Query params: `rating` (1-5), optional `comment`.    |
-| GET    | `/api/v1/rating/{contentId}`         | Paginated ratings; filter by a single value with `rating`.         |
+| GET    | `/api/v1/rating/{contentId}`         | Paginated ratings, newest first; filter with `rating`, `sort` by `createdAt`, `updatedAt` or `rating`. |
 | GET    | `/api/v1/rating/{contentId}/distribution` | Count of ratings per value                                    |
 | GET    | `/api/v1/stats/{contentId}`          | Downloads (total and last 7 days), rating count and average        |
 
