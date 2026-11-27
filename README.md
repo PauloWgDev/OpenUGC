@@ -229,7 +229,7 @@ src/main/java/com/diversestudio/openugc/
 ├── storage/       Local and Google Cloud Storage implementations
 ├── config/        Security, startup role seeding, guest settings
 └── util/          Database-specific native queries
-docs/              Docusaurus documentation site and Postman collection
+docs/              Docusaurus documentation site 
 ```
 
 ## Documentation
