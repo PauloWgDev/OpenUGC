@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,10 +62,10 @@ public class RatingController
      *                Defaults to "createdAt,desc".
      * @param rating  an optional rating filter; if set to a value from 1 to 5, only ratings with that score will be returned.
      *                Use -1 to fetch all ratings. Defaults to -1.
-     * @return a {@link ResponseEntity} containing a {@link Page} of {@link Rating} entities matching the criteria.
+     * @return a {@link ResponseEntity} containing a {@link PagedModel} of {@link Rating} entities matching the criteria.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Page<Rating>> getRatingPage(@PathVariable Long id,
+    public ResponseEntity<PagedModel<Rating>> getRatingPage(@PathVariable Long id,
                                                       @RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "10") int size,
                                                       @RequestParam(defaultValue = "createdAt,desc") String sort,
@@ -73,7 +74,7 @@ public class RatingController
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
         Page<Rating> ratingPage = ratingService.getRatingPage(id, rating, pageable);
-        return ResponseEntity.ok(ratingPage);
+        return ResponseEntity.ok(new PagedModel<>(ratingPage));
     }
 
 

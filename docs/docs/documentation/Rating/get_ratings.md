@@ -48,13 +48,12 @@ This endpoint also accepts a `sort` parameter, but it has no effect yet: ratings
       "comment": null
     }
   ],
-  "totalElements": 2,
-  "totalPages": 1,
-  "number": 0,
-  "size": 10,
-  "first": true,
-  "last": true,
-  ...
+  "page": {
+    "size": 10,
+    "number": 0,
+    "totalElements": 2,
+    "totalPages": 1
+  }
 }
 ```
 

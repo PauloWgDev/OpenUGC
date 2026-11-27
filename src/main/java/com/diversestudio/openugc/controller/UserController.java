@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class UserController {
      * @return a {@link ResponseEntity} containing a page of {@link UserDTO} objects
      */
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> getUserPage(
+    public ResponseEntity<PagedModel<UserDTO>> getUserPage(
             @RequestParam(defaultValue = "") String prompt,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -51,7 +52,7 @@ public class UserController {
         Sort sortOrder = nativeQueryHelper.StringToSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortOrder);
         Page<UserDTO> userPage = userService.getUserPage(prompt, pageable);
-        return ResponseEntity.ok(userPage);
+        return ResponseEntity.ok(new PagedModel<>(userPage));
     }
 
 
